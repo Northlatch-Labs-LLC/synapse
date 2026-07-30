@@ -133,6 +133,13 @@ FRP_SHARED_TOKEN_VALUE="$(read_env_value FRP_SHARED_TOKEN)"
 if [ -z "$FRP_SHARED_TOKEN_VALUE" ]; then
   FRP_SHARED_TOKEN_VALUE="$(openssl rand -hex 32)"
 fi
+# SearXNG signing secret (web-search sidecar: Flask secret + image-proxy HMAC).
+# Reuse an existing value across re-runs; the compose fallback default is
+# internal-network-only, a generated per-install value is always preferred.
+SEARXNG_SECRET_VALUE="$(read_env_value SEARXNG_SECRET)"
+if [ -z "$SEARXNG_SECRET_VALUE" ]; then
+  SEARXNG_SECRET_VALUE="$(openssl rand -hex 32)"
+fi
 
 upsert_env_var() {
   local file="$1"
@@ -348,6 +355,7 @@ upsert_env_var "$ENV_FILE" SYNAPSE_WWW_DOMAIN "$WWW_DOMAIN"
 # Sandbox secrets — added to existing .env files too (don't rotate if present).
 upsert_env_var "$ENV_FILE" SYNAPSE_DEVICE_ENVELOPE_SIGNING_KEY "$SANDBOX_SIGNING_KEY"
 upsert_env_var "$ENV_FILE" FRP_SHARED_TOKEN "$FRP_SHARED_TOKEN_VALUE"
+upsert_env_var "$ENV_FILE" SEARXNG_SECRET "$SEARXNG_SECRET_VALUE"
 upsert_env_var "$ENV_FILE" SYNAPSE_MOBILE_SHORT_DOMAIN "$MOBILE_SHORT_DOMAIN"
 upsert_env_var "$ENV_FILE" SYNAPSE_MOBILE_DOMAIN "$MOBILE_DOMAIN"
 upsert_env_var "$ENV_FILE" SYNAPSE_REGISTRY_DOMAIN "$REGISTRY_DOMAIN"

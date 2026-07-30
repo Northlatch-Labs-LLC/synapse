@@ -15,6 +15,7 @@ import {
   isPlanDraftingCollaborationMode,
 } from "@synapse/shared/utils"
 import { sortAvailableSkillsForDiscovery } from "../skills/discovery-order.js"
+import { resolveWebSearchProvider } from "../web-search/index.js"
 import { buildReplyToRefUsageGuidance } from "./session-tool-guidance.js"
 
 // camelCase structural subset of the producer ChatParticipantRow (chat/repo.ts).
@@ -429,6 +430,11 @@ export function buildActorPrompt(
       `- \`sleep\`: When you have finished your work, call sleep. You will be automatically woken when someone sends you a message`,
       `- \`memory_search\`: Search durable memories when recalled context is insufficient`,
       `- \`create_memory\`: Save a durable established fact for future reference`,
+      ...(resolveWebSearchProvider().isConfigured()
+        ? [
+            `- \`search_web\`: Search the public web for current events or external information beyond your training data`,
+          ]
+        : []),
       ...(availableSkills && availableSkills.length > 0
         ? [
             "- `read_skill`: Load an available skill package on demand when a listed skill clearly applies",

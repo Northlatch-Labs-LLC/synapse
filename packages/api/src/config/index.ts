@@ -263,6 +263,88 @@ const envObjectSchema = z.object({
   DOCEXTRACT_ASYNC_POLL_INTERVAL_MS: withDefault(positiveInt, "5000"),
   DOCEXTRACT_ASYNC_DEADLINE_MS: withDefault(positiveInt, "600000"),
 
+  // ===== Web search (query → ranked public-web results) =====
+  // The api bundles NO search engine (the 6th sibling of the OCR / transcription /
+  // realtime-ASR / embedding / document-extraction provider abstractions).
+  // WEB_SEARCH_PROVIDER selects an out-of-process provider: the self-hosted
+  // SearXNG sidecar, or a cloud vendor (zhipu / bocha / langsearch / tavily /
+  // serper). Default resolves to "none" => the search_web actor tool is HIDDEN
+  // (not failing). The compose production profile sets this to "searxng" and
+  // starts the searxng sidecar.
+  WEB_SEARCH_PROVIDER: z.string().optional(),
+  // searxng provider → stock SearXNG sidecar (native JSON API, no auth —
+  // compose-network isolation). URL required when provider=searxng (superRefine).
+  // The adapter timeout MUST exceed SearXNG's own outgoing.max_request_timeout
+  // (settings.yml caps it at 10s) so the api receives SearXNG's partial results
+  // instead of aborting simultaneously.
+  WEBSEARCH_SEARXNG_URL: withDefault(z.string(), ""),
+  WEBSEARCH_SEARXNG_TIMEOUT_MS: withDefault(positiveInt, "20000"),
+  // Optional per-deployment result language (e.g. zh-CN, en-US); empty = SearXNG default.
+  WEBSEARCH_SEARXNG_LANGUAGE: withDefault(z.string(), ""),
+  // Optional CSV of SearXNG engine ids (e.g. "baidu,sogou,quark" for mainland
+  // deployments). Explicit engines= selection bypasses the `disabled` flag in
+  // settings.yml, so no settings edit is needed. When set, the adapter omits
+  // categories=general (SearXNG would otherwise APPEND the category's engines on
+  // top of the explicit list, defeating the narrowing).
+  WEBSEARCH_SEARXNG_ENGINES: withDefault(z.string(), ""),
+  WEBSEARCH_SEARXNG_SAFESEARCH: withDefault(z.enum(["0", "1", "2"]), "0"),
+  // zhipu provider → BigModel web_search API (Bearer). BASE_URL is swappable to
+  // the z.ai international mirror. Engine variants: search_std (default) /
+  // search_pro / search_pro_sogou (count in 10-steps) / search_pro_quark (no count).
+  WEBSEARCH_ZHIPU_API_KEY: withDefault(z.string(), ""),
+  WEBSEARCH_ZHIPU_BASE_URL: withDefault(
+    z.string(),
+    "https://open.bigmodel.cn/api/paas/v4"
+  ),
+  WEBSEARCH_ZHIPU_SEARCH_ENGINE: withDefault(
+    z.enum([
+      "search_std",
+      "search_pro",
+      "search_pro_sogou",
+      "search_pro_quark",
+    ]),
+    "search_std"
+  ),
+  WEBSEARCH_ZHIPU_TIMEOUT_MS: withDefault(positiveInt, "30000"),
+  // bocha / langsearch providers → one Bing-SearchResponse-compatible adapter
+  // family (POST /v1/web-search, Bearer; near-identical wire shapes).
+  WEBSEARCH_BOCHA_API_KEY: withDefault(z.string(), ""),
+  WEBSEARCH_BOCHA_BASE_URL: withDefault(z.string(), "https://api.bochaai.com"),
+  WEBSEARCH_BOCHA_TIMEOUT_MS: withDefault(positiveInt, "30000"),
+  WEBSEARCH_LANGSEARCH_API_KEY: withDefault(z.string(), ""),
+  WEBSEARCH_LANGSEARCH_BASE_URL: withDefault(
+    z.string(),
+    "https://api.langsearch.com"
+  ),
+  WEBSEARCH_LANGSEARCH_TIMEOUT_MS: withDefault(positiveInt, "30000"),
+  // tavily provider → api.tavily.com (Bearer). Depth typo must fail at boot,
+  // not as per-request 400s, hence the enum.
+  WEBSEARCH_TAVILY_API_KEY: withDefault(z.string(), ""),
+  WEBSEARCH_TAVILY_BASE_URL: withDefault(z.string(), "https://api.tavily.com"),
+  WEBSEARCH_TAVILY_SEARCH_DEPTH: withDefault(
+    z.enum(["basic", "advanced", "fast", "ultra-fast"]),
+    "basic"
+  ),
+  WEBSEARCH_TAVILY_TIMEOUT_MS: withDefault(positiveInt, "30000"),
+  // serper provider → google.serper.dev (X-API-KEY). gl/hl are optional Google
+  // locale hints (e.g. gl=cn, hl=zh-cn). Note: num>10 bills 2 credits per call.
+  WEBSEARCH_SERPER_API_KEY: withDefault(z.string(), ""),
+  WEBSEARCH_SERPER_BASE_URL: withDefault(
+    z.string(),
+    "https://google.serper.dev"
+  ),
+  WEBSEARCH_SERPER_GL: withDefault(z.string(), ""),
+  WEBSEARCH_SERPER_HL: withDefault(z.string(), ""),
+  WEBSEARCH_SERPER_TIMEOUT_MS: withDefault(positiveInt, "30000"),
+  // Optional egress proxy for the CLOUD web-search adapters only (never the
+  // searxng sidecar). Falls back to the generic HTTPS_PROXY/HTTP_PROXY chain
+  // (same chain as ai/providers/proxy-fetch.ts) when unset.
+  WEBSEARCH_HTTPS_PROXY: withDefault(z.string(), ""),
+  HTTPS_PROXY: z.string().optional(),
+  https_proxy: z.string().optional(),
+  HTTP_PROXY: z.string().optional(),
+  http_proxy: z.string().optional(),
+
   PLATFORM_ADMIN_EMAILS: withDefault(z.string(), ""),
 
   // ===== Better Auth =====
@@ -575,6 +657,40 @@ export const envSchema = envObjectSchema.superRefine((env, ctx) => {
       })
     }
   }
+  // A selected web-search provider must have its sidecar URL / vendor API key,
+  // or the api would boot "configured" (search_web tool visible) but every
+  // search would fail at request time. ("none" is a valid opt-out that only
+  // hides the tool, so it is not gated here.)
+  const webSearchProvider = resolveWebSearchProviderName(env)
+  if (webSearchProvider === "searxng" && !env.WEBSEARCH_SEARXNG_URL?.trim()) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["WEBSEARCH_SEARXNG_URL"],
+      message:
+        "WEBSEARCH_SEARXNG_URL is required when WEB_SEARCH_PROVIDER=searxng (the api runs no in-process search engine)",
+    })
+  }
+  const webSearchKeyGates: ReadonlyArray<[string, string | undefined, string]> =
+    [
+      ["zhipu", env.WEBSEARCH_ZHIPU_API_KEY, "WEBSEARCH_ZHIPU_API_KEY"],
+      ["bocha", env.WEBSEARCH_BOCHA_API_KEY, "WEBSEARCH_BOCHA_API_KEY"],
+      [
+        "langsearch",
+        env.WEBSEARCH_LANGSEARCH_API_KEY,
+        "WEBSEARCH_LANGSEARCH_API_KEY",
+      ],
+      ["tavily", env.WEBSEARCH_TAVILY_API_KEY, "WEBSEARCH_TAVILY_API_KEY"],
+      ["serper", env.WEBSEARCH_SERPER_API_KEY, "WEBSEARCH_SERPER_API_KEY"],
+    ]
+  for (const [providerName, key, varName] of webSearchKeyGates) {
+    if (webSearchProvider === providerName && !key?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        path: [varName],
+        message: `${varName} is required when WEB_SEARCH_PROVIDER=${providerName}`,
+      })
+    }
+  }
   // Sandbox: a docker provider is only reachable over the frp tunnel and needs
   // its full run env at boot — move the old dockerSandboxOptionsFromEnv
   // fail-fast here so a misconfiguration is caught at STARTUP, not on the first
@@ -692,6 +808,15 @@ function resolveDocumentExtractionProviderName(env: {
   DOCUMENT_EXTRACTION_PROVIDER?: string
 }): string {
   return firstNonEmpty([env.DOCUMENT_EXTRACTION_PROVIDER]) ?? "none"
+}
+
+/** Resolve the active web-search provider name: WEB_SEARCH_PROVIDER, else "none"
+ *  (opt-in, like OCR/embedding/document-extraction — no deprecated alias exists).
+ *  Centralized so the superRefine gate and the config assembly can't diverge. */
+function resolveWebSearchProviderName(env: {
+  WEB_SEARCH_PROVIDER?: string
+}): string {
+  return firstNonEmpty([env.WEB_SEARCH_PROVIDER]) ?? "none"
 }
 
 /** Resolve the active sandbox provider (runtime substrate) name: SANDBOX_PROVIDER,
@@ -990,6 +1115,63 @@ export const config = {
     async: {
       pollIntervalMs: env.DOCEXTRACT_ASYNC_POLL_INTERVAL_MS,
       deadlineMs: env.DOCEXTRACT_ASYNC_DEADLINE_MS,
+    },
+  },
+  // Web search (query → ranked public-web results). The api bundles NO search
+  // engine (env-only provider selection). Consumed by the search_web actor tool.
+  // See modules/web-search/ + .docs/web-search-abstraction-layer-plan-2026-07-29.md.
+  webSearch: {
+    provider: resolveWebSearchProviderName(env),
+    // Egress proxy for CLOUD adapters only (never the searxng sidecar). Chain
+    // mirrors ai/providers/proxy-fetch.ts so a deployment-wide HTTPS_PROXY also
+    // covers web-search vendor egress unless WEBSEARCH_HTTPS_PROXY overrides it.
+    proxyUrl:
+      firstNonEmpty([
+        env.WEBSEARCH_HTTPS_PROXY,
+        env.HTTPS_PROXY,
+        env.https_proxy,
+        env.HTTP_PROXY,
+        env.http_proxy,
+      ]) ?? "",
+    searxng: {
+      // Trimmed so a whitespace-only value is the empty string the adapter's
+      // isConfigured()/`if (!url)` guard treats as unconfigured (the boot gate
+      // rejects it for an explicit searxng selection).
+      url: env.WEBSEARCH_SEARXNG_URL.trim(),
+      timeoutMs: env.WEBSEARCH_SEARXNG_TIMEOUT_MS,
+      language: env.WEBSEARCH_SEARXNG_LANGUAGE.trim(),
+      // Normalized CSV (spaces stripped); empty = default general category.
+      engines: splitList(env.WEBSEARCH_SEARXNG_ENGINES).join(","),
+      safesearch: env.WEBSEARCH_SEARXNG_SAFESEARCH,
+    },
+    zhipu: {
+      apiKey: env.WEBSEARCH_ZHIPU_API_KEY.trim(),
+      baseUrl: env.WEBSEARCH_ZHIPU_BASE_URL.trim(),
+      searchEngine: env.WEBSEARCH_ZHIPU_SEARCH_ENGINE,
+      timeoutMs: env.WEBSEARCH_ZHIPU_TIMEOUT_MS,
+    },
+    bocha: {
+      apiKey: env.WEBSEARCH_BOCHA_API_KEY.trim(),
+      baseUrl: env.WEBSEARCH_BOCHA_BASE_URL.trim(),
+      timeoutMs: env.WEBSEARCH_BOCHA_TIMEOUT_MS,
+    },
+    langsearch: {
+      apiKey: env.WEBSEARCH_LANGSEARCH_API_KEY.trim(),
+      baseUrl: env.WEBSEARCH_LANGSEARCH_BASE_URL.trim(),
+      timeoutMs: env.WEBSEARCH_LANGSEARCH_TIMEOUT_MS,
+    },
+    tavily: {
+      apiKey: env.WEBSEARCH_TAVILY_API_KEY.trim(),
+      baseUrl: env.WEBSEARCH_TAVILY_BASE_URL.trim(),
+      searchDepth: env.WEBSEARCH_TAVILY_SEARCH_DEPTH,
+      timeoutMs: env.WEBSEARCH_TAVILY_TIMEOUT_MS,
+    },
+    serper: {
+      apiKey: env.WEBSEARCH_SERPER_API_KEY.trim(),
+      baseUrl: env.WEBSEARCH_SERPER_BASE_URL.trim(),
+      gl: env.WEBSEARCH_SERPER_GL.trim(),
+      hl: env.WEBSEARCH_SERPER_HL.trim(),
+      timeoutMs: env.WEBSEARCH_SERPER_TIMEOUT_MS,
     },
   },
   platform: {

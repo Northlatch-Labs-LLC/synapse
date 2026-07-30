@@ -97,6 +97,7 @@ import {
 import { registerActorStateCallableToolPlugins } from "./modules/ai/tools.js"
 import { registerActorFileToolPlugins } from "./modules/ai/file-tools.js"
 import { registerCallableToolPlugins } from "./modules/ai/session-tools.js"
+import { registerWebSearchToolPlugins } from "./modules/ai/web-search-tools.js"
 import { startSessionThinkingWorker } from "./workers/session-thinking.js"
 import {
   ensureAutomationSchedulerJob,
@@ -558,6 +559,7 @@ async function main() {
   registerActorStateCallableToolPlugins()
   registerCallableToolPlugins()
   registerActorFileToolPlugins()
+  registerWebSearchToolPlugins()
   await ensureAutomationSchedulerJob()
   startAutomationSchedulerWorker()
   startAutomationExecutionWorker()

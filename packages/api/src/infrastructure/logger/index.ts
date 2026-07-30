@@ -66,6 +66,7 @@ export const LOG_DOMAINS = [
   "skills",
   "tasks",
   "transcription",
+  "websearch",
   "workspace",
   "infra",
 ] as const
@@ -191,6 +192,16 @@ const SCOPE_TO_DOMAIN: Readonly<Record<string, DomainScope>> = {
   "transcription.registry": { domain: "transcription", component: "registry" },
   "transcription.sherpa": { domain: "transcription", component: "sherpa" },
   "transcription.whisper": { domain: "transcription", component: "whisper" },
+  "websearch.facade": { domain: "websearch", component: "facade" },
+  "websearch.registry": { domain: "websearch", component: "registry" },
+  "websearch.searxng": { domain: "websearch", component: "searxng" },
+  "websearch.zhipu": { domain: "websearch", component: "zhipu" },
+  "websearch.bing-compatible": {
+    domain: "websearch",
+    component: "bing-compatible",
+  },
+  "websearch.tavily": { domain: "websearch", component: "tavily" },
+  "websearch.serper": { domain: "websearch", component: "serper" },
   "worker.job-tracing": { domain: "infra", component: "worker.job-tracing" },
   workspace: { domain: "workspace" },
 }

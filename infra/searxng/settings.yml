@@ -1,0 +1,36 @@
+# SearXNG settings for the Synapse web-search sidecar (compose service
+# `searxng`, internal port 8777). Merged over the upstream defaults
+# (use_default_settings: true) — only the deltas live here.
+#
+# - search.formats gains `json`: the api's searxng adapter calls
+#   GET /search?format=json, which is HTTP 403 unless enabled.
+# - server.limiter stays false (the upstream default, kept explicit as
+#   documentation): the limiter exists to block bot callers, and the api IS
+#   the bot. Safe because the service is internal-only (compose `expose`, no
+#   host port). With the limiter off, no valkey/redis service is needed.
+# - outgoing.max_request_timeout globally caps any engine's per-engine timeout
+#   so a slow upstream (360search ships timeout: 20s) can never stall the
+#   response past the api adapter's abort. Invariant:
+#   WEBSEARCH_SEARXNG_TIMEOUT_MS (default 20000) > this value.
+# - Engines are deliberately UNTOUCHED: the upstream default general mix stays
+#   enabled, and the CJK engines (baidu / sogou / quark / 360search / bilibili)
+#   stay disabled:true. An explicit WEBSEARCH_SEARXNG_ENGINES selection
+#   bypasses the disabled flag upstream, so mainland deployments narrow via
+#   env instead of editing this file. (bilibili is category `videos` and only
+#   participates via that explicit list anyway.)
+#
+# The secret key comes from the SEARXNG_SECRET env var (server.secret_key —
+# setup.sh generates a per-install value). The listen port comes from the
+# SEARXNG_PORT env var (granian ignores settings.yml server.port).
+use_default_settings: true
+
+server:
+  limiter: false
+
+search:
+  formats:
+    - html
+    - json
+
+outgoing:
+  max_request_timeout: 10.0

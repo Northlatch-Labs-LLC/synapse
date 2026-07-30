@@ -84,6 +84,12 @@ export const SYSTEM_TOOL_PRESENTATION: Record<
     }),
     "search"
   ),
+  search_web: withIcon(
+    title("tool.sys.search_web.title", "搜索网页 {query}", {
+      query: { path: "query", preprocess: "truncate60", default: "" },
+    }),
+    "globe"
+  ),
   create_memory: withIcon(
     title("tool.sys.create_memory.title", "记录记忆"),
     "brain"

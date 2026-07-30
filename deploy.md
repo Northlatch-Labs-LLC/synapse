@@ -98,6 +98,23 @@ OCR is **not** baked into the API image — it runs out-of-process. The
 default); the optional `ppocr` profile adds a PP-OCRv6 sidecar. Select the
 provider with `OCR_PROVIDER` (see the OCR block in `.env.example`).
 
+Web search is likewise **not** baked into the API image. The `production`
+profile includes a `searxng` sidecar (the stock upstream SearXNG image with a
+mounted `infra/searxng/settings.yml`), which backs the `search_web` actor tool
+by default (`WEB_SEARCH_PROVIDER=searxng`). Cloud vendors (`zhipu` / `bocha` /
+`langsearch` / `tavily` / `serper`) are env-key adapters — see the WEB_SEARCH
+block in `.env.example`; mainland deployments should set
+`WEBSEARCH_SEARXNG_ENGINES=baidu,sogou,quark`. With `WEB_SEARCH_PROVIDER=none`
+the tool is hidden from actors entirely. Recommended posture: ONE search tool
+per workspace — if you enable `search_web` platform-wide, advise workspaces to
+switch off the z-ai plugin's `feature_search` toggle (or vice versa: plugin
+search bills the workspace's own Zhipu key, `search_web` bills the operator's
+env key). Users who prefer hosted MCP search servers can still attach them via
+the MCP plugin system (e.g. Zhipu `https://open.bigmodel.cn/api/mcp/web_search_prime/mcp`,
+Tavily `https://mcp.tavily.com/mcp`) — those are user-plane tools, not this
+provider layer. SearXNG upstream source: https://github.com/searxng/searxng
+(AGPL-3.0; shipped unmodified as a separate container).
+
 Start infrastructure:
 
 ```bash

@@ -126,6 +126,33 @@ services:
       # DOCUMENT_EXTRACTION_PROVIDER=llamaparse + this key to use it. Async runs go
       # through a durable poll job (file_parse_runs.metadata token), no worker held.
       DOCEXTRACT_LLAMAPARSE_API_KEY: ${DOCEXTRACT_LLAMAPARSE_API_KEY:-}
+      # Web search runs OUT-OF-PROCESS — the api bundles no search engine and
+      # reads env only (the 6th provider abstraction). WEB_SEARCH_PROVIDER
+      # selects the self-hosted SearXNG sidecar (shipped in the `production`
+      # profile), a cloud vendor (zhipu | bocha | langsearch | tavily | serper),
+      # or `none` (web search disabled → the search_web actor tool is HIDDEN).
+      # The default keeps web search on via the searxng sidecar. See .env.example.
+      WEB_SEARCH_PROVIDER: ${WEB_SEARCH_PROVIDER:-searxng}
+      WEBSEARCH_SEARXNG_URL: ${WEBSEARCH_SEARXNG_URL:-http://searxng:8777/}
+      # Optional engine narrowing (CSV, e.g. baidu,sogou,quark for mainland
+      # deployments where the default engine mix is unreachable). Explicit
+      # engines bypass the disabled flag in the sidecar's settings.yml.
+      WEBSEARCH_SEARXNG_ENGINES: ${WEBSEARCH_SEARXNG_ENGINES:-}
+      WEBSEARCH_SEARXNG_LANGUAGE: ${WEBSEARCH_SEARXNG_LANGUAGE:-}
+      # Cloud vendors (opt-in): set WEB_SEARCH_PROVIDER + the matching key.
+      # ⚠ paid per call — prompt-injected query spam can run up vendor bills;
+      # set vendor-side spend caps. See .env.example for details.
+      WEBSEARCH_ZHIPU_API_KEY: ${WEBSEARCH_ZHIPU_API_KEY:-}
+      WEBSEARCH_ZHIPU_SEARCH_ENGINE: ${WEBSEARCH_ZHIPU_SEARCH_ENGINE:-search_std}
+      WEBSEARCH_BOCHA_API_KEY: ${WEBSEARCH_BOCHA_API_KEY:-}
+      WEBSEARCH_LANGSEARCH_API_KEY: ${WEBSEARCH_LANGSEARCH_API_KEY:-}
+      WEBSEARCH_TAVILY_API_KEY: ${WEBSEARCH_TAVILY_API_KEY:-}
+      WEBSEARCH_SERPER_API_KEY: ${WEBSEARCH_SERPER_API_KEY:-}
+      WEBSEARCH_SERPER_GL: ${WEBSEARCH_SERPER_GL:-}
+      WEBSEARCH_SERPER_HL: ${WEBSEARCH_SERPER_HL:-}
+      # Optional egress proxy for the CLOUD web-search vendors only (never the
+      # searxng sidecar); falls back to HTTPS_PROXY/HTTP_PROXY when unset.
+      WEBSEARCH_HTTPS_PROXY: ${WEBSEARCH_HTTPS_PROXY:-}
       # Batch audio transcription (ASR / speech-to-text) also runs OUT-OF-PROCESS
       # — the api bundles no ASR engine. TRANSCRIPTION_PROVIDER selects the
       # sherpa-asr sidecar (opt-in `asr` profile) or `none` (default => audio
@@ -627,6 +654,48 @@ services:
       timeout: 5s
       retries: 12
       start_period: 90s
+    profiles:
+      - production
+
+  # Self-hosted web-search engine (SearXNG metasearch) — the default back-end for
+  # the search_web actor tool (WEB_SEARCH_PROVIDER=searxng, `production` profile).
+  # STOCK upstream image + ro config mount (the verdaccio/loki idiom): the api's
+  # searxng adapter speaks the native JSON API and owns the retry classification,
+  # so no FastAPI shim is needed. Internal-only, no host port, explicit env
+  # allowlist. The api reaches it at WEBSEARCH_SEARXNG_URL=http://searxng:8777/.
+  # SECURITY: never attach this service to synapse-sandbox-egress — it is an
+  # unauthenticated internet-egress proxy (limiter off) and would defeat the
+  # sandbox no-egress invariant.
+  searxng:
+    image: docker.io/searxng/searxng:2026.7.28-c01178d03
+    container_name: synapse-searxng
+    restart: unless-stopped
+    logging: *default-logging
+    mem_limit: ${SEARXNG_MEM_LIMIT:-512m}
+    environment:
+      # The entrypoint maps SEARXNG_PORT → GRANIAN_PORT (granian ignores
+      # settings.yml server.port); 8777 = the next free sidecar port.
+      SEARXNG_PORT: "8777"
+      # Flask secret + image-proxy HMAC key. The ro-mounted settings.yml
+      # disables the entrypoint's first-boot secret randomization, so this is
+      # MANDATORY (the container exits when left at the upstream default).
+      # setup.sh generates a per-install value; the static fallback is
+      # acceptable ONLY because the service is internal-network-only.
+      SEARXNG_SECRET: ${SEARXNG_SECRET:-synapse-internal-only-searxng-secret}
+      # Skip the entrypoint chown pass over the ro config mount (log noise).
+      FORCE_OWNERSHIP: "false"
+    volumes:
+      - ./infra/searxng/settings.yml:/etc/searxng/settings.yml:ro
+    expose:
+      - "8777"
+    healthcheck:
+      # /healthz returns a plain-text "OK" body — no JSON parse here (unlike
+      # the FastAPI sidecars). wget ships in the image; curl does not.
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8777/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     profiles:
       - production
 

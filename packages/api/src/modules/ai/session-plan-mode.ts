@@ -15,6 +15,7 @@ const PLAN_MODE_TOOL_NAMES = new Set([
 const PLAN_DRAFTING_ALLOWED_TOOLS = new Set([
   "read_skill",
   "memory_search",
+  "search_web",
   "current_time",
   "request_user_input",
   "update_plan",

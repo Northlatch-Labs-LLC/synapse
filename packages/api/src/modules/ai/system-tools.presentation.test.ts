@@ -6,6 +6,7 @@ import assert from "node:assert/strict"
 import { registerCallableToolPlugins } from "./session-tools.js"
 import { registerActorFileToolPlugins } from "./file-tools.js"
 import { registerActorStateCallableToolPlugins } from "./tools.js"
+import { registerWebSearchToolPlugins } from "./web-search-tools.js"
 import { getToolPlugin } from "./tool-plugins.js"
 import { SYSTEM_TOOL_PRESENTATION } from "./system-tools.presentation.js"
 
@@ -16,6 +17,7 @@ function ensureRegistered() {
   registerActorStateCallableToolPlugins()
   registerCallableToolPlugins()
   registerActorFileToolPlugins()
+  registerWebSearchToolPlugins()
   registered = true
 }
 
