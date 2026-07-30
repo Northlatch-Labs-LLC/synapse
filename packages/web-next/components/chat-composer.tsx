@@ -62,6 +62,7 @@ import {
 } from "@/components/ui/tooltip"
 import { searchEmojiSuggestions } from "@/lib/emoji"
 import { api } from "@/lib/api"
+import { createUuid } from "@/lib/uuid"
 import { cn } from "@/lib/utils"
 
 const CHAT_ATTACHMENT_ACCEPT =
@@ -189,17 +190,6 @@ type ChatComposerProps = {
   ) => Promise<boolean | void> | boolean | void
   /** Called on every keystroke; consumer is responsible for debouncing. */
   onTyping?: () => void
-}
-
-function createAttachmentId() {
-  if (
-    typeof crypto !== "undefined" &&
-    typeof crypto.randomUUID === "function"
-  ) {
-    return crypto.randomUUID()
-  }
-
-  return `attachment-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
 function formatFileSize(bytes: number) {
@@ -1053,7 +1043,7 @@ export default function ChatComposer({
       return
     }
 
-    const attachmentId = createAttachmentId()
+    const attachmentId = createUuid()
     const controller = new AbortController()
 
     uploadControllersRef.current.set(attachmentId, controller)

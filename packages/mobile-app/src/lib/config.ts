@@ -5,6 +5,9 @@ function trimTrailingSlash(value: string) {
   return value.replace(/\/+$/, "")
 }
 
+// A scheme-less value is assumed to be https. EXPO_PUBLIC_* is inlined at build
+// time, so the assumption is reported once where it is actually actionable —
+// app.config.js warns at config-eval time — rather than on every app start.
 function ensureScheme(value: string) {
   return /^https?:\/\//i.test(value) ? value : `https://${value}`
 }

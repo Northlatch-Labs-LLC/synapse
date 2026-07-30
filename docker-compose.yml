@@ -980,26 +980,48 @@ services:
     logging: *default-logging
     cpus: "1.0"
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      # Host ports are remappable for NAT'd / port-scarce hosts (defaults 80 +
+      # 443). The container side stays fixed; render-edge-config.sh reads
+      # SYNAPSE_TLS_PORT so redirects + Alt-Svc advertise the REAL public port.
+      - "${SYNAPSE_TLS_ACME_PORT:-80}:80"
+      - "${SYNAPSE_TLS_PORT:-443}:443"
+      - "${SYNAPSE_TLS_PORT:-443}:443/udp"
     environment:
       NGINX_ENTRYPOINT_WORKER_PROCESSES_AUTOTUNE: "1"
-      SYNAPSE_PUBLIC_DOMAIN: ${SYNAPSE_PUBLIC_DOMAIN:?SYNAPSE_PUBLIC_DOMAIN is required. Run ./setup.sh first.}
-      SYNAPSE_WWW_DOMAIN: ${SYNAPSE_WWW_DOMAIN:?SYNAPSE_WWW_DOMAIN is required. Run ./setup.sh first.}
-      SYNAPSE_MOBILE_SHORT_DOMAIN: ${SYNAPSE_MOBILE_SHORT_DOMAIN:?SYNAPSE_MOBILE_SHORT_DOMAIN is required. Run ./setup.sh first.}
-      SYNAPSE_MOBILE_DOMAIN: ${SYNAPSE_MOBILE_DOMAIN:?SYNAPSE_MOBILE_DOMAIN is required. Run ./setup.sh first.}
-      SYNAPSE_REGISTRY_DOMAIN: ${SYNAPSE_REGISTRY_DOMAIN:?SYNAPSE_REGISTRY_DOMAIN is required. Run ./setup.sh first.}
-      LETSENCRYPT_CERT_NAME: ${LETSENCRYPT_CERT_NAME:?LETSENCRYPT_CERT_NAME is required. Run ./setup.sh first.}
+      # Soft `:-` defaults on purpose: compose interpolates ${VAR:?} for EVERY
+      # service at file-parse time (before profile filtering), so hard-requiring
+      # the TLS-only domain vars here would force http-mode deploys to carry
+      # dummy values. The fail-loud validation lives in render-edge-config.sh —
+      # the only consumer — which refuses to start nginx without them.
+      SYNAPSE_DEPLOY_MODE: ${SYNAPSE_DEPLOY_MODE:-tls}
+      SYNAPSE_PUBLIC_DOMAIN: ${SYNAPSE_PUBLIC_DOMAIN:-}
+      SYNAPSE_WWW_DOMAIN: ${SYNAPSE_WWW_DOMAIN:-}
+      SYNAPSE_MOBILE_SHORT_DOMAIN: ${SYNAPSE_MOBILE_SHORT_DOMAIN:-}
+      SYNAPSE_MOBILE_DOMAIN: ${SYNAPSE_MOBILE_DOMAIN:-}
+      SYNAPSE_REGISTRY_DOMAIN: ${SYNAPSE_REGISTRY_DOMAIN:-}
+      LETSENCRYPT_CERT_NAME: ${LETSENCRYPT_CERT_NAME:-}
+      SYNAPSE_TLS_PORT: ${SYNAPSE_TLS_PORT:-443}
     volumes:
-      - ./infrastructure/nginx/public.conf.template:/etc/nginx/templates/default.conf.template:ro
+      # Templates live OUTSIDE /etc/nginx/templates so the stock envsubst
+      # entrypoint script never touches them; render-edge-config.sh (below, runs
+      # first as 15-*) owns rendering: conditional vhost fragments (mobile /
+      # registry subdomains only when configured), HSTS-off for selfsigned mode,
+      # cert-dir resolution + preflight, non-443 redirect suffix.
+      - ./infrastructure/nginx/public.conf.template:/etc/nginx/synapse-templates/public.conf.template:ro
+      - ./infrastructure/nginx/public-mobile-domains.conf.template:/etc/nginx/synapse-templates/public-mobile-domains.conf.template:ro
+      - ./infrastructure/nginx/public-registry-domain.conf.template:/etc/nginx/synapse-templates/public-registry-domain.conf.template:ro
+      - ./infrastructure/nginx/render-edge-config.sh:/docker-entrypoint.d/15-synapse-render-edge-config.sh:ro
       # Ring-0 rate-limit client key: njs computes the IPv6 /64 (js_set
       # $synapse_client_key). Bind-mounted (not baked) so it rides the same
       # force-recreate as the template — no image rebuild needed. The http
-      # profile (stock nginx:alpine, below) has no njs and keys per-address.
+      # profile (stock nginx, below) has no njs and keys per-address.
       - ./infrastructure/nginx/ratelimit.js:/etc/nginx/ratelimit.js:ro
       - certbot_etc:/etc/letsencrypt:ro
       - certbot_www:/var/www/certbot:ro
+      # Self-signed certs (SYNAPSE_DEPLOY_MODE=selfsigned; gitignored, written
+      # by infrastructure/scripts/issue-selfsigned-cert.sh). Harmlessly empty in
+      # tls mode.
+      - ./infrastructure/certs:/etc/synapse-certs:ro
     depends_on:
       - api
       - web
@@ -1008,7 +1030,9 @@ services:
       - tls
 
   nginx-http:
-    image: nginx:alpine
+    # Version-pinned like the TLS edge (which builds its own 1.31.2): a floating
+    # `alpine` tag would silently change the edge behavior across pulls.
+    image: nginx:1.31.2-alpine
     container_name: synapse-nginx-http
     restart: unless-stopped
     logging: *default-logging
@@ -1024,11 +1048,14 @@ services:
       - http
 
   acme-http:
-    image: nginx:alpine
+    image: nginx:1.31.2-alpine
     container_name: synapse-acme-http
     logging: *default-logging
     ports:
-      - "80:80"
+      # Same remap knob as the TLS edge's port-80 listener. NB: Let's Encrypt
+      # HTTP-01 always validates against PUBLIC port 80 — a remap only works
+      # behind an external 80→this-port forward.
+      - "${SYNAPSE_TLS_ACME_PORT:-80}:80"
     volumes:
       - certbot_www:/usr/share/nginx/html
     profiles:
@@ -1094,7 +1121,20 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "127.0.0.1:${VERDACCIO_PORT:-4873}:4873"
+      # Bind address is the deploy-mode knob (setup.sh writes it):
+      #   127.0.0.1 (default) — registry reachable from the host only; external
+      #     access goes through the TLS nginx registry-subdomain vhost.
+      #   0.0.0.0 — deployments WITHOUT a registry subdomain (http / selfsigned
+      #     / single-domain tls) publish verdaccio's own port directly; npm
+      #     handles plain-http registries, and serving verdaccio directly keeps
+      #     the port in the Host header so its generated dist.tarball URLs stay
+      #     correct (an nginx proxy would drop a non-default port from $host).
+      #     Publishing stays a loopback-only workflow either way (see
+      #     infra/verdaccio/README.md) — the anonymous-read/authenticated-write
+      #     split is enforced by verdaccio itself.
+      # (VERDACCIO_PORT is the pre-rename spelling of the port var — honored as
+      # a fallback so existing .env files keep their override.)
+      - "${SYNAPSE_REGISTRY_BIND:-127.0.0.1}:${SYNAPSE_REGISTRY_PORT:-${VERDACCIO_PORT:-4873}}:4873"
     volumes:
       - ./infra/verdaccio/config.yaml:/verdaccio/conf/config.yaml:ro
       - ./infra/verdaccio/htpasswd:/verdaccio/conf/htpasswd

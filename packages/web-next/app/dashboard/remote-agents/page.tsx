@@ -16,6 +16,7 @@ import type {
   RemoteAgentView,
 } from "@/lib/api"
 import { api } from "@/lib/api"
+import { copyTextToClipboard } from "@/lib/clipboard"
 import { qk } from "@/lib/query-keys"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -118,8 +119,12 @@ function sessionStateLabel(state?: RemoteAgentRuntimeSummaryView["state"]) {
 }
 
 async function copyText(value: string, label: string) {
-  await navigator.clipboard.writeText(value)
-  toast.success(`${label} copied`)
+  const copied = await copyTextToClipboard(value)
+  if (copied) {
+    toast.success(`${label} copied`)
+  } else {
+    toast.error(`Failed to copy ${label}`)
+  }
 }
 
 const emptyMachineDraft = {

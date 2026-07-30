@@ -2,9 +2,16 @@
 
 > **Production deploys run Verdaccio from the root `docker-compose.yml`**
 > (`registry` profile): `docker compose --profile registry up -d verdaccio`.
-> It shares the main network so the public nginx proxies it at
-> `https://$SYNAPSE_REGISTRY_DOMAIN/` with TLS, and the `4873` port is bound
-> to loopback only. The standalone `docker-compose.yml` in THIS directory is
+> Two exposure shapes (deploy.md §5b): with a registry subdomain configured,
+> the public nginx proxies it at `https://$SYNAPSE_REGISTRY_DOMAIN/` with TLS
+> and the `4873` port stays bound to loopback; without one (single-domain TLS
+> / selfsigned / http deploys), verdaccio's own port is published directly at
+> `http://<public-host>:$SYNAPSE_REGISTRY_PORT/` (`SYNAPSE_REGISTRY_BIND=
+0.0.0.0`, written by setup.sh). Publishing remains a loopback WORKFLOW
+> either way (auth-gated by htpasswd; the direct port serves the publish
+> endpoint over plain HTTP too, so always run `npm publish` on the host —
+> never send publisher credentials across the network).
+> The standalone `docker-compose.yml` in THIS directory is
 > kept for local/offline single-container use; pick one, not both. The
 > `config.yaml` and `htpasswd` here are the volumes both setups mount.
 

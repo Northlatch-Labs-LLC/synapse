@@ -15,6 +15,8 @@ import {
   type CoreActorDocKey,
 } from "@synapse/shared"
 
+import { createUuid } from "@/lib/uuid"
+
 export type {
   ActorDocKey,
   ActorDocVisibility,
@@ -224,7 +226,7 @@ export function buildEditableDocFromTemplate(
   }
 
   return {
-    id: crypto.randomUUID(),
+    id: createUuid(),
     key: template.key,
     title: template.title,
     description: template.description,
@@ -236,7 +238,7 @@ export function buildEditableDocFromTemplate(
 
 export function buildEditableCustomDoc(): EditableDoc {
   return {
-    id: crypto.randomUUID(),
+    id: createUuid(),
     key: "custom",
     title: "Custom section",
     description:

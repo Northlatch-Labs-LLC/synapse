@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ChatMarkdown } from "@/components/chat-markdown"
 import { Button } from "@/components/ui"
 import type { ChatTaskResolveInput, ChatTaskResolvePayload } from "@/lib/api"
+import { createId } from "@/lib/ids"
 import { theme } from "@/theme/tokens"
 import {
   TASK_REQUEST_KIND,
@@ -431,12 +432,10 @@ function withTaskCommandMetadata(
 ): ChatTaskResolveInput {
   return {
     ...payload,
-    commandId:
-      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : `task-${Date.now().toString(36)}-${Math.random()
-            .toString(16)
-            .slice(2)}`,
+    // Always a real v4 UUID: the server validates commandId with the strict
+    // chat uuid schema, and crypto.randomUUID is missing on insecure-context
+    // web exports (http://<ip>/mobile/) — createId falls back safely.
+    commandId: createId(),
     baseRevision: task.revision,
   }
 }

@@ -1,0 +1,129 @@
+# Mobile redirect vhost (m. / mobile. subdomains) — OPTIONAL fragment.
+# Rendered by render-edge-config.sh ONLY when at least one of
+# SYNAPSE_MOBILE_SHORT_DOMAIN / SYNAPSE_MOBILE_DOMAIN is set; single-domain
+# deployments skip it entirely (the /mobile/ path on the primary vhost is the
+# canonical mobile entry). Split out of public.conf.template because an empty
+# server_name list is a config error, not a no-op.
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    listen 443 quic;
+    listen [::]:443 quic;
+    http2 on;
+    http3 on;
+    server_name ${SYNAPSE_MOBILE_SHORT_DOMAIN} ${SYNAPSE_MOBILE_DOMAIN};
+
+    ssl_certificate ${SYNAPSE_TLS_CERT_DIR}/fullchain.pem;
+    ssl_certificate_key ${SYNAPSE_TLS_CERT_DIR}/privkey.pem;
+    ssl_trusted_certificate ${SYNAPSE_TLS_CERT_DIR}/chain.pem;
+    ssl_session_cache shared:SynapseSSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    quic_retry on;
+    resolver 127.0.0.11 valid=30s ipv6=off;
+    resolver_timeout 5s;
+
+    # Empty value (selfsigned mode) => nginx skips the header entirely. HSTS on
+    # an untrusted cert would remove the browser's manual bypass, bricking the
+    # deploy for its own users — render-edge-config.sh owns this policy.
+    add_header Strict-Transport-Security "${SYNAPSE_HSTS_VALUE}" always;
+    add_header Alt-Svc 'h3=":${SYNAPSE_TLS_PORT}"; ma=86400' always;
+
+    # --- Browser auto-reporting (W3C Reporting API + NEL) -> POST /api/v1/reports
+    # Same-origin endpoint (proxied below under /api/), so no CORS preflight is
+    # needed. NEL still requires the v0 Report-To group today; Reporting-Endpoints
+    # (v1) routes crash/deprecation/intervention to the "default" group.
+    # success_fraction is tiny to bound volume; HTTPS-only; Chromium-only in
+    # practice. See docs/logging-refactor/06-...md §2.
+    # IMPORTANT (add_header inheritance footgun): every location in this block is
+    # currently add_header-free, so these server-level headers are inherited into
+    # all responses. If any location here later adds its own add_header (e.g. a
+    # serve-stale `Cache-Status`), you MUST add `add_header_inherit merge;`
+    # (nginx >= 1.29.3) at server/http level — otherwise nginx silently DROPS all
+    # inherited add_header on that location and these policy headers vanish there.
+    # CSP reporting is intentionally NOT enabled yet (needs a policy baseline);
+    # the routing above is ready for Content-Security-Policy-Report-Only with
+    # `report-to default; report-uri /api/v1/reports` once the team defines it.
+    add_header Reporting-Endpoints 'default="/api/v1/reports"' always;
+    add_header Report-To '{"group":"nel","max_age":31556952,"endpoints":[{"url":"/api/v1/reports"}]}' always;
+    add_header NEL '{"report_to":"nel","max_age":2592000,"success_fraction":0.01,"failure_fraction":1.0}' always;
+
+    client_max_body_size 25m;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $host;
+    # Trace trust boundary (Ring 0 -> 1): strip tracestate/baggage/sentry-trace,
+    # KEEP traceparent — same posture as the web vhost above; see
+    # docs/trace-propagation-policy.md. Re-declared in /ws (own proxy_set_header).
+    proxy_set_header tracestate "";
+    proxy_set_header baggage "";
+    proxy_set_header sentry-trace "";
+    # Ring-0 ingress marker — nginx OWNS this header. proxy_set_header REPLACES
+    # any client-supplied copy (single or repeated, probe-proven), so its
+    # presence upstream means exactly "arrived through the public edge". The api
+    # selects its span attribute synapse.trace.ingress=public from it. It grants
+    # NOTHING: never an authn/authz/rate-limit-exemption input, never echoed.
+    proxy_set_header x-synapse-trace-ingress "public";
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        try_files $uri =404;
+    }
+
+    location ~ /\.(?!well-known/acme-challenge/) {
+        return 404;
+    }
+
+    location /api/ {
+        set $api_upstream api;
+        # 200 requests instantly, then 50/s sustained, per client (zone at the
+        # top of this file). nodelay: a burst passes or 429s, never queued.
+        limit_req zone=synapse_api_req burst=200 nodelay;
+        proxy_pass http://$api_upstream:3001;
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+    }
+
+    location /ws {
+        set $api_upstream api;
+        # Upgrades are cheap to bound — one request per connection.
+        limit_req zone=synapse_ws_req burst=50 nodelay;
+        # CONCURRENT sessions per client: a WS connection holds its slot for the
+        # whole connection lifetime (hours), so this counts sessions, not
+        # traffic. 128 covers many tabs plus several daemons behind one NAT; a
+        # large corporate/carrier-grade NAT is the case that needs it raised.
+        limit_conn synapse_ws_conn 128;
+        proxy_pass http://$api_upstream:3001;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        # Ring-0 strip + ingress marker re-declared: this location's own
+        # proxy_set_header kills server-level inheritance (traceparent still
+        # passes; the marker still OVERRIDES any client copy).
+        proxy_set_header tracestate "";
+        proxy_set_header baggage "";
+        proxy_set_header sentry-trace "";
+        proxy_set_header x-synapse-trace-ingress "public";
+        proxy_read_timeout 86400s;
+    }
+
+    location = / {
+        return 302 /mobile/;
+    }
+
+    location /mobile/ {
+        set $mobile_upstream mobile-web;
+        proxy_pass http://$mobile_upstream:80;
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+    }
+
+    location / {
+        return 302 /mobile$request_uri;
+    }
+}

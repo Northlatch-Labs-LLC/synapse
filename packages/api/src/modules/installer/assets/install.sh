@@ -522,8 +522,17 @@ activate_node() {
 # ---------------------------------------------------------------------------
 fetch_to_file() {
   local url="$1" out="$2"
+  # Pin curl to the URL's own scheme: https URLs stay https-only (a redirect
+  # cannot downgrade them), while an http:// URL — the ps1 re-exec fetch from
+  # an SYNAPSE_DEPLOY_MODE=http server — must be allowed at all ('=https'
+  # refuses it outright). Third-party downloads (Node tarballs) are always
+  # https URLs, so they keep the strict pin automatically.
+  local proto='=https'
+  case "$url" in
+    http://*) proto='=http,https' ;;
+  esac
   if command -v curl >/dev/null 2>&1; then
-    run curl -fsSL --proto '=https' --tlsv1.2 --retry 3 -o "$out" "$url" \
+    run curl -fsSL --proto "$proto" --tlsv1.2 --retry 3 -o "$out" "$url" \
       || die "download failed: $url"
   elif command -v wget >/dev/null 2>&1; then
     run wget -q --tries=3 -O "$out" "$url" || die "download failed: $url"

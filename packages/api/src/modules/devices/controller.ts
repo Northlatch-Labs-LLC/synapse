@@ -75,8 +75,27 @@ function sendModuleError(reply: any, err: unknown) {
 function resolveControlPlaneUrl(): string {
   const explicit = process.env.SYNAPSE_DEVICE_CONTROL_PLANE_URL
   if (explicit && explicit.trim().length > 0) return explicit.trim()
-  const base = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3001"
+  const base =
+    process.env.NEXT_PUBLIC_WS_URL ??
+    wsBaseFromAppBaseUrl() ??
+    "ws://localhost:3001"
   return `${base.replace(/\/$/, "")}/api/v1/devices/control-plane`
+}
+
+// The public origin is authoritative when no frontend ws var reached this
+// process (hand-written .env files often carry only APP_BASE_URL/BASE_URL):
+// http(s) maps 1:1 onto ws(s) for the same edge.
+function wsBaseFromAppBaseUrl(): string | null {
+  const base = process.env.APP_BASE_URL ?? process.env.BASE_URL
+  if (!base || base.trim().length === 0) return null
+  try {
+    const url = new URL(base.trim())
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null
+    const scheme = url.protocol === "https:" ? "wss" : "ws"
+    return `${scheme}://${url.host}`
+  } catch {
+    return null
+  }
 }
 
 /**

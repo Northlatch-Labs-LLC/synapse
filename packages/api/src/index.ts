@@ -287,6 +287,21 @@ async function main() {
     await fatalExit(err, "startup:embedding-preflight")
   }
 
+  // Warn-only sanity for the registry URL baked into one-click installers +
+  // the dashboard daemon command: end users' machines dial it verbatim, so a
+  // value that doesn't even parse means every install they copy is dead.
+  // Warn, not fail — the URL is display/installer plumbing, not a serving
+  // dependency (empty is the documented off switch and stays silent).
+  if (config.remoteAgent.npmRegistryUrl) {
+    try {
+      new URL(config.remoteAgent.npmRegistryUrl)
+    } catch {
+      log.warn(
+        `PUBLIC_NPM_REGISTRY_URL is not a valid URL (${JSON.stringify(config.remoteAgent.npmRegistryUrl)}); the dashboard one-click installers it is baked into will not work. Re-run ./setup.sh or fix it in .env.`
+      )
+    }
+  }
+
   await startRealtimeEventOutboxDispatcher()
   if (process.env.CHAT_DEDUP_LOGGER === "1") {
     startChatDedupCounterLogger()

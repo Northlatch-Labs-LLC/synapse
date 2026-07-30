@@ -4,6 +4,7 @@ import type { InviteTrustLevel, WorkspaceInviteView } from "@synapse/shared"
 import { useEffect, useState, useCallback } from "react"
 import { useWorkspace } from "../workspace-provider"
 import { api } from "@/lib/api"
+import { copyTextToClipboard } from "@/lib/clipboard"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -88,9 +89,13 @@ export default function InviteManagement() {
     }
   }
 
-  const copyLink = (token: string, inviteId: string) => {
+  const copyLink = async (token: string, inviteId: string) => {
     const link = `${window.location.origin}/invite/${token}`
-    navigator.clipboard.writeText(link)
+    const copied = await copyTextToClipboard(link)
+    if (!copied) {
+      alert("Failed to copy invite link")
+      return
+    }
     setCopiedId(inviteId)
     setTimeout(() => setCopiedId(null), 2000)
   }
@@ -227,7 +232,7 @@ export default function InviteManagement() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => copyLink(invite.token, invite.id)}
+                      onClick={() => void copyLink(invite.token, invite.id)}
                       className="h-8 w-8 p-0"
                       title="Copy invite link"
                     >

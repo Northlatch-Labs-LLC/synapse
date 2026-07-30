@@ -10,6 +10,21 @@ This repository is deployed on a single Ubuntu host with Docker Compose:
 - `nginx-http` as the optional HTTP-only entrypoint for IP and port deployments
 - Dockerized Certbot for Let's Encrypt certificates and renewal
 
+Three deploy modes (`SYNAPSE_DEPLOY_MODE`) cover the public entrypoint:
+
+- **`tls`** — a real domain + Let's Encrypt certificates (the `nginx` service,
+  profile `tls`). Single-domain by default; the classic subdomain layout is
+  opt-in (§2).
+- **`selfsigned`** — HTTPS on a bare IP (or any hostname) with a locally
+  generated self-signed certificate, served by the same `nginx` service /
+  `tls` profile. No DNS or CA needed. This is the recommended no-domain mode:
+  browsers treat the origin as a secure context, so mic dictation, camera QR
+  scan, clipboard, and the offline service worker all work — at the cost of a
+  one-time manual certificate trust on each client (§5a).
+- **`http`** — plain HTTP on `ip:port` (the `nginx-http` service, profile
+  `http`). Zero-ceremony, but browsers treat the origin as insecure and some
+  product features degrade or vanish — read §9 before choosing it.
+
 ## 1. Host Prerequisites
 
 Install Docker and Compose:
@@ -23,26 +38,38 @@ systemctl enable --now docker
 The public host must allow the selected inbound port:
 
 - TLS mode: TCP `80` and `443`, plus UDP `443` for HTTP/3 over QUIC
+  (remappable: `SYNAPSE_TLS_PORT` for 443, `SYNAPSE_TLS_ACME_PORT` for 80)
+- Self-signed mode: the same TCP/UDP `SYNAPSE_TLS_PORT` (default `443`)
 - HTTP-only mode: TCP `${SYNAPSE_HTTP_PORT:-80}`
+- Private npm registry without a registry subdomain (any mode): TCP
+  `${SYNAPSE_REGISTRY_PORT:-4873}` (§5b)
 
 ## 2. DNS or IP
 
-For TLS mode, point these hostnames at the server IP:
+TLS mode needs one DNS record: point `<primary-domain>` at the server IP.
+That single domain serves everything — desktop web at `/`, mobile web at
+`/mobile/`, API under `/api/`, and (optionally) the npm registry on its own
+port.
 
-- primary domain, for example `<primary-domain>`
+The classic subdomain layout is opt-in. Pass `SYNAPSE_SUBDOMAINS=full` to
+`setup.sh` (or set any of the vars individually) to also serve:
+
 - `www.<primary-domain>`
-- `m.<primary-domain>`
-- `mobile.<primary-domain>`
-- `npmr.<primary-domain>` (private npm registry; only needed if you run the `registry` profile)
+- `m.<primary-domain>` and `mobile.<primary-domain>` (redirect to `/mobile/`)
+- `npmr.<primary-domain>` (private npm registry over TLS; only needed if you
+  run the `registry` profile)
 
-After generating `.env`, you can verify with:
+Every configured subdomain must have its own DNS record and lands in the
+certificate SAN list; unset subdomains are simply not served. After generating
+`.env`, you can verify with:
 
 ```bash
 set -a; . ./.env; set +a
-getent ahostsv4 "$SYNAPSE_PUBLIC_DOMAIN" "$SYNAPSE_WWW_DOMAIN" "$SYNAPSE_MOBILE_SHORT_DOMAIN" "$SYNAPSE_MOBILE_DOMAIN" "$SYNAPSE_REGISTRY_DOMAIN"
+getent ahostsv4 "$SYNAPSE_PUBLIC_DOMAIN" $SYNAPSE_WWW_DOMAIN $SYNAPSE_MOBILE_SHORT_DOMAIN $SYNAPSE_MOBILE_DOMAIN $SYNAPSE_REGISTRY_DOMAIN
 ```
 
-HTTP-only mode can use a plain IP or hostname with a single port and does not require DNS.
+Self-signed and HTTP-only modes use a plain IP or hostname and do not require
+DNS.
 
 ## 3. Local Env
 
@@ -50,6 +77,16 @@ Generate local-only secrets and public URLs for TLS mode:
 
 ```bash
 SYNAPSE_PUBLIC_DOMAIN=<primary-domain> ./setup.sh
+# classic 5-hostname layout instead of single-domain:
+SYNAPSE_PUBLIC_DOMAIN=<primary-domain> SYNAPSE_SUBDOMAINS=full ./setup.sh
+```
+
+For self-signed HTTPS mode:
+
+```bash
+SYNAPSE_DEPLOY_MODE=selfsigned SYNAPSE_PUBLIC_HOST=<ip-or-host> ./setup.sh
+# custom https port (default 443):
+SYNAPSE_DEPLOY_MODE=selfsigned SYNAPSE_PUBLIC_HOST=<ip-or-host> SYNAPSE_TLS_PORT=<port> ./setup.sh
 ```
 
 For HTTP-only mode:
@@ -60,11 +97,17 @@ SYNAPSE_DEPLOY_MODE=http SYNAPSE_PUBLIC_HOST=<ip-or-host> SYNAPSE_HTTP_PORT=<por
 
 This creates `.env` and `packages/web-next/.env.local`. Do not commit either file.
 
+Re-running `setup.sh` preserves existing values (secrets are never rotated). In
+`http` mode it also scrubs the legacy fabricated values older versions wrote
+(`www.<ip>`-style subdomains and the unresolvable `http://npmr.<ip>/` registry
+URL) and replaces the registry URL with the port-based one.
+
 `setup.sh` stores the concrete production hostnames in local-only `.env` variables:
 
 - `SYNAPSE_DEPLOY_MODE`
 - `SYNAPSE_PUBLIC_HOST`
 - `SYNAPSE_HTTP_PORT`
+- `SYNAPSE_TLS_PORT`
 - `SYNAPSE_PUBLIC_DOMAIN`
 - `SYNAPSE_WWW_DOMAIN`
 - `SYNAPSE_MOBILE_SHORT_DOMAIN`
@@ -73,6 +116,7 @@ This creates `.env` and `packages/web-next/.env.local`. Do not commit either fil
 - `LETSENCRYPT_CERT_NAME`
 - `LETSENCRYPT_EMAIL`
 - `PUBLIC_NPM_REGISTRY_URL`
+- `SYNAPSE_REGISTRY_BIND` / `SYNAPSE_REGISTRY_PORT`
 
 Before using real AI flows, configure at least one platform model group: copy `packages/api/config/model-groups.yaml.example` to `packages/api/config/model-groups.yaml`, fill the referenced `${ENV}` variables (e.g. `ANTHROPIC_API_KEY`) in `.env`, and apply it via `db:rebuild` (which imports it automatically) or `npm run db:seed:model-groups`. For ASR, fill the Volcengine ASR variables in `.env` if ASR is required.
 
@@ -140,9 +184,11 @@ Seeded demo accounts:
 
 ## 5. TLS Certificates
 
-Skip this section when `SYNAPSE_DEPLOY_MODE=http`.
+Skip this section when `SYNAPSE_DEPLOY_MODE=http`; for
+`SYNAPSE_DEPLOY_MODE=selfsigned` use §5a instead.
 
-Issue a SAN certificate for all TLS public hostnames:
+Issue a SAN certificate for all configured TLS public hostnames (the primary
+domain plus any opt-in subdomains — unset subdomains are skipped):
 
 ```bash
 ./infrastructure/scripts/issue-cert.sh
@@ -172,16 +218,70 @@ Manual renewal:
 ./infrastructure/scripts/renew-cert.sh
 ```
 
+## 5a. Self-signed certificate (`SYNAPSE_DEPLOY_MODE=selfsigned`)
+
+Generate the certificate (host `openssl`, no containers involved):
+
+```bash
+./infrastructure/scripts/issue-selfsigned-cert.sh
+```
+
+It writes `infrastructure/certs/<cert-name>/{privkey,fullchain,chain}.pem`
+(gitignored; `<cert-name>` = `LETSENCRYPT_CERT_NAME`, default the public host)
+in the Let's Encrypt live-dir layout, with a SAN matching the configured host —
+`IP:` entries for IP literals, `DNS:` for hostnames. The TLS `nginx` service
+bind-mounts the directory and its config render script points at it in
+selfsigned mode. Validity is 10 years; there is no renewal machinery — re-run
+the script to rotate (clients must then re-trust).
+
+Client trust is manual and per-device: browsers show a certificate warning the
+first time (proceed via the interstitial, or import `fullchain.pem` into the
+OS/browser trust store for a clean padlock). The edge deliberately does NOT
+send HSTS in this mode — HSTS on an untrusted certificate would remove the
+browser's "proceed anyway" option entirely.
+
+**Node clients (remote-agent daemon, device-runtime) do NOT read the OS trust
+store** — Node only trusts its bundled CAs plus `NODE_EXTRA_CA_CERTS`. On every
+machine that runs a daemon or pairs a device against a selfsigned deploy,
+export it before the daemon starts (and persist it into the service/unit
+environment for installed daemons):
+
+```bash
+export NODE_EXTRA_CA_CERTS=/path/to/fullchain.pem   # copy it from the server's infrastructure/certs/<name>/
+```
+
+Without it the daemon's `wss://` dial fails TLS verification and reconnects
+forever. (Windows PowerShell's own installer downloads are unaffected once the
+cert is in the OS store — .NET uses it; only the Node processes need the env
+var.) Per-platform trust quirks: iOS requires profile install + full trust;
+**Android native apps distrust user-installed CAs entirely** (system store
+only, Android 7+), so selfsigned mode does not support self-built Android
+native apps — use the `/mobile/` web build there.
+
 ## 5b. Private npm registry (Verdaccio)
 
 The private registry serves `@synapse/*` to end users and caches third-party
 deps from npmjs. It runs as the `verdaccio` service behind the `registry`
-compose profile, published at the registry subdomain
-(`$SYNAPSE_REGISTRY_DOMAIN`, e.g. `npmr.<primary-domain>`) through the same
-public nginx + TLS cert. The `4873` port is bound to loopback only — all
-external access goes through nginx. The real registry hostname lives only in
-the gitignored `.env` (`SYNAPSE_REGISTRY_DOMAIN` / `PUBLIC_NPM_REGISTRY_URL`),
-never in the repo.
+compose profile, reachable externally in one of two ways:
+
+- **Registry subdomain** (TLS deployments with `SYNAPSE_REGISTRY_DOMAIN` set):
+  published at `npmr.<primary-domain>` through the public nginx + TLS cert.
+  Verdaccio's own `4873` port stays bound to loopback — all external access
+  goes through nginx.
+- **Dedicated port** (single-domain TLS, selfsigned, and http deployments —
+  whenever `SYNAPSE_REGISTRY_DOMAIN` is empty): verdaccio's own port is
+  published directly on `SYNAPSE_REGISTRY_PORT` (default `4873`, bind
+  `SYNAPSE_REGISTRY_BIND=0.0.0.0`; setup.sh derives both plus
+  `PUBLIC_NPM_REGISTRY_URL=http://<host>:<port>/`). Deliberately plain HTTP in
+  every mode: npm is not a browser (no secure-context concern) and a
+  self-signed https registry would force `strict-ssl` workarounds on every
+  consumer. Anonymous installs carry no credentials; publishing stays a
+  loopback-only workflow (below), so no publish token ever crosses the wire.
+  Open the port in your firewall — or firewall it off if you don't run the
+  `registry` profile.
+
+The real registry hostname lives only in the gitignored `.env`
+(`SYNAPSE_REGISTRY_DOMAIN` / `PUBLIC_NPM_REGISTRY_URL`), never in the repo.
 
 One-time setup (publisher credentials + registry config are gitignored):
 
@@ -191,9 +291,9 @@ cp infra/verdaccio/.env.example infra/verdaccio/.env   # set NPM_REGISTRY / PUBL
 docker run --rm httpd:2 htpasswd -nbB publisher 'STRONG_PASSWORD' >> infra/verdaccio/htpasswd
 ```
 
-Make sure `$SYNAPSE_REGISTRY_DOMAIN` is in the TLS cert (re-run
-`./infrastructure/scripts/issue-cert.sh` — it now includes the registry
-subdomain in the SAN list), then start the registry:
+If you use the registry subdomain, make sure `$SYNAPSE_REGISTRY_DOMAIN` is in
+the TLS cert (re-run `./infrastructure/scripts/issue-cert.sh` — configured
+subdomains land in the SAN list). Then start the registry:
 
 ```bash
 docker compose --profile registry up -d verdaccio
@@ -258,7 +358,9 @@ members who need their own account create a separate installation.
 
 ## 6. Start Production
 
-Start or update the TLS public stack:
+Start or update the TLS public stack (both `tls` and `selfsigned` modes — the
+same `nginx` service serves either certificate source; its config render
+script picks the right one from `SYNAPSE_DEPLOY_MODE`):
 
 ```bash
 docker compose --profile production --profile tls up -d api web mobile-web nginx
@@ -278,13 +380,20 @@ docker compose --profile production --profile http up -d api web mobile-web ngin
 
 Service routing:
 
-- TLS mode: `https://${SYNAPSE_PUBLIC_DOMAIN}/` and `https://${SYNAPSE_WWW_DOMAIN}/` serve desktop web.
-- TLS mode: `https://${SYNAPSE_MOBILE_SHORT_DOMAIN}/` and `https://${SYNAPSE_MOBILE_DOMAIN}/` redirect to `/mobile/`.
+- TLS/selfsigned mode: `https://<public-host>[:${SYNAPSE_TLS_PORT}]/` serves
+  desktop web (plus `https://${SYNAPSE_WWW_DOMAIN}/` when that subdomain is
+  configured).
+- TLS mode with mobile subdomains: `https://${SYNAPSE_MOBILE_SHORT_DOMAIN}/`
+  and `https://${SYNAPSE_MOBILE_DOMAIN}/` redirect to `/mobile/`. Without
+  them, mobile web is simply the `/mobile/` path on the primary origin.
 - HTTP-only mode: `http://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_HTTP_PORT}/` serves desktop web.
 - HTTP-only mode: `http://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_HTTP_PORT}/mobile/` serves mobile web.
-- `/api/`, `/ws`, and `/files/` are proxied to the API.
+- `/api/` and `/ws` are proxied to the API (file downloads live under
+  `/api/v1/files/…` — there is no separate `/files/` route).
 - `/mobile/` is proxied to the `mobile-web` static nginx container.
-- TLS mode: `https://${SYNAPSE_REGISTRY_DOMAIN}/` serves the private npm registry (when the `registry` profile is up).
+- npm registry (when the `registry` profile is up): `https://${SYNAPSE_REGISTRY_DOMAIN}/`
+  with the registry subdomain, else `http://<public-host>:${SYNAPSE_REGISTRY_PORT}/`
+  directly from verdaccio (§5b).
 
 ## 7. Updates
 
@@ -323,10 +432,11 @@ docker compose --profile production --profile http up -d --force-recreate nginx-
 > every chunk 404s. `nginx`'s `WEB_IMAGE` build arg reads the freshly built web image
 > **tag**, not a compose build dependency, so compose does not guarantee web builds first.
 > Build them as **separate, ordered** invocations; do not lean on a single
-> `up -d --build web nginx` (it may build them in parallel). The `nginx` single-file
-> template + `ratelimit.js` bind mounts also need a **`--force-recreate`** (not reload/
-> restart) to take effect — a plain edit swaps the inode and the container keeps serving
-> the deleted one.
+> `up -d --build web nginx` (it may build them in parallel). The `nginx` config
+> template + `render-edge-config.sh` + `ratelimit.js` bind mounts also need a
+> **`--force-recreate`** (not reload/restart) to take effect — a plain edit swaps
+> the inode and the container keeps serving the deleted one, and the render
+> script only runs at container start.
 
 The trace-correctness round-2 rollout (commits `defdece3`, `f6c456b5`, `cd615060`,
 `79ddc845`) is exactly this shape and has an exact runnable procedure — build order
@@ -373,6 +483,26 @@ curl -I "http://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_HTTP_PORT}/"
 curl -I "http://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_HTTP_PORT}/mobile/"
 curl -I "http://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_HTTP_PORT}/.env"
 curl -I "http://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_HTTP_PORT}/mobile/.env"
+```
+
+Self-signed checks (`-k` skips CA verification — expected for this mode; drop
+`:${SYNAPSE_TLS_PORT}` when it is 443):
+
+```bash
+set -a; . ./.env; set +a
+curl -ksS "https://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_TLS_PORT}/api/v1/health"
+curl -kI "https://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_TLS_PORT}/"
+curl -kI "https://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_TLS_PORT}/mobile/"
+# confirm the edge does NOT send HSTS in selfsigned mode:
+curl -ksI "https://${SYNAPSE_PUBLIC_HOST}:${SYNAPSE_TLS_PORT}/" | grep -i strict-transport && echo "UNEXPECTED HSTS" || echo "no HSTS (correct)"
+```
+
+Registry checks (dedicated-port mode):
+
+```bash
+set -a; . ./.env; set +a
+curl -sS "${PUBLIC_NPM_REGISTRY_URL%/}/-/ping"
+npm ping --registry "$PUBLIC_NPM_REGISTRY_URL"
 ```
 
 Check the certificate chain:
@@ -570,7 +700,58 @@ bwrap does not help a bare-metal process.
 the shell first) — it must be unset or `http://api:3001`, never a loopback/public
 domain, or the docker sandbox container will dial the wrong address.
 
-## 9. Troubleshooting
+## 9. Deploy-mode limitations (read before choosing `http`)
+
+Some product features depend on the transport, not on Synapse. Feature matrix
+(✓ works, ◐ degrades, ✗ unavailable):
+
+| Feature                                                     | `tls` | `selfsigned`¹ | `http` (ip:port)                                        |
+| ----------------------------------------------------------- | ----- | ------------- | ------------------------------------------------------- |
+| Desktop + mobile web, chat, API, realtime WS                | ✓     | ✓             | ✓                                                       |
+| Remote-agent daemon / device pairing (`ws://`/`wss://`)     | ✓     | ◐⁴            | ✓                                                       |
+| One-click daemon installer + npm registry                   | ✓     | ✓             | ✓ (port mode, §5b)                                      |
+| Voice input — mic dictation (`/ws/asr`) and voice messages  | ✓     | ✓             | ✗ browser blocks mic on insecure origins                |
+| Camera QR scan (login / pairing, mobile web)                | ✓     | ✓             | ✗ camera needs a secure context                         |
+| Copy-to-clipboard buttons                                   | ✓     | ✓             | ◐ falls back to `execCommand`; on failure copy manually |
+| Chat offline outbox / service worker, desktop notifications | ✓     | ✓             | ✗ silently disabled (secure-context APIs)               |
+| Telegram connector — webhook mode                           | ✓     | ✗²            | ✗² (long-polling mode works everywhere)                 |
+| WhatsApp Cloud connector (webhook-only)                     | ✓     | ✗²            | ✗² (`whatsapp_unofficial`/Baileys works everywhere)     |
+| Feishu OAuth login, MCP plugin OAuth connections            | ✓     | ◐³            | ◐³                                                      |
+| HTTP/2 + HTTP/3, brotli/zstd + compression dictionaries     | ✓     | ✓             | ✗ HTTP/1.1 + gzip only                                  |
+
+¹ After the client trusts the certificate (§5a). iOS native builds need
+profile install + full trust; Android native builds distrust user-installed
+CAs entirely (use the `/mobile/` web build) — see §5a.
+² Third-party platforms only deliver webhooks to publicly-trusted HTTPS URLs —
+a self-signed cert does not qualify. Use polling/long-connection transports.
+³ Depends on the provider: most refuse to register plain-http (or untrusted
+https) non-localhost redirect URIs.
+⁴ Works, but every daemon/device machine must set
+`NODE_EXTRA_CA_CERTS=<path>/fullchain.pem` (Node ignores the OS trust store) —
+see §5a.
+
+Additional `http`-mode caveats:
+
+- **Everything is cleartext**: session cookies, daemon api-keys, pairing
+  codes, uploaded files. Deploy only on networks you trust (LAN/VPN), or
+  prefer `selfsigned`.
+- **Android native builds** need cleartext opt-in (the repo's Expo config
+  enables `usesCleartextTraffic` automatically when the baked
+  `EXPO_PUBLIC_API_URL` is `http://`); iOS allows IP-literal http but not
+  hostname http without an ATS exception. The shipped `/mobile/` web export is
+  unaffected.
+- **Fronting `nginx-http` with your own TLS terminator** collapses the
+  per-client rate-limit key to the terminator's address (a single global
+  bucket that self-429s). Add `set_real_ip_from <terminator CIDR>;
+real_ip_header X-Forwarded-For; real_ip_recursive on;` — see the comment at
+  the top of `infrastructure/nginx/public-http.conf.template`.
+- **Changing the public host/port requires rebuilding the browser bundles**:
+  `NEXT_PUBLIC_*` / `EXPO_PUBLIC_*` values are inlined at image build
+  (`docker compose --profile production build web mobile-web`), runtime env
+  alone never reaches the browser. This applies to every mode, but host
+  changes are far more common on ip:port deploys.
+
+## 10. Troubleshooting
 
 Inspect logs:
 

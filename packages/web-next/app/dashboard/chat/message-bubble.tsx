@@ -78,6 +78,8 @@ import {
 import type { ServerToolCall } from "@synapse/shared"
 import type { ConversationMember } from "@/stores/chat-store"
 import type { ChatTaskResolveInput, ChatTaskResolvePayload } from "@/lib/api"
+import { copyTextToClipboard } from "@/lib/clipboard"
+import { createUuid } from "@/lib/uuid"
 import { cn, resolveContentUrl } from "@/lib/utils"
 import ChatAvatar from "./chat-avatar"
 import { getRuntimeDetail, getRuntimeLabel } from "./runtime-ui"
@@ -888,12 +890,7 @@ function TaskCard({
     setSubmittingAction(actionKey)
     setSubmitError(null)
     try {
-      const commandId =
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : `task-${Date.now().toString(36)}-${Math.random()
-              .toString(16)
-              .slice(2)}`
+      const commandId = createUuid()
       await onResolveTask(task.id, {
         ...payload,
         commandId,
@@ -2775,10 +2772,12 @@ export default function MessageBubble({
 
   async function copyText(text: string) {
     try {
-      await navigator.clipboard.writeText(text)
-      toast.success("Copied")
-    } catch {
-      toast.error("Failed to copy")
+      const copied = await copyTextToClipboard(text)
+      if (copied) {
+        toast.success("Copied")
+      } else {
+        toast.error("Failed to copy")
+      }
     } finally {
       setContextMenu(null)
     }

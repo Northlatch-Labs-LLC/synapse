@@ -104,6 +104,28 @@ server {
         proxy_send_timeout 120s;
     }
 
+    # Device control-plane WebSocket. Lives under /api/v1/ (the runtime builds
+    # the path off the server origin), but the generic /api/ location above
+    # forwards no Upgrade/Connection headers — without this exact-match block
+    # the handshake is proxied as a plain GET and the upgrade fails. Same
+    # limiter + posture as /ws (it IS a ws endpoint, just differently pathed).
+    location = /api/v1/devices/control-plane {
+        set $api_upstream api;
+        limit_req zone=synapse_ws_req burst=50 nodelay;
+        limit_conn synapse_ws_conn 128;
+        proxy_pass http://$api_upstream:3001;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        # Ring-0 strip + ingress marker re-declared: this location's own
+        # proxy_set_header kills server-level inheritance (traceparent still
+        # passes; the marker still OVERRIDES any client copy).
+        proxy_set_header tracestate "";
+        proxy_set_header baggage "";
+        proxy_set_header sentry-trace "";
+        proxy_set_header x-synapse-trace-ingress "public";
+        proxy_read_timeout 86400s;
+    }
+
     location /ws {
         set $api_upstream api;
         # Upgrades are cheap to bound — one request per connection.

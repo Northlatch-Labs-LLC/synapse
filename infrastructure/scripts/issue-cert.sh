@@ -12,17 +12,24 @@ if [ -f "$REPO_ROOT/.env" ]; then
 fi
 
 DEPLOY_MODE="${SYNAPSE_DEPLOY_MODE:-tls}"
-if [ "$DEPLOY_MODE" = "http" ]; then
-  echo "SYNAPSE_DEPLOY_MODE=http does not use Let's Encrypt certificates." >&2
-  echo "Switch to SYNAPSE_DEPLOY_MODE=tls before running issue-cert.sh." >&2
+if [ "$DEPLOY_MODE" != "tls" ]; then
+  echo "SYNAPSE_DEPLOY_MODE=$DEPLOY_MODE does not use Let's Encrypt certificates." >&2
+  if [ "$DEPLOY_MODE" = "selfsigned" ]; then
+    echo "Use ./infrastructure/scripts/issue-selfsigned-cert.sh instead." >&2
+  else
+    echo "Switch to SYNAPSE_DEPLOY_MODE=tls before running issue-cert.sh." >&2
+  fi
   exit 1
 fi
 
 PRIMARY_DOMAIN="${SYNAPSE_PUBLIC_DOMAIN:?SYNAPSE_PUBLIC_DOMAIN is required in .env. Run SYNAPSE_PUBLIC_DOMAIN=<domain> ./setup.sh first.}"
-WWW_DOMAIN="${SYNAPSE_WWW_DOMAIN:-www.${PRIMARY_DOMAIN}}"
-MOBILE_SHORT_DOMAIN="${SYNAPSE_MOBILE_SHORT_DOMAIN:-m.${PRIMARY_DOMAIN}}"
-MOBILE_DOMAIN="${SYNAPSE_MOBILE_DOMAIN:-mobile.${PRIMARY_DOMAIN}}"
-REGISTRY_DOMAIN="${SYNAPSE_REGISTRY_DOMAIN:-npmr.${PRIMARY_DOMAIN}}"
+# Subdomains are OPT-IN since the single-domain layout landed: an empty var
+# means "not part of this deployment", so no www./m./mobile./npmr. fallbacks
+# are fabricated here — setup.sh is the only deriver (SYNAPSE_SUBDOMAINS=full).
+WWW_DOMAIN="${SYNAPSE_WWW_DOMAIN:-}"
+MOBILE_SHORT_DOMAIN="${SYNAPSE_MOBILE_SHORT_DOMAIN:-}"
+MOBILE_DOMAIN="${SYNAPSE_MOBILE_DOMAIN:-}"
+REGISTRY_DOMAIN="${SYNAPSE_REGISTRY_DOMAIN:-}"
 EMAIL="${LETSENCRYPT_EMAIL:-admin@${PRIMARY_DOMAIN}}"
 CERT_NAME="${LETSENCRYPT_CERT_NAME:-${PRIMARY_DOMAIN}}"
 DOMAINS=(
@@ -51,6 +58,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# --expand: a no-op while the domain set is unchanged, but required when a
+# re-run GROWS the SAN list for an existing cert name (e.g. a single-domain
+# deploy later opts into SYNAPSE_SUBDOMAINS=full) — without it a non-TTY run
+# fails with "Use --expand" instead of updating the lineage.
 docker compose --profile certbot run --rm certbot certonly \
   --webroot \
   --webroot-path /var/www/certbot \
@@ -58,4 +69,5 @@ docker compose --profile certbot run --rm certbot certonly \
   --email "$EMAIL" \
   --agree-tos \
   --no-eff-email \
+  --expand \
   "${domain_args[@]}"
