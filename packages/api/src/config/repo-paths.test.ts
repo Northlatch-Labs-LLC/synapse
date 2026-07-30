@@ -37,10 +37,10 @@ test("repo path helpers resolve from module location instead of cwd", async () =
       join(expectedRepoRoot, "subprojects", "lark-cli")
     )
 
-    assert.equal(
-      existsSync(repoPaths.resolveRepoPath("docs", "device-runtime-v3.md")),
-      true
-    )
+    // Anchor on a TRACKED root file: working docs moved to the gitignored
+    // .docs/ (commit e2ef38c98 "stop tracking docs/"), so any docs/* anchor
+    // would couple this path-resolution test to untracked local state.
+    assert.equal(existsSync(repoPaths.resolveRepoPath("AGENTS.md")), true)
 
     // The remaining existsSync checks below depend on git submodules
     // being initialized (`git submodule update --init`). Worktrees often
