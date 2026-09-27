@@ -61,7 +61,7 @@ test("parseRemoteInstanceCommand rejects invalid command payloads", () => {
         configHash: "hash-1",
         input: {},
       }),
-    /Invalid input/
+    /Invalid input|No matching discriminator/
   )
 
   assert.throws(
@@ -72,7 +72,7 @@ test("parseRemoteInstanceCommand rejects invalid command payloads", () => {
         key: "instance-key",
         configHash: "hash-1",
       }),
-    /Invalid input/
+    /Invalid input|No matching discriminator/
   )
 })
 

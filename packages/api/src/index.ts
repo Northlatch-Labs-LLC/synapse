@@ -223,7 +223,7 @@ async function main() {
       error:
         statusCode >= 500
           ? "Internal Server Error"
-          : error.message || "Request failed",
+          : (error as { message?: string }).message || "Request failed",
       code,
     })
   })

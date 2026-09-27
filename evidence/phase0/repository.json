@@ -1,0 +1,33 @@
+{
+  "recordedAt": "2026-09-27T05:17:00Z",
+  "mission": "synapse-phase0 (SYNAPSE-HANDOUT.md §4.1 fork & baseline)",
+  "upstream": {
+    "url": "https://github.com/zai-org/Synapse.git",
+    "defaultBranch": "main",
+    "baselineHead": "651d39d92ff08beff0868f991c36a27c20191726",
+    "baselineHeadSubject": "docs(changelog): drop the embedded commit-SHA citations from 0.27.0 / 0.28.0",
+    "baselineHeadDate": "2026-07-29 08:05:30 -0700",
+    "upstreamVersion": "0.28.0",
+    "lastUpstreamPush": "2026-07-31T07:25:27Z"
+  },
+  "fork": {
+    "url": "https://github.com/Northlatch-Labs-LLC/synapse",
+    "visibility": "private",
+    "clonedTo": "synapse/ (workspace-local path relative to northlatch-harness)",
+    "remotes": {
+      "origin": "https://github.com/Northlatch-Labs-LLC/synapse.git",
+      "upstream": "https://github.com/zai-org/Synapse.git"
+    },
+    "note": "Converting the fork to private detached it from the upstream fork network (GitHub behavior: fork=false, parent=null after privatize). Upstream tracking continues via the 'upstream' remote; weekly sync per handout INV-S2 uses fetch/merge against https://github.com/zai-org/Synapse.git. Recorded so nobody re-derives this."
+  },
+  "incident": {
+    "title": "git transport 403 'Repository is disabled' for ~2 minutes post-privatize",
+    "resolution": "Eventual consistency after rename + visibility change; API reported disabled:false throughout; clone succeeded on retry. No action needed for future forks beyond retrying."
+  },
+  "toolchain": {
+    "node": "v26.7.0",
+    "npm": "12.0.2",
+    "git": "2.55.0",
+    "packageManager": "npm workspaces (package-lock.json)"
+  }
+}

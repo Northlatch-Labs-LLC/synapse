@@ -55,13 +55,9 @@
                   "type": "object",
                   "properties": {
                     "url": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
+                      "type": [
+                        "string",
+                        "null"
                       ]
                     }
                   },

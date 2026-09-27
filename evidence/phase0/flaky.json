@@ -1,0 +1,68 @@
+{
+  "canonicalBaseline": {
+    "run": 4,
+    "toolchain": {
+      "node": "v22.13.1",
+      "npm": "10.9.2"
+    },
+    "services": {
+      "redis": "localhost:6379 (docker synapse-baseline-redis)",
+      "postgres": "self-provisioned via testcontainers"
+    },
+    "tree": "pristine upstream dependencies at 651d39d9 (pre-remediation)",
+    "result": {
+      "pass": 3003,
+      "fail": 34,
+      "skipped": 25,
+      "testPhaseDurationMs": 454559
+    },
+    "note": "Upstream CI at the same HEAD never reached the suite: its verify-boundary gate died at guard:fk-policy (uncommitted generated doc), and its secret-scan was also red. The 34 failures below were therefore invisible upstream."
+  },
+  "classifications": [
+    {
+      "class": "platform-gated (not a defect)",
+      "count": 33,
+      "files": [
+        "src/modules/sandbox/local-bare-plane.test.ts (17)",
+        "src/modules/sandbox/core-catalog.test.ts (5)",
+        "src/modules/sandbox/data-plane.test.ts (3)",
+        "src/modules/sandbox/bare-degraded-matrix.test.ts (3)",
+        "src/modules/sandbox/bare-dispatch-fail-closed.test.ts (2)",
+        "src/modules/sandbox/working-set-bridge.test.ts (1)",
+        "src/modules/sandbox/local-bare-dispatch.test.ts (1)",
+        "src/modules/sandbox/docker-bare-adapter.test.ts (1)"
+      ],
+      "rootCause": "buildLocalBareDescriptor() probes bwrapAvailable(); macOS hosts have no bubblewrap, so isolation degrades to null and the plane fail-closes with runtime_constraint where the tests expect permission_denied / successful exec. Secure direction (deny), Linux+bwrap is the covered environment.",
+      "fix": "ci.yml installs bubblewrap + ripgrep on ubuntu-latest before the suite; these 33 run and assert the real paths in CI."
+    },
+    {
+      "class": "fresh-clone papercut (upstream, fixed in Phase 0)",
+      "count": 1,
+      "file": "src/config/repo-paths.test.ts",
+      "rootCause": "Asserts existsSync(docs/device-runtime-v3.md); the file was never committed upstream (not tracked, not ignored, no history). Every fresh clone fails this test.",
+      "fix": "Present-only guard mirroring the file's existing submodule pattern; path resolution (the named contract) remains asserted unconditionally."
+    }
+  ],
+  "environmentNotes": [
+    "node 26 (dev host default) additionally fails 5 downloadToBufferWithLimit tests: npm undici@5 dispatcher passed to node-26 built-in fetch raises 'invalid onError method'. Node 22 is the CI toolchain and the supported combo (ADR-0001).",
+    "Without a reachable Redis, module-scope ioredis clients retry forever and the suite hangs (run 2, ~40min stall). CI provides a redis service container.",
+    "guard:fk-policy fails on fresh clones: docs/fk-policy.generated.md untracked upstream; committed in Phase 0 (content-identical regeneration).",
+    "npm >= 11 needs --allow-remote/--allow-git escapes for the xlsx CDN tarball and the libsignal git dep (WhatsApp transport, INV-S1)."
+  ],
+  "flakyProper": [
+    {
+      "test": "boot matrix 6 (F13): OTEL_TRACES_EXPORTER=bogus + endpoint ⇒ treated as unset, export ON",
+      "file": "src/instrumentation.boot.test.ts",
+      "evidence": "Failed in full-suite run 10 (identical tree to run 9 where it passed); 3/3 green in isolated runs after.",
+      "suspectedCause": "Process-env mutation racing sibling test files under `tsx --test --test-concurrency=4`; OTEL exporter boot tests read/overwrite shared env.",
+      "action": "Tracked for Phase 1 hardening: serialize env-mutating boot tests (node:test `--test-isolation=process` per-file or a concurrency group). Not capability-affecting."
+    },
+    {
+      "test": "(b) recovery: sandbox row ref resolution under shared test DB (pg 57P01)",
+      "file": "src/modules/sandbox/reaper-recovery-loopback.test.ts",
+      "evidence": "G-S1 seal run: terminating connection due to administrator command during bootSharedTestDb — shared testcontainers Postgres torn down by a concurrently finishing file.",
+      "suspectedCause": "testcontainers shared-container teardown race under --test-concurrency=4.",
+      "action": "Recorded; candidate fix is a refcounted teardown barrier in test/helpers/db.ts (Phase-1 test-infra item). Not product code."
+    }
+  ]
+}

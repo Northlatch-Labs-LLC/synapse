@@ -27,3 +27,19 @@ description = "security-auditor SKILL.md: single doc-example key"
 condition = "AND"
 paths = ['''\.setup/skills/clawhub/skills/security-auditor/SKILL\.md$''']
 regexes = ['''sk-1234567890abcdef''']
+
+# Phase-0 evidence (SYNAPSE-HANDOUT §4, INV-S6) — machine-generated scanner
+# outputs quote advisory prose/hashes that pattern-match generic-api-key.
+# File-scoped to the four raw outputs only; the normalized reports
+# (dependency-audit.json etc.) and all source remain fully scanned.
+[[allowlists]]
+description = "osv-scanner raw output quotes advisory prose (generic-api-key FPs)"
+paths = ['''^evidence/phase0/osv-scanner\.json$''']
+
+[[allowlists]]
+description = "npm audit raw output quotes advisory prose (generic-api-key FPs)"
+paths = ['''^evidence/phase0/npm-audit-raw\.json$''']
+
+[[allowlists]]
+description = "trivy raw outputs quote advisory prose (generic-api-key FPs)"
+paths = ['''^evidence/phase0/trivy-api-image(-remediated)?\.json$''']

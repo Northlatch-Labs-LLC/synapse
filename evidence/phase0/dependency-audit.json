@@ -1,0 +1,1000 @@
+{
+  "generatedAt": "2026-09-27T12:27:01.802Z",
+  "baselineHead": "651d39d92ff08beff0868f991c36a27c20191726",
+  "scope": "production dependencies (--omit=dev), npm workspaces root",
+  "toolchain": {
+    "node": "v26.7.0",
+    "npm": "12.0.2"
+  },
+  "criticals": 3,
+  "highs": 24,
+  "sources": {
+    "npmAudit": {
+      "total": 72,
+      "bySeverity": {
+        "info": 0,
+        "low": 7,
+        "moderate": 38,
+        "high": 24,
+        "critical": 3,
+        "total": 72
+      }
+    },
+    "osvScanner": {
+      "packagesScanned": 1775,
+      "packagesWithFindings": 43,
+      "criticalHighPackages": 30,
+      "note": "OSV severities from GHSA database_specific; CVSS vectors in raw output"
+    }
+  },
+  "topFindings": [
+    {
+      "name": "fast-jwt",
+      "severity": "critical",
+      "range": "<=6.2.3",
+      "advisories": [
+        "Fast-JWT Improperly Validates iss Claims (https://github.com/advisories/GHSA-gm45-q3v2-6cf8)",
+        "fast-jwt accepts unknown `crit` header extensions (RFC 7515 violation) (https://github.com/advisories/GHSA-hm7r-c7qw-ghp6)",
+        "fast-jwt: Incomplete fix for CVE-2023-48223: JWT Algorithm Confusion via Whitespace-Prefixed RSA Public Key (https://github.com/advisories/GHSA-mvf2-f6gm-w987)",
+        "fast-jwt: Cache Confusion via cacheKeyBuilder Collisions Can Return Claims From a Different Token (Identity/Authorization Mixup) (https://github.com/advisories/GHSA-rp9m-7r4c-75qg)",
+        "fast-jwt: Stateful RegExp (/g or /y) causes non-deterministic allowed-claim validation (logical DoS) (https://github.com/advisories/GHSA-3j8v-cgw4-2g6q)",
+        "fast-jwt: JWT auth bypass due to empty HMAC secret accepted by async key resolver (https://github.com/advisories/GHSA-gmvf-9v4p-v8jc)"
+      ],
+      "fixAvailable": "@fastify/jwt@10.2.2 (semver-major)",
+      "isDirect": false,
+      "effects": ["@fastify/jwt"]
+    },
+    {
+      "name": "next",
+      "severity": "critical",
+      "range": "9.3.4-canary.0 - 16.3.2",
+      "advisories": [
+        "Next.js: HTTP request smuggling in rewrites (https://github.com/advisories/GHSA-ggv3-7p47-pfv8)",
+        "Next.js: Unbounded next/image disk cache growth can exhaust storage (https://github.com/advisories/GHSA-3x4c-7xq6-9pq8)",
+        "Next.js: Unbounded postponed resume buffering can lead to DoS (https://github.com/advisories/GHSA-h27x-g6w4-24gq)",
+        "Next.js: null origin can bypass Server Actions CSRF checks (https://github.com/advisories/GHSA-mq59-m269-xvcx)",
+        "Next.js: null origin can bypass dev HMR websocket CSRF checks (https://github.com/advisories/GHSA-jcc7-9wpm-mj36)",
+        "Next.js has a Denial of Service with Server Components (https://github.com/advisories/GHSA-q4gf-8mx6-v5v3)",
+        "Next.js Vulnerable to Denial of Service with Server Components (https://github.com/advisories/GHSA-8h8q-6873-q5fj)",
+        "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes - Incomplete Fix Follow-Up (https://github.com/advisories/GHSA-26hh-7cqf-hhc6)",
+        "Next.js's Middleware / Proxy redirects can be cache-poisoned (https://github.com/advisories/GHSA-3g8h-86w9-wvmq)",
+        "Next.js vulnerable to cross-site scripting in App Router applications using CSP nonces (https://github.com/advisories/GHSA-ffhc-5mcf-pf4q)",
+        "Next.js vulnerable to cache poisoning via collisions in React Server Component cache-busting (https://github.com/advisories/GHSA-vfv6-92ff-j949)",
+        "Next.js has cross-site scripting in beforeInteractive scripts with untrusted input (https://github.com/advisories/GHSA-gx5p-jg67-6x7h)",
+        "Next.js vulnerable to Denial of Service via connection exhaustion in applications using Cache Components (https://github.com/advisories/GHSA-mg66-mrh9-m8jx)",
+        "Next.js has a Denial of Service in the Image Optimization API (https://github.com/advisories/GHSA-h64f-5h5j-jqjh)",
+        "Next.js vulnerable to server-side request forgery in applications using WebSocket upgrades (https://github.com/advisories/GHSA-c4j6-fc7j-m34r)",
+        "Next.js has a Middleware / Proxy bypass through dynamic route parameter injection (https://github.com/advisories/GHSA-492v-c6pp-mqqv)",
+        "Next.js vulnerable to cache poisoning in React Server Component responses (https://github.com/advisories/GHSA-wfc6-r584-vfw7)",
+        "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes (https://github.com/advisories/GHSA-267c-6grr-h53f)",
+        "Next.js has a Middleware / Proxy bypass in Pages Router applications using i18n (https://github.com/advisories/GHSA-36qx-fr4f-26g5)",
+        "Next.js: Middleware / Proxy bypass in App Router applications using Turbopack and single locale (https://github.com/advisories/GHSA-6gpp-xcg3-4w24)",
+        "Next.js: Denial of Service in App Router using Server Actions (https://github.com/advisories/GHSA-m99w-x7hq-7vfj)",
+        "Next.js: Server-Side Request Forgery in Server Actions on custom servers (https://github.com/advisories/GHSA-89xv-2m56-2m9x)",
+        "Next.js: Cache confusion of response bodies for requests with bodies (https://github.com/advisories/GHSA-68g3-v927-f742)",
+        "Next.js: Cache confusion of response bodies for requests with bodies containing invalid UTF-8 byte sequences (https://github.com/advisories/GHSA-4633-3j49-mh5q)",
+        "Next.js: Unbounded Server Action payload in Edge runtime (https://github.com/advisories/GHSA-4c39-4ccg-62r3)",
+        "Next.js: Server-Side Request Forgery in rewrites via attacker-controlled destination hostname (https://github.com/advisories/GHSA-p9j2-gv94-2wf4)",
+        "Next.js: Denial of Service in the Image Optimization API using SVGs (https://github.com/advisories/GHSA-q8wf-6r8g-63ch)",
+        "Next.js: Unauthenticated disclosure of internal Server Function endpoints (https://github.com/advisories/GHSA-955p-x3mx-jcvp)",
+        "Next.js: Unauthenticated Remote Code Execution on windows-hosted servers (https://github.com/advisories/GHSA-p293-qw3h-jr36)",
+        "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when AVIF files are used (https://github.com/advisories/GHSA-2xp9-vwfh-vxw4)"
+      ],
+      "fixAvailable": "next@16.3.6",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "tar",
+      "severity": "critical",
+      "range": "<=7.5.20",
+      "advisories": [
+        "node-tar applies PAX size override to intermediary GNU long-name/long-link headers, causing tar parser interpretation differential (file smuggling) (https://github.com/advisories/GHSA-vmf3-w455-68vh)",
+        "node-tar: Process crash via PAX numeric path type confusion (https://github.com/advisories/GHSA-w8wr-v893-vjvp)",
+        "node-tar: Decompression/parse DoS via unlimited input (https://github.com/advisories/GHSA-23hp-3jrh-7fpw)",
+        "node-tar: Negative tar entry size causes infinite loop in archive replace (https://github.com/advisories/GHSA-8x88-c5mf-7j5w)",
+        "node-tar: Uncaught Exception DoS via NUL byte in PAX path/linkpath records (https://github.com/advisories/GHSA-gvwx-54wh-qm9j)",
+        "node-tar: Uncontrolled recursion in mapHas/filesFilter allows uncatchable stack-overflow DoS via crafted long-path tar with member selection (https://github.com/advisories/GHSA-r292-9mhp-454m)"
+      ],
+      "fixAvailable": "tar@7.5.22",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "@larksuiteoapi/node-sdk",
+      "severity": "high",
+      "range": "1.57.0-beta.0 - 1.71.0",
+      "advisories": [],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "@modelcontextprotocol/sdk",
+      "severity": "high",
+      "range": "<=1.25.3",
+      "advisories": [
+        "@modelcontextprotocol/sdk has cross-client data leak via shared server/transport instance reuse (https://github.com/advisories/GHSA-345p-7cg4-v4c7)",
+        "Model Context Protocol (MCP) TypeScript SDK does not enable DNS rebinding protection by default (https://github.com/advisories/GHSA-w48q-cv73-mx4w)",
+        "Anthropic's MCP TypeScript SDK has a ReDoS vulnerability (https://github.com/advisories/GHSA-8r9q-7v3j-jr4g)"
+      ],
+      "fixAvailable": "chrome-devtools-mcp@1.10.1 (semver-major)",
+      "isDirect": false,
+      "effects": ["chrome-devtools-mcp"]
+    },
+    {
+      "name": "@puppeteer/browsers",
+      "severity": "high",
+      "range": "<=2.13.2",
+      "advisories": [],
+      "fixAvailable": "chrome-devtools-mcp@1.10.1 (semver-major)",
+      "isDirect": false,
+      "effects": ["puppeteer-core"]
+    },
+    {
+      "name": "@tiptap/core",
+      "severity": "high",
+      "range": "<=3.30.4",
+      "advisories": [
+        "Tiptap: mergeAttributes() turns an own __proto__ key into inherited executable DOM attributes (https://github.com/advisories/GHSA-cp6q-959q-f8rh)",
+        "Tiptap: Quadratic ReDoS in block and inline Markdown attribute parsing (https://github.com/advisories/GHSA-j95f-988m-3j2f)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": [
+        "@tiptap/extension-blockquote",
+        "@tiptap/extension-bold",
+        "@tiptap/extension-bubble-menu",
+        "@tiptap/extension-code",
+        "@tiptap/extension-code-block",
+        "@tiptap/extension-document",
+        "@tiptap/extension-floating-menu",
+        "@tiptap/extension-hard-break",
+        "@tiptap/extension-heading",
+        "@tiptap/extension-horizontal-rule",
+        "@tiptap/extension-italic",
+        "@tiptap/extension-link",
+        "@tiptap/extension-list",
+        "@tiptap/extension-mention",
+        "@tiptap/extension-paragraph",
+        "@tiptap/extension-strike",
+        "@tiptap/extension-text",
+        "@tiptap/extension-underline",
+        "@tiptap/extensions",
+        "@tiptap/react",
+        "@tiptap/suggestion"
+      ]
+    },
+    {
+      "name": "axios",
+      "severity": "high",
+      "range": "1.0.0 - 1.17.0",
+      "advisories": [
+        "Axios has a NO_PROXY Hostname Normalization Bypass that Leads to SSRF (https://github.com/advisories/GHSA-3p68-rc4w-qgx5)",
+        "Axios: Authentication Bypass via Prototype Pollution Gadget in `validateStatus` Merge Strategy (https://github.com/advisories/GHSA-w9j2-pvgh-6h63)",
+        "Axios: Incomplete Fix for CVE-2025-62718 — NO_PROXY Protection Bypassed via RFC 1122 Loopback Subnet (127.0.0.0/8) in Axios 1.15.0 (https://github.com/advisories/GHSA-pmwg-cvhr-8vh7)",
+        "Axios: Invisible JSON Response Tampering via Prototype Pollution Gadget in `parseReviver` (https://github.com/advisories/GHSA-3w6x-2g7m-8v23)",
+        "Axios: Null Byte Injection via Reverse-Encoding in AxiosURLSearchParams (https://github.com/advisories/GHSA-xhjh-pmcv-23jw)",
+        "Axios: CRLF Injection in multipart/form-data body via unsanitized blob.type in formDataToStream (https://github.com/advisories/GHSA-445q-vr5w-6q77)",
+        "Axios: no_proxy bypass via IP alias allows SSRF (https://github.com/advisories/GHSA-m7pr-hjqh-92cm)",
+        "Axios' HTTP adapter-streamed uploads bypass maxBodyLength when maxRedirects: 0 (https://github.com/advisories/GHSA-5c9x-8gcm-mpgx)",
+        "Axios: HTTP adapter streamed responses bypass maxContentLength (https://github.com/advisories/GHSA-vf2m-468p-8v99)",
+        "Axios: Prototype Pollution Gadgets - Response Tampering, Data Exfiltration, and Request Hijacking (https://github.com/advisories/GHSA-pf86-5x62-jrwf)",
+        "Axios: Header Injection via Prototype Pollution (https://github.com/advisories/GHSA-6chq-wfr3-2hj9)",
+        "Axios: XSRF Token Cross-Origin Leakage via Prototype Pollution Gadget in `withXSRFToken` Boolean Coercion (https://github.com/advisories/GHSA-xx6v-rp6x-q39c)",
+        "Axios has prototype pollution read-side gadgets in HTTP adapter that allow credential injection and request hijacking (https://github.com/advisories/GHSA-q8qp-cvcw-x6jj)",
+        "Axios has Unrestricted Cloud Metadata Exfiltration via Header Injection Chain (https://github.com/advisories/GHSA-fvcv-3m26-pcqx)",
+        "Axios: unbounded recursion in toFormData causes DoS via deeply nested request data (https://github.com/advisories/GHSA-62hf-57xw-28j9)",
+        "Axios: Regular Expression Denial of Service (ReDoS) via Cookie Name Injection (https://github.com/advisories/GHSA-hfxv-24rg-xrqf)",
+        "Allocation of Resources Without Limits or Throttling in Axios (https://github.com/advisories/GHSA-777c-7fjr-54vf)",
+        "Axios: Proxy-Authorization Credential Leak to Origin Server Across HTTP-to-HTTPS Redirect in Axios Node.js HTTP Adapter (https://github.com/advisories/GHSA-p92q-9vqr-4j8v)",
+        "Axios: Proxy-Authorization header leaks to redirect target when proxy is re-evaluated to direct connection (https://github.com/advisories/GHSA-j5f8-grm9-p9fc)",
+        "axios Vulnerable to Credential Theft and Response Hijacking via Prototype Pollution Gadget in Config Merge (https://github.com/advisories/GHSA-3g43-6gmg-66jw)",
+        "axios Vulnerable to Full Man-in-the-Middle via Prototype Pollution Gadget in `config.proxy` (https://github.com/advisories/GHSA-35jp-ww65-95wh)",
+        "axios has DoS & Header Injection via Prototype Pollution Read-Side Gadgets in axios merge functions (https://github.com/advisories/GHSA-898c-q2cr-xwhg)",
+        "Axios: Prototype pollution gadgets can alter axios request construction (https://github.com/advisories/GHSA-mmx7-hfxf-jppx)",
+        "Axios: Deep formToJSON Key Recursion Can Cause Denial of Service (https://github.com/advisories/GHSA-pmv8-rq9r-6j72)",
+        "Axios: HTTP/2 streamed uploads bypass `maxBodyLength` (https://github.com/advisories/GHSA-mwf2-3pr3-8698)",
+        "Axios: Nested axios option objects can consume polluted prototype values (https://github.com/advisories/GHSA-7q8q-rj6j-mhjq)",
+        "Axios: Fetch adapter `ReadableStream` uploads bypass `maxBodyLength` (https://github.com/advisories/GHSA-jqh4-m9w3-8hp9)",
+        "Axios: Excessive recursion in formDataToJSON can cause denial of service (https://github.com/advisories/GHSA-42h9-826w-cgv3)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": ["@larksuiteoapi/node-sdk"]
+    },
+    {
+      "name": "better-auth",
+      "severity": "high",
+      "range": "1.1.3 - 1.6.21",
+      "advisories": [
+        "Better Auth: Account takeover via pre-account hijacking on magic-link and email-OTP sign-in (https://github.com/advisories/GHSA-qq9h-g4jm-xgf3)"
+      ],
+      "fixAvailable": "better-auth@1.7.6",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "brace-expansion",
+      "severity": "high",
+      "range": "<=1.1.17 || 3.0.0 - 5.0.8",
+      "advisories": [
+        "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups (https://github.com/advisories/GHSA-3jxr-9vmj-r5cp)",
+        "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups (https://github.com/advisories/GHSA-3jxr-9vmj-r5cp)",
+        "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash (https://github.com/advisories/GHSA-mh99-v99m-4gvg)",
+        "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash (https://github.com/advisories/GHSA-mh99-v99m-4gvg)",
+        "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation (https://github.com/advisories/GHSA-rgw5-rvv9-x895)",
+        "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation (https://github.com/advisories/GHSA-rgw5-rvv9-x895)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "browserslist",
+      "severity": "high",
+      "range": "<=4.28.6",
+      "advisories": [
+        "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM (https://github.com/advisories/GHSA-c83g-rgw3-j3cx)",
+        "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats) (https://github.com/advisories/GHSA-73wf-gq98-2v4g)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "chrome-devtools-mcp",
+      "severity": "high",
+      "range": "0.0.2 - 0.8.1",
+      "advisories": [],
+      "fixAvailable": "chrome-devtools-mcp@1.10.1 (semver-major)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "extract-zip",
+      "severity": "high",
+      "range": "*",
+      "advisories": [
+        "extract-zip unvalidated symlink path traversal (https://github.com/advisories/GHSA-jmr9-qjv8-65gv)",
+        "extract-zip allows arbitrary file writes through symlink archive entries (https://github.com/advisories/GHSA-7pqw-9j4j-h8q3)"
+      ],
+      "fixAvailable": "chrome-devtools-mcp@1.10.1 (semver-major)",
+      "isDirect": false,
+      "effects": ["@puppeteer/browsers"]
+    },
+    {
+      "name": "fast-uri",
+      "severity": "high",
+      "range": "<=2.4.4 || 3.0.0 - 3.1.5",
+      "advisories": [
+        "fast-uri vulnerable to host confusion via literal backslash authority delimiter (https://github.com/advisories/GHSA-v2hh-gcrm-f6hx)",
+        "fast-uri vulnerable to host confusion via literal backslash authority delimiter (https://github.com/advisories/GHSA-v2hh-gcrm-f6hx)",
+        "fast-uri vulnerable to host confusion via backslash authority introducer (https://github.com/advisories/GHSA-7p8r-x3mc-p8w7)",
+        "fast-uri vulnerable to host confusion via backslash authority introducer (https://github.com/advisories/GHSA-7p8r-x3mc-p8w7)",
+        "fast-uri vulnerable to path traversal via percent-encoded dot segments (https://github.com/advisories/GHSA-q3j6-qgpj-74h6)",
+        "fast-uri vulnerable to host confusion via percent-encoded authority delimiters (https://github.com/advisories/GHSA-v39h-62p7-jpjc)",
+        "fast-uri vulnerable to server-side request forgery via malformed IPv6 normalization (https://github.com/advisories/GHSA-f65p-4m7j-42xc)",
+        "fast-uri vulnerable to server-side request forgery via malformed IPv6 normalization (https://github.com/advisories/GHSA-f65p-4m7j-42xc)",
+        "fast-uri vulnerable to server-side request forgery via repeated hostname percent-decoding (https://github.com/advisories/GHSA-fph4-wmhf-6fwf)",
+        "fast-uri vulnerable to host confusion via percent-encoded scheme normalization (https://github.com/advisories/GHSA-jqff-g426-hqxp)",
+        "fast-uri vulnerable to host confusion via percent-encoded scheme normalization (https://github.com/advisories/GHSA-jqff-g426-hqxp)",
+        "fast-uri vulnerable to host confusion via failed IDN canonicalization (https://github.com/advisories/GHSA-4c8g-83qw-93j6)",
+        "fast-uri vulnerable to host confusion via failed IDN canonicalization (https://github.com/advisories/GHSA-4c8g-83qw-93j6)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "fastify",
+      "severity": "high",
+      "range": "<=5.12.0",
+      "advisories": [
+        "Fastify Vulnerable to DoS via Unbounded Memory Allocation in sendWebStream (https://github.com/advisories/GHSA-mrq3-vjjr-p77c)",
+        "Fastify's Content-Type header tab character allows body validation bypass (https://github.com/advisories/GHSA-jx2c-rxcm-jvmq)",
+        "fastify: request.protocol and request.host Spoofable via X-Forwarded-Proto/Host from Untrusted Connections (https://github.com/advisories/GHSA-444r-cwp2-x5xf)",
+        "fastify vulnerable to schema validation bypass via root primitive coercion mismatch (https://github.com/advisories/GHSA-w2qp-rph6-63g4)"
+      ],
+      "fixAvailable": "fastify@5.12.5 (semver-major)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "find-my-way",
+      "severity": "high",
+      "range": "<=9.6.0",
+      "advisories": [
+        "find-my-way: DDoS with HTTP2 (https://github.com/advisories/GHSA-c96f-x56v-gq3h)"
+      ],
+      "fixAvailable": "fastify@5.12.5 (semver-major)",
+      "isDirect": false,
+      "effects": ["fastify"]
+    },
+    {
+      "name": "form-data",
+      "severity": "high",
+      "range": "4.0.0 - 4.0.5",
+      "advisories": [
+        "form-data: CRLF injection in form-data via unescaped multipart field names and filenames (https://github.com/advisories/GHSA-hmw2-7cc7-3qxx)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "hono",
+      "severity": "high",
+      "range": "<=4.13.4",
+      "advisories": [
+        "hono: Body Limit Middleware can be bypassed on AWS Lambda by understating `Content-Length` (https://github.com/advisories/GHSA-rv63-4mwf-qqc2)",
+        "hono: Lambda@Edge adapter keeps only the last value of a repeated request header, dropping the rest (https://github.com/advisories/GHSA-wgpf-jwqj-8h8p)",
+        "hono: CORS Middleware reflects any Origin with credentials when `origin` defaults to the wildcard (https://github.com/advisories/GHSA-88fw-hqm2-52qc)",
+        "hono: Path traversal in `serve-static` on Windows via encoded backslash (`%5C`) (https://github.com/advisories/GHSA-wwfh-h76j-fc44)",
+        "hono: AWS Lambda adapter merges multiple `Set-Cookie` headers into one value, dropping cookies on ALB single-header and Lattice (https://github.com/advisories/GHSA-j6c9-x7qj-28xf)",
+        "Hono: API Gateway v1 adapter can drop a distinct repeated request header value during de-duplication (https://github.com/advisories/GHSA-xgm2-5f3f-mvvc)",
+        "hono/jsx does not isolate context per request, leading to cross-request data disclosure (https://github.com/advisories/GHSA-hvrm-45r6-mjfj)",
+        "Hono: Server-Side XSS via JSX Escaping Bypass in cx() Utility (https://github.com/advisories/GHSA-w62v-xxxg-mg59)",
+        "Hono: ReDoS in CORS middleware via Access-Control-Request-Headers (https://github.com/advisories/GHSA-8j4g-w8fx-2239)",
+        "Hono: `memo()` retains SSR output across requests, leading to cross-user data disclosure (https://github.com/advisories/GHSA-f23p-vx2j-j53r)",
+        "Hono: Proxy Helper does not remove response headers listed in the `Connection` header (https://github.com/advisories/GHSA-79qm-7rj5-m7r9)",
+        "Hono: Algorithmic Complexity DoS in Language Middleware (https://github.com/advisories/GHSA-54fx-42gc-7vw4)",
+        "Hono: Incomplete fix for CVE-2026-39408: `toSSG()` still writes files outside the output directory (https://github.com/advisories/GHSA-gqvv-2mrq-wpjv)",
+        "Hono: Unbounded dot-notation nesting in `parseBody()` can cause memory exhaustion (https://github.com/advisories/GHSA-g6gw-c38x-mqfc)",
+        "Hono: Query parser reads parameters after the URL fragment, causing cache-key and proxy interpretation differentials (https://github.com/advisories/GHSA-crvj-82cr-hjcx)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "ip-address",
+      "severity": "high",
+      "range": "<=10.3.0",
+      "advisories": [
+        "ip-address: Address4 decodes leading-zero octets as decimal while resolvers decode them as octal, allowing SSRF and trust-boundary bypass (https://github.com/advisories/GHSA-mwp4-54f8-5fhr)",
+        "ip-address: a CIDR suffix on the parsed address suppresses special-use classification and can bypass SSRF and trust-boundary checks (https://github.com/advisories/GHSA-4xrf-jv44-h6hh)",
+        "ip-address: misclassification of IPv4-mapped/NAT64 IPv6 addresses can bypass SSRF and trust-boundary checks (https://github.com/advisories/GHSA-22jq-vg5j-6vgg)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "js-yaml",
+      "severity": "high",
+      "range": "4.0.0 - 4.3.1",
+      "advisories": [
+        "js-yaml: YAML merge-key chains can force quadratic CPU consumption (https://github.com/advisories/GHSA-52cp-r559-cp3m)",
+        "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported (https://github.com/advisories/GHSA-5p4m-2wfm-xmqj)",
+        "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources (https://github.com/advisories/GHSA-2883-xcg3-v3hh)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "nanoid",
+      "severity": "high",
+      "range": "<=3.3.17",
+      "advisories": [
+        "nanoid: non-secure generators can loop indefinitely with negative size (https://github.com/advisories/GHSA-28wg-ghj8-5hjv)",
+        "nanoid: custom generators can loop indefinitely when size is zero (https://github.com/advisories/GHSA-2v37-7h3g-55p8)"
+      ],
+      "fixAvailable": "in-range (npm audit fix)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "picomatch",
+      "severity": "high",
+      "range": "<=2.3.1",
+      "advisories": [
+        "Picomatch: Method Injection in POSIX Character Classes causes incorrect Glob Matching (https://github.com/advisories/GHSA-3v7f-55p6-f55p)",
+        "Picomatch has a ReDoS vulnerability via extglob quantifiers (https://github.com/advisories/GHSA-c2c7-rcm5-vvqj)"
+      ],
+      "fixAvailable": "picomatch@2.3.2",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "postcss",
+      "severity": "high",
+      "range": "<=8.5.22",
+      "advisories": [
+        "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output (https://github.com/advisories/GHSA-qx2v-qp2m-jg93)",
+        "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments (https://github.com/advisories/GHSA-6g55-p6wh-862q)",
+        "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset (https://github.com/advisories/GHSA-fxqj-rqcc-2cmp)",
+        "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure (https://github.com/advisories/GHSA-r28c-9q8g-f849)"
+      ],
+      "fixAvailable": "next@16.3.6",
+      "isDirect": false,
+      "effects": ["next"]
+    },
+    {
+      "name": "puppeteer-core",
+      "severity": "high",
+      "range": "19.8.4 - 24.43.1",
+      "advisories": [],
+      "fixAvailable": "chrome-devtools-mcp@1.10.1 (semver-major)",
+      "isDirect": false,
+      "effects": ["chrome-devtools-mcp"]
+    },
+    {
+      "name": "sharp",
+      "severity": "high",
+      "range": "<=0.35.4-rc.0",
+      "advisories": [
+        "sharp inherited vulnerabilities in libvips: CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591 (https://github.com/advisories/GHSA-f88m-g3jw-g9cj)",
+        "sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545 (https://github.com/advisories/GHSA-rgj7-g3m4-5g8c)"
+      ],
+      "fixAvailable": "sharp@0.35.4 (semver-major)",
+      "isDirect": false,
+      "effects": ["next"]
+    },
+    {
+      "name": "undici",
+      "severity": "high",
+      "range": "<=6.27.0",
+      "advisories": [
+        "Undici has an unbounded decompression chain in HTTP responses on Node.js Fetch API via Content-Encoding leads to resource exhaustion (https://github.com/advisories/GHSA-g9mf-h72j-4rw9)",
+        "Undici has an HTTP Request/Response Smuggling issue (https://github.com/advisories/GHSA-2mjp-6q6p-2qxm)",
+        "Undici has Unbounded Memory Consumption in WebSocket permessage-deflate Decompression (https://github.com/advisories/GHSA-vrm6-8vpv-qv8q)",
+        "Undici has Unhandled Exception in WebSocket Client Due to Invalid server_max_window_bits Validation (https://github.com/advisories/GHSA-v9p9-hfj2-hcw8)",
+        "Undici has CRLF Injection in undici via `upgrade` option (https://github.com/advisories/GHSA-4992-7rv2-5pvq)",
+        "undici vulnerable to HTTP header injection via Set-Cookie percent-decoding (https://github.com/advisories/GHSA-p88m-4jfj-68fv)",
+        "undici WebSocket client vulnerable to denial of service via fragment count bypass (https://github.com/advisories/GHSA-vxpw-j846-p89q)",
+        "undici vulnerable to Set-Cookie SameSite attribute downgrade via permissive substring matching (https://github.com/advisories/GHSA-g8m3-5g58-fq7m)",
+        "undici vulnerable to downstream response desynchronization via retry interceptor (https://github.com/advisories/GHSA-8xcm-r25x-g524)",
+        "undici vulnerable to CRLF Injection via blob-like body 'type' property (https://github.com/advisories/GHSA-m8rv-5g2x-5cg5)",
+        "undici vulnerable to cookie attribute injection via unsanitized domain and unparsed setCookie fields (https://github.com/advisories/GHSA-v3r7-h72x-cjcm)",
+        "undici vulnerable to HTTP response queue poisoning via keep-alive socket reuse (https://github.com/advisories/GHSA-35p6-xmwp-9g52)"
+      ],
+      "fixAvailable": "undici@8.11.2 (semver-major)",
+      "isDirect": false,
+      "effects": []
+    },
+    {
+      "name": "ws",
+      "severity": "high",
+      "range": "8.0.0 - 8.20.1",
+      "advisories": [
+        "ws: Uninitialized memory disclosure (https://github.com/advisories/GHSA-58qx-3vcg-4xpx)",
+        "ws: Memory exhaustion DoS from tiny fragments and data chunks (https://github.com/advisories/GHSA-96hv-2xvq-fx4p)"
+      ],
+      "fixAvailable": "ws@8.22.0",
+      "isDirect": false,
+      "effects": []
+    }
+  ],
+  "osvCrossCheck": {
+    "criticalHigh": [
+      {
+        "package": "@modelcontextprotocol/sdk@1.19.1",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-345p-7cg4-v4c7",
+          "CVE-2026-25536",
+          "GHSA-8r9q-7v3j-jr4g",
+          "CVE-2026-0621",
+          "GHSA-w48q-cv73-mx4w",
+          "CVE-2025-66414"
+        ]
+      },
+      {
+        "package": "@tiptap/core@3.25.0",
+        "maxSeverity": "HIGH",
+        "advisories": ["GHSA-cp6q-959q-f8rh", "GHSA-j95f-988m-3j2f"]
+      },
+      {
+        "package": "axios@1.13.6",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-35jp-ww65-95wh",
+          "CVE-2026-44494",
+          "GHSA-3g43-6gmg-66jw",
+          "CVE-2026-44495",
+          "GHSA-3p68-rc4w-qgx5",
+          "CVE-2025-62718",
+          "GHSA-3w6x-2g7m-8v23",
+          "CVE-2026-42044",
+          "GHSA-42h9-826w-cgv3",
+          "CVE-2026-67313",
+          "GHSA-445q-vr5w-6q77",
+          "CVE-2026-42037",
+          "GHSA-5c9x-8gcm-mpgx",
+          "CVE-2026-42034",
+          "GHSA-62hf-57xw-28j9",
+          "CVE-2026-42039",
+          "GHSA-6chq-wfr3-2hj9",
+          "CVE-2026-42035",
+          "GHSA-777c-7fjr-54vf",
+          "CVE-2026-44488",
+          "GHSA-7q8q-rj6j-mhjq",
+          "CVE-2026-67319",
+          "GHSA-898c-q2cr-xwhg",
+          "CVE-2026-44490",
+          "GHSA-fvcv-3m26-pcqx",
+          "CVE-2026-40175",
+          "GHSA-hfxv-24rg-xrqf",
+          "CVE-2026-44496",
+          "GHSA-j5f8-grm9-p9fc",
+          "CVE-2026-44486",
+          "GHSA-jqh4-m9w3-8hp9",
+          "CVE-2026-67317",
+          "GHSA-m7pr-hjqh-92cm",
+          "CVE-2026-42038",
+          "GHSA-mmx7-hfxf-jppx",
+          "CVE-2026-67316",
+          "GHSA-mwf2-3pr3-8698",
+          "CVE-2026-67318",
+          "GHSA-p92q-9vqr-4j8v",
+          "CVE-2026-44487",
+          "GHSA-pf86-5x62-jrwf",
+          "CVE-2026-42033",
+          "GHSA-pmv8-rq9r-6j72",
+          "CVE-2026-67312",
+          "GHSA-pmwg-cvhr-8vh7",
+          "CVE-2026-42043",
+          "GHSA-q8qp-cvcw-x6jj",
+          "CVE-2026-42264",
+          "GHSA-vf2m-468p-8v99",
+          "CVE-2026-42036",
+          "GHSA-w9j2-pvgh-6h63",
+          "CVE-2026-42041",
+          "GHSA-xhjh-pmcv-23jw",
+          "CVE-2026-42040",
+          "GHSA-xx6v-rp6x-q39c",
+          "CVE-2026-42042"
+        ]
+      },
+      {
+        "package": "better-auth@1.6.13",
+        "maxSeverity": "HIGH",
+        "advisories": ["GHSA-qq9h-g4jm-xgf3", "CVE-2026-67327"]
+      },
+      {
+        "package": "brace-expansion@1.1.15",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-3jxr-9vmj-r5cp",
+          "CVE-2026-13149",
+          "GHSA-mh99-v99m-4gvg",
+          "CVE-2026-14257",
+          "GHSA-rgw5-rvv9-x895",
+          "CVE-2026-69152"
+        ]
+      },
+      {
+        "package": "brace-expansion@2.1.1",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-3jxr-9vmj-r5cp",
+          "CVE-2026-13149",
+          "GHSA-mh99-v99m-4gvg",
+          "CVE-2026-14257",
+          "GHSA-rgw5-rvv9-x895",
+          "CVE-2026-69152"
+        ]
+      },
+      {
+        "package": "brace-expansion@5.0.6",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-3jxr-9vmj-r5cp",
+          "CVE-2026-13149",
+          "GHSA-mh99-v99m-4gvg",
+          "CVE-2026-14257",
+          "GHSA-rgw5-rvv9-x895",
+          "CVE-2026-69152"
+        ]
+      },
+      {
+        "package": "brace-expansion@5.0.7",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-mh99-v99m-4gvg",
+          "CVE-2026-14257",
+          "GHSA-rgw5-rvv9-x895",
+          "CVE-2026-69152"
+        ]
+      },
+      {
+        "package": "browserslist@4.28.2",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-73wf-gq98-2v4g",
+          "CVE-2026-73088",
+          "GHSA-c83g-rgw3-j3cx",
+          "CVE-2026-73089"
+        ]
+      },
+      {
+        "package": "extract-zip@2.0.1",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-7pqw-9j4j-h8q3",
+          "CVE-2026-19693",
+          "GHSA-jmr9-qjv8-65gv",
+          "CVE-2026-56876"
+        ]
+      },
+      {
+        "package": "fast-jwt@4.0.5",
+        "maxSeverity": "CRITICAL",
+        "advisories": [
+          "GHSA-3j8v-cgw4-2g6q",
+          "CVE-2026-35040",
+          "GHSA-gm45-q3v2-6cf8",
+          "CVE-2025-30144",
+          "GHSA-gmvf-9v4p-v8jc",
+          "CVE-2026-44351",
+          "GHSA-hm7r-c7qw-ghp6",
+          "CVE-2026-35042",
+          "GHSA-mvf2-f6gm-w987",
+          "CVE-2026-34950",
+          "GHSA-rp9m-7r4c-75qg",
+          "CVE-2026-35039"
+        ]
+      },
+      {
+        "package": "fast-uri@2.4.0",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-4c8g-83qw-93j6",
+          "CVE-2026-13676",
+          "GHSA-7p8r-x3mc-p8w7",
+          "CVE-2026-18446",
+          "GHSA-f65p-4m7j-42xc",
+          "CVE-2026-75975",
+          "GHSA-jqff-g426-hqxp",
+          "CVE-2026-76172",
+          "GHSA-q3j6-qgpj-74h6",
+          "CVE-2026-6321",
+          "GHSA-v2hh-gcrm-f6hx",
+          "CVE-2026-16221",
+          "GHSA-v39h-62p7-jpjc",
+          "CVE-2026-6322"
+        ]
+      },
+      {
+        "package": "fast-uri@3.1.2",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-4c8g-83qw-93j6",
+          "CVE-2026-13676",
+          "GHSA-7p8r-x3mc-p8w7",
+          "CVE-2026-18446",
+          "GHSA-f65p-4m7j-42xc",
+          "CVE-2026-75975",
+          "GHSA-fph4-wmhf-6fwf",
+          "CVE-2026-75899",
+          "GHSA-jqff-g426-hqxp",
+          "CVE-2026-76172",
+          "GHSA-v2hh-gcrm-f6hx",
+          "CVE-2026-16221"
+        ]
+      },
+      {
+        "package": "fastify@4.29.1",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-444r-cwp2-x5xf",
+          "CVE-2026-3635",
+          "GHSA-jx2c-rxcm-jvmq",
+          "CVE-2026-25223",
+          "GHSA-mrq3-vjjr-p77c",
+          "CVE-2026-25224",
+          "GHSA-w2qp-rph6-63g4",
+          "CVE-2026-18504"
+        ]
+      },
+      {
+        "package": "find-my-way@8.2.2",
+        "maxSeverity": "HIGH",
+        "advisories": ["GHSA-c96f-x56v-gq3h", "CVE-2026-47219"]
+      },
+      {
+        "package": "form-data@4.0.5",
+        "maxSeverity": "HIGH",
+        "advisories": ["GHSA-hmw2-7cc7-3qxx", "CVE-2026-12143"]
+      },
+      {
+        "package": "hono@4.12.23",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-54fx-42gc-7vw4",
+          "CVE-2026-71848",
+          "GHSA-79qm-7rj5-m7r9",
+          "CVE-2026-71849",
+          "GHSA-88fw-hqm2-52qc",
+          "CVE-2026-54290",
+          "GHSA-8j4g-w8fx-2239",
+          "CVE-2026-69207",
+          "GHSA-crvj-82cr-hjcx",
+          "CVE-2026-84363",
+          "GHSA-f23p-vx2j-j53r",
+          "CVE-2026-71850",
+          "GHSA-g6gw-c38x-mqfc",
+          "CVE-2026-84364",
+          "GHSA-gqvv-2mrq-wpjv",
+          "CVE-2026-84365",
+          "GHSA-hvrm-45r6-mjfj",
+          "CVE-2026-59896",
+          "GHSA-j6c9-x7qj-28xf",
+          "CVE-2026-54287",
+          "GHSA-rv63-4mwf-qqc2",
+          "CVE-2026-54288",
+          "GHSA-w62v-xxxg-mg59",
+          "CVE-2026-59895",
+          "GHSA-wgpf-jwqj-8h8p",
+          "CVE-2026-54289",
+          "GHSA-wwfh-h76j-fc44",
+          "CVE-2026-54286",
+          "GHSA-xgm2-5f3f-mvvc",
+          "CVE-2026-59897"
+        ]
+      },
+      {
+        "package": "ip-address@10.2.0",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-22jq-vg5j-6vgg",
+          "CVE-2026-54272",
+          "GHSA-4xrf-jv44-h6hh",
+          "CVE-2026-69198",
+          "GHSA-mwp4-54f8-5fhr",
+          "CVE-2026-69192"
+        ]
+      },
+      {
+        "package": "js-yaml@4.2.0",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-2883-xcg3-v3hh",
+          "CVE-2026-84375",
+          "GHSA-52cp-r559-cp3m",
+          "CVE-2026-59869",
+          "GHSA-5p4m-2wfm-xmqj"
+        ]
+      },
+      {
+        "package": "nanoid@3.3.12",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-28wg-ghj8-5hjv",
+          "CVE-2026-67214",
+          "GHSA-2v37-7h3g-55p8",
+          "CVE-2026-67213"
+        ]
+      },
+      {
+        "package": "next@16.1.6",
+        "maxSeverity": "CRITICAL",
+        "advisories": [
+          "GHSA-267c-6grr-h53f",
+          "CVE-2026-44575",
+          "GHSA-26hh-7cqf-hhc6",
+          "CVE-2026-45109",
+          "GHSA-2xp9-vwfh-vxw4",
+          "GHSA-36qx-fr4f-26g5",
+          "CVE-2026-44573",
+          "GHSA-3g8h-86w9-wvmq",
+          "CVE-2026-44572",
+          "GHSA-3x4c-7xq6-9pq8",
+          "CVE-2026-27980",
+          "GHSA-4633-3j49-mh5q",
+          "CVE-2026-64647",
+          "GHSA-492v-c6pp-mqqv",
+          "CVE-2026-44574",
+          "GHSA-4c39-4ccg-62r3",
+          "CVE-2026-64646",
+          "GHSA-68g3-v927-f742",
+          "CVE-2026-64648",
+          "GHSA-6gpp-xcg3-4w24",
+          "CVE-2026-64642",
+          "GHSA-89xv-2m56-2m9x",
+          "CVE-2026-64649",
+          "GHSA-8h8q-6873-q5fj",
+          "GHSA-955p-x3mx-jcvp",
+          "CVE-2026-64643",
+          "GHSA-c4j6-fc7j-m34r",
+          "CVE-2026-44578",
+          "GHSA-ffhc-5mcf-pf4q",
+          "CVE-2026-44581",
+          "GHSA-ggv3-7p47-pfv8",
+          "CVE-2026-29057",
+          "GHSA-gx5p-jg67-6x7h",
+          "CVE-2026-44580",
+          "GHSA-h27x-g6w4-24gq",
+          "CVE-2026-27979",
+          "GHSA-h64f-5h5j-jqjh",
+          "CVE-2026-44577",
+          "GHSA-jcc7-9wpm-mj36",
+          "CVE-2026-27977",
+          "GHSA-m99w-x7hq-7vfj",
+          "CVE-2026-64641",
+          "GHSA-mg66-mrh9-m8jx",
+          "CVE-2026-44579",
+          "GHSA-mq59-m269-xvcx",
+          "CVE-2026-27978",
+          "GHSA-p293-qw3h-jr36",
+          "CVE-2026-75604",
+          "GHSA-p9j2-gv94-2wf4",
+          "CVE-2026-64645",
+          "GHSA-q4gf-8mx6-v5v3",
+          "GHSA-q8wf-6r8g-63ch",
+          "CVE-2026-64644",
+          "GHSA-vfv6-92ff-j949",
+          "CVE-2026-44582",
+          "GHSA-wfc6-r584-vfw7",
+          "CVE-2026-44576"
+        ]
+      },
+      {
+        "package": "picomatch@2.3.1",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-3v7f-55p6-f55p",
+          "CVE-2026-33672",
+          "GHSA-c2c7-rcm5-vvqj",
+          "CVE-2026-33671"
+        ]
+      },
+      {
+        "package": "postcss@8.4.31",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-6g55-p6wh-862q",
+          "CVE-2026-45623",
+          "GHSA-fxqj-rqcc-2cmp",
+          "CVE-2026-69153",
+          "GHSA-qx2v-qp2m-jg93",
+          "CVE-2026-41305",
+          "GHSA-r28c-9q8g-f849",
+          "CVE-2026-73646"
+        ]
+      },
+      {
+        "package": "postcss@8.5.15",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-fxqj-rqcc-2cmp",
+          "CVE-2026-69153",
+          "GHSA-r28c-9q8g-f849",
+          "CVE-2026-73646"
+        ]
+      },
+      {
+        "package": "sharp@0.34.5",
+        "maxSeverity": "HIGH",
+        "advisories": ["GHSA-f88m-g3jw-g9cj", "GHSA-rgj7-g3m4-5g8c"]
+      },
+      {
+        "package": "tar@7.5.13",
+        "maxSeverity": "CRITICAL",
+        "advisories": [
+          "GHSA-23hp-3jrh-7fpw",
+          "CVE-2026-59873",
+          "GHSA-8x88-c5mf-7j5w",
+          "CVE-2026-59874",
+          "GHSA-gvwx-54wh-qm9j",
+          "CVE-2026-59875",
+          "GHSA-r292-9mhp-454m",
+          "CVE-2026-73566",
+          "GHSA-vmf3-w455-68vh",
+          "CVE-2026-53655",
+          "GHSA-w8wr-v893-vjvp",
+          "CVE-2026-59871"
+        ]
+      },
+      {
+        "package": "undici@5.29.0",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-2mjp-6q6p-2qxm",
+          "CVE-2026-1525",
+          "GHSA-35p6-xmwp-9g52",
+          "CVE-2026-6733",
+          "GHSA-4992-7rv2-5pvq",
+          "CVE-2026-1527",
+          "GHSA-8xcm-r25x-g524",
+          "CVE-2026-16728",
+          "GHSA-g8m3-5g58-fq7m",
+          "CVE-2026-11525",
+          "GHSA-g9mf-h72j-4rw9",
+          "CVE-2026-22036",
+          "GHSA-m8rv-5g2x-5cg5",
+          "CVE-2026-15157",
+          "GHSA-p88m-4jfj-68fv",
+          "CVE-2026-9679",
+          "GHSA-v3r7-h72x-cjcm",
+          "CVE-2026-16729",
+          "GHSA-v9p9-hfj2-hcw8",
+          "CVE-2026-2229",
+          "GHSA-vrm6-8vpv-qv8q",
+          "CVE-2026-1526",
+          "GHSA-vxpw-j846-p89q",
+          "CVE-2026-12151"
+        ]
+      },
+      {
+        "package": "undici@7.27.0",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-35p6-xmwp-9g52",
+          "CVE-2026-6733",
+          "GHSA-4cwx-7wf7-3272",
+          "CVE-2026-13697",
+          "GHSA-8xcm-r25x-g524",
+          "CVE-2026-16728",
+          "GHSA-g8m3-5g58-fq7m",
+          "CVE-2026-11525",
+          "GHSA-hm92-r4w5-c3mj",
+          "CVE-2026-6734",
+          "GHSA-jr45-8vmc-qm54",
+          "CVE-2026-14643",
+          "GHSA-m8rv-5g2x-5cg5",
+          "CVE-2026-15157",
+          "GHSA-p88m-4jfj-68fv",
+          "CVE-2026-9679",
+          "GHSA-pr7r-676h-xcf6",
+          "CVE-2026-9678",
+          "GHSA-v3r7-h72x-cjcm",
+          "CVE-2026-16729",
+          "GHSA-vmh5-mc38-953g",
+          "CVE-2026-9697",
+          "GHSA-vxpw-j846-p89q",
+          "CVE-2026-12151"
+        ]
+      },
+      {
+        "package": "ws@8.20.0",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-58qx-3vcg-4xpx",
+          "CVE-2026-45736",
+          "GHSA-96hv-2xvq-fx4p",
+          "CVE-2026-48779"
+        ]
+      },
+      {
+        "package": "xlsx@0.20.3",
+        "maxSeverity": "HIGH",
+        "advisories": [
+          "GHSA-4r6h-8v6p-xvw6",
+          "CVE-2023-30533",
+          "GHSA-5pgg-2g8v-p4x9",
+          "CVE-2024-22363"
+        ]
+      }
+    ],
+    "note": "Cross-check surface: packages npm-audit flags as critical/high that also appear in OSV confirm both DBs agree; OSV-only entries listed here for triage"
+  },
+  "fixPlan": [
+    {
+      "batch": 1,
+      "theme": "In-range and patch/minor direct bumps + root overrides for transitives",
+      "items": [
+        "next 16.1.6 -> 16.3.6 (web-next; fixes critical CVE chain incl. postcss/sharp transitives)",
+        "better-auth 1.6.13 -> 1.7.6 + root override @better-auth/core -> 1.7.6 (api + web-next)",
+        "ws ^8.20.0 -> 8.22.0, tar root override -> 7.5.22, picomatch -> 2.3.2",
+        "sharp ^0.34.5 -> 0.35.4",
+        "npm audit fix --omit=dev for the FIX:true set (axios chain, hono, form-data, js-yaml, nanoid, brace-expansion, browserslist, fast-uri, ip-address, @tiptap/core, @larksuiteoapi/node-sdk)"
+      ],
+      "risk": "low"
+    },
+    {
+      "batch": 2,
+      "theme": "Majors with API surface: fastify 4 -> 5.x + @fastify/jwt 8 -> 10 (fixes critical fast-jwt) + @fastify plugin set aligned to fastify 5",
+      "items": [
+        "fastify ^4.28.0 -> ^5.12.5 (api) — also closes high find-my-way",
+        "@fastify/jwt ^8.0.0 -> ^10.2.2 (api)",
+        "align @fastify/cookie, @fastify/cors, @fastify/multipart, @fastify/rate-limit, @fastify/websocket, @fastify/otel peers to fastify 5-compatible majors",
+        "undici ^5.29.0 -> ^8.11.2 (api)",
+        "chrome-devtools-mcp -> 1.10.1 (closes puppeteer-core/@puppeteer/browsers/extract-zip/@modelcontextprotocol/sdk highs)"
+      ],
+      "risk": "high — full suite + conformance green or revert (INV-S1)"
+    }
+  ]
+}

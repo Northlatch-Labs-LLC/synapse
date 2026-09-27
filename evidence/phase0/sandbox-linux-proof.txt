@@ -1,0 +1,581 @@
+bwrap+rg present
+TAP version 13
+# Subtest: S13 (b)(c) — a whole-sandbox-scope fs grant (pathPrefixes:['/']) derives WHOLE_SCOPE (root-jail, NOT a '/' prefix, NOT deny)
+ok 1 - S13 (b)(c) — a whole-sandbox-scope fs grant (pathPrefixes:['/']) derives WHOLE_SCOPE (root-jail, NOT a '/' prefix, NOT deny)
+  ---
+  duration_ms: 2.187001
+  ...
+# Subtest: S13 (a) Mode-A REGRESSION — a NATIVE sub-prefix fs grant is UNCHANGED (a prefix array, never WHOLE_SCOPE)
+ok 2 - S13 (a) Mode-A REGRESSION — a NATIVE sub-prefix fs grant is UNCHANGED (a prefix array, never WHOLE_SCOPE)
+  ---
+  duration_ms: 0.913229
+  ...
+# Subtest: S13 F-C — a scoped fs grant deriving ∅ still HARD-DENIES (does not fall through to WHOLE_SCOPE)
+ok 3 - S13 F-C — a scoped fs grant deriving ∅ still HARD-DENIES (does not fall through to WHOLE_SCOPE)
+  ---
+  duration_ms: 0.597033
+  ...
+# [16:58:01.304] [33mWARN[39m (38): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:01.305] [33mWARN[39m (38): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# Subtest: S13 (d) — a caller's explicit expected_sha256 is REJECTED-on-mismatch under BOTH 'strict' and 'advisory' (advisory relaxes only the forced self-CAS)
+ok 4 - S13 (d) — a caller's explicit expected_sha256 is REJECTED-on-mismatch under BOTH 'strict' and 'advisory' (advisory relaxes only the forced self-CAS)
+  ---
+  duration_ms: 87.930524
+  ...
+# Subtest: B4 — WHOLE_SCOPE root-jails: a within-root path resolves; the empty scope is a hard deny upstream
+ok 5 - B4 — WHOLE_SCOPE root-jails: a within-root path resolves; the empty scope is a hard deny upstream
+  ---
+  duration_ms: 26.608794
+  ...
+# Subtest: R3.1 — a toggled-off CORE op (mkdir/move/remove/search) fail-closes at coreInvokeBarePlane with runtime_constraint
+ok 6 - R3.1 — a toggled-off CORE op (mkdir/move/remove/search) fail-closes at coreInvokeBarePlane with runtime_constraint
+  ---
+  duration_ms: 17.975995
+  ...
+# Subtest: R3.1 — !rangeRead rejects a supplied byte-window (start_byte/end_byte) but a plain read + max_bytes still works (max_bytes is not a range feature)
+ok 7 - R3.1 — !rangeRead rejects a supplied byte-window (start_byte/end_byte) but a plain read + max_bytes still works (max_bytes is not a range feature)
+  ---
+  duration_ms: 29.038197
+  ...
+# Subtest: R3.1 — fs_write create_parents:true under !mkdir fail-closes with runtime_constraint
+ok 8 - R3.1 — fs_write create_parents:true under !mkdir fail-closes with runtime_constraint
+  ---
+  duration_ms: 16.298529
+  ...
+# [16:58:01.578] [33mWARN[39m (39): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:01.579] [33mWARN[39m (39): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# Subtest: P8(A): endpoint scheme 'https://attacker.example' → runtime_constraint, NOT local-plane execution
+ok 9 - P8(A): endpoint scheme 'https://attacker.example' → runtime_constraint, NOT local-plane execution
+  ---
+  duration_ms: 9373.274601
+  ...
+# Subtest: P8(A): endpoint scheme '(empty)' → runtime_constraint, NOT local-plane execution
+ok 10 - P8(A): endpoint scheme '(empty)' → runtime_constraint, NOT local-plane execution
+  ---
+  duration_ms: 337.508379
+  ...
+# Subtest: P8(A): endpoint scheme 'inprocessTYPO:x' → runtime_constraint, NOT local-plane execution
+ok 11 - P8(A): endpoint scheme 'inprocessTYPO:x' → runtime_constraint, NOT local-plane execution
+  ---
+  duration_ms: 327.645639
+  ...
+# Subtest: P1.3(a): decodeSandboxCapabilityDescriptor allows isolation:null and rejects a non-number cap
+ok 12 - P1.3(a): decodeSandboxCapabilityDescriptor allows isolation:null and rejects a non-number cap
+  ---
+  duration_ms: 1.192793
+  ...
+# Subtest: P1.3(a): a corrupt capability_descriptor fails the bare dispatch CLOSED (no plane built)
+ok 13 - P1.3(a): a corrupt capability_descriptor fails the bare dispatch CLOSED (no plane built)
+  ---
+  duration_ms: 324.73825
+  ...
+# Subtest: P1.3(c): a docker-exec: endpoint on a LOCAL adapter is a mismatch → runtime_constraint
+ok 14 - P1.3(c): a docker-exec: endpoint on a LOCAL adapter is a mismatch → runtime_constraint
+  ---
+  duration_ms: 247.149397
+  ...
+# Subtest: R3.2: a docker-exec endpoint whose cid ≠ resource_id denies (wrong-container)
+ok 15 - R3.2: a docker-exec endpoint whose cid ≠ resource_id denies (wrong-container)
+  ---
+  duration_ms: 272.300755
+  ...
+# Subtest: R3.P2a: toolName ≠ runtime_tools.current_name denies (bash on an fs_read target)
+ok 16 - R3.P2a: toolName ≠ runtime_tools.current_name denies (bash on an fs_read target)
+  ---
+  duration_ms: 356.400288
+  ...
+# Subtest: R3.7: a dispatch racing a mid-teardown runtime is refused (closing tombstone), then allowed after clear
+ok 17 - R3.7: a dispatch racing a mid-teardown runtime is refused (closing tombstone), then allowed after clear
+  ---
+  duration_ms: 297.614229
+  ...
+# Subtest: P2(B): a bare sandbox dispatch is refused when SANDBOX_PROVIDER=none (and dispatches otherwise)
+ok 18 - P2(B): a bare sandbox dispatch is refused when SANDBOX_PROVIDER=none (and dispatches otherwise)
+  ---
+  duration_ms: 274.572746
+  ...
+# Subtest: R3.P2a: a STALE tool revision (≠ runtime_tools.latest_revision_id) denies
+ok 19 - R3.P2a: a STALE tool revision (≠ runtime_tools.latest_revision_id) denies
+  ---
+  duration_ms: 320.335239
+  ...
+# Subtest: R3.P2a: a tool whose status is NOT 'active' (removed/disabled) denies
+ok 20 - R3.P2a: a tool whose status is NOT 'active' (removed/disabled) denies
+  ---
+  duration_ms: 357.00027
+  ...
+# Subtest: R3.P2a: a CROSS-FAMILY grant (capability ≠ exposure.builtin_kind) denies
+ok 21 - R3.P2a: a CROSS-FAMILY grant (capability ≠ exposure.builtin_kind) denies
+  ---
+  duration_ms: 324.692062
+  ...
+# Subtest: F-D: the bare catalog is descriptor-gated
+ok 22 - F-D: the bare catalog is descriptor-gated
+  ---
+  duration_ms: 4.481539
+  ...
+# Subtest: golden-drift: every bare filesystem tool is a SUBSET of the device builtin's schema for the same name
+ok 23 - golden-drift: every bare filesystem tool is a SUBSET of the device builtin's schema for the same name
+  ---
+  duration_ms: 18.243239
+  ...
+# Subtest: reduced-fidelity: bare STRIPS line_range (fs_read) + include_sha256 (fs_stat) without corrupting the shared device schema
+ok 24 - reduced-fidelity: bare STRIPS line_range (fs_read) + include_sha256 (fs_stat) without corrupting the shared device schema
+  ---
+  duration_ms: 9.242016
+  ...
+# Subtest: full separate contract: every BARE_TOOL_DESCRIPTION_OVERRIDES tool ships a non-empty bare-specific description that DIFFERS from resident (fs + commandline)
+ok 25 - full separate contract: every BARE_TOOL_DESCRIPTION_OVERRIDES tool ships a non-empty bare-specific description that DIFFERS from resident (fs + commandline)
+  ---
+  duration_ms: 7.025766
+  ...
+# Subtest: gate: fs_search is OMITTED from the bare catalog when descriptor.core.search is false
+ok 26 - gate: fs_search is OMITTED from the bare catalog when descriptor.core.search is false
+  ---
+  duration_ms: 1.303042
+  ...
+# Subtest: golden-drift: the bare commandline tools are backed by the device commandline builtin (bash + exec_file)
+ok 27 - golden-drift: the bare commandline tools are backed by the device commandline builtin (bash + exec_file)
+  ---
+  duration_ms: 1.066053
+  ...
+# [16:58:01.371] [33mWARN[39m (45): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:01.372] [33mWARN[39m (45): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# Subtest: behavior: fs_write REJECTS invalid base64 (strict decode; no silent corruption)
+ok 28 - behavior: fs_write REJECTS invalid base64 (strict decode; no silent corruption)
+  ---
+  duration_ms: 76.466068
+  ...
+# Subtest: behavior: fs_write stale-guard REJECTS a wrong expected_sha256 (lost-update prevention)
+ok 29 - behavior: fs_write stale-guard REJECTS a wrong expected_sha256 (lost-update prevention)
+  ---
+  duration_ms: 51.893765
+  ...
+# Subtest: behavior: fs_write stale-guard REJECTS a wrong expected_mtime_ms
+ok 30 - behavior: fs_write stale-guard REJECTS a wrong expected_mtime_ms
+  ---
+  duration_ms: 22.505333
+  ...
+# Subtest: R3.1 Layer 1: !mkdir/!move/!remove/!search OMIT the tool from the published bare catalog
+ok 31 - R3.1 Layer 1: !mkdir/!move/!remove/!search OMIT the tool from the published bare catalog
+  ---
+  duration_ms: 1.386469
+  ...
+# Subtest: R3.1 Layer 1: !rangeRead strips start_byte+end_byte from fs_read but RETAINS max_bytes (response-size cap, not a range feature)
+ok 32 - R3.1 Layer 1: !rangeRead strips start_byte+end_byte from fs_read but RETAINS max_bytes (response-size cap, not a range feature)
+  ---
+  duration_ms: 0.573983
+  ...
+# Subtest: R3.1 Layer 1: !mkdir also STRIPS create_parents from fs_write's schema (implicit dir-create)
+ok 33 - R3.1 Layer 1: !mkdir also STRIPS create_parents from fs_write's schema (implicit dir-create)
+  ---
+  duration_ms: 0.597248
+  ...
+# Subtest: R3.1: the filesystem exposure surfaces write=true (always-present CORE) and atomicWrite SEPARATELY
+ok 34 - R3.1: the filesystem exposure surfaces write=true (always-present CORE) and atomicWrite SEPARATELY
+  ---
+  duration_ms: 0.812626
+  ...
+# Subtest: R3.1 Layer 2: a direct coreInvokeBarePlane call fail-closes with runtime_constraint when the capability is toggled off
+ok 35 - R3.1 Layer 2: a direct coreInvokeBarePlane call fail-closes with runtime_constraint when the capability is toggled off
+  ---
+  duration_ms: 9.115012
+  ...
+# Subtest: R3.1 Layer 2: fs_write create_parents:true under !mkdir fail-closes (runtime_constraint); a plain write still works
+ok 36 - R3.1 Layer 2: fs_write create_parents:true under !mkdir fail-closes (runtime_constraint); a plain write still works
+  ---
+  duration_ms: 14.42006
+  ...
+# Subtest: R3.P2a: a negative CORE numeric param (max_bytes) is REJECTED, not clamped
+ok 37 - R3.P2a: a negative CORE numeric param (max_bytes) is REJECTED, not clamped
+  ---
+  duration_ms: 14.054709
+  ...
+# [16:58:01.288] [33mWARN[39m (46): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:01.289] [33mWARN[39m (46): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# Subtest: P7: mutating plane methods THROW GrantAccessDeniedError under access:'read'
+ok 38 - P7: mutating plane methods THROW GrantAccessDeniedError under access:'read'
+  ---
+  duration_ms: 57.523186
+  ...
+# Subtest: P7: mutating plane methods SUCCEED under access:'write'
+ok 39 - P7: mutating plane methods SUCCEED under access:'write'
+  ---
+  duration_ms: 83.019823
+  ...
+# Subtest: P7: read ops (stat/list/read) are unaffected under access:'read'
+ok 40 - P7: read ops (stat/list/read) are unaffected under access:'read'
+  ---
+  duration_ms: 40.154565
+  ...
+# Subtest: P7: a read-ctx fs_write maps to permission_denied through the CORE fork
+ok 41 - P7: a read-ctx fs_write maps to permission_denied through the CORE fork
+  ---
+  duration_ms: 5.993234
+  ...
+# Subtest: B6 — docker:bare `docker run` is HARDENED (no SYS_ADMIN / no unconfined / no secrets env / network none) + three literal-path subpath mounts (HOST-RCE trap)
+ok 42 - B6 — docker:bare `docker run` is HARDENED (no SYS_ADMIN / no unconfined / no secrets env / network none) + three literal-path subpath mounts (HOST-RCE trap)
+  ---
+  duration_ms: 5.060985
+  ...
+# Subtest: B7 — docker:bare create() fails fast on a uid-parity violation (runAsUid != API uid)
+ok 43 - B7 — docker:bare create() fails fast on a uid-parity violation (runAsUid != API uid)
+  ---
+  duration_ms: 26.768076
+  ...
+# Subtest: docker:bare create() runs the hardened container, probes timeout/bash, mints adapter='docker' + docker-exec endpoint
+ok 44 - docker:bare create() runs the hardened container, probes timeout/bash, mints adapter='docker' + docker-exec endpoint
+  ---
+  duration_ms: 12.384029
+  ...
+# Subtest: runDockerCapture — a NON-ZERO exit is a RESULT (not a reject)
+ok 45 - runDockerCapture — a NON-ZERO exit is a RESULT (not a reject)
+  ---
+  duration_ms: 1.603185
+  ...
+# Subtest: runDockerCapture — exit 125 + 'No such container' rejects with SandboxResourceGoneError (B13)
+ok 46 - runDockerCapture — exit 125 + 'No such container' rejects with SandboxResourceGoneError (B13)
+  ---
+  duration_ms: 1.696056
+  ...
+# Subtest: runDockerCapture — API-side backstop SIGKILLs the CLI child AND `docker kill`s the container on a hang
+ok 47 - runDockerCapture — API-side backstop SIGKILLs the CLI child AND `docker kill`s the container on a hang
+  ---
+  duration_ms: 40.678278
+  ...
+# Subtest: docker:bare plane exec → `docker exec -w <cwd> <cid> timeout -k 5 -s TERM <secs> bash -c <cmd>`
+ok 48 - docker:bare plane exec → `docker exec -w <cwd> <cid> timeout -k 5 -s TERM <secs> bash -c <cmd>`
+  ---
+  duration_ms: 30.410197
+  ...
+# Subtest: docker:bare plane fs is HOST-SIDE — fs_read reads the host file with NO docker call
+ok 49 - docker:bare plane fs is HOST-SIDE — fs_read reads the host file with NO docker call
+  ---
+  duration_ms: 48.085266
+  ...
+# Subtest: docker:bare plane exec — resource_gone surfaces as runtime_constraint + resource_gone detail
+ok 50 - docker:bare plane exec — resource_gone surfaces as runtime_constraint + resource_gone detail
+  ---
+  duration_ms: 17.985393
+  ...
+# [16:58:06.703] [33mWARN[39m (139): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:06.704] [33mWARN[39m (139): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:07.861] [33mWARN[39m (146): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:07.863] [33mWARN[39m (146): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# Subtest: B1/B2: mintBareSandboxRuntimeTx mints mode=bare + bare_dataplane (NO keypair) and persists the descriptor-gated api-authored catalog
+ok 51 - B1/B2: mintBareSandboxRuntimeTx mints mode=bare + bare_dataplane (NO keypair) and persists the descriptor-gated api-authored catalog
+  ---
+  duration_ms: 6761.175409
+  ...
+# Subtest: B2: isolation:null → NO commandline exposure (fail-closed, descriptor-gated)
+ok 52 - B2: isolation:null → NO commandline exposure (fail-closed, descriptor-gated)
+  ---
+  duration_ms: 242.91417
+  ...
+# Subtest: B3/B11: dispatchBareRuntimeTool routes to the plane, checks envelope expiry + target-id binding, and registers NO tunnel endpoint
+ok 53 - B3/B11: dispatchBareRuntimeTool routes to the plane, checks envelope expiry + target-id binding, and registers NO tunnel endpoint
+  ---
+  duration_ms: 404.161671
+  ...
+# Subtest: B3: lazy rebuild-on-miss hard-denies a non-active/deleted runtime (registry miss branch)
+ok 54 - B3: lazy rebuild-on-miss hard-denies a non-active/deleted runtime (registry miss branch)
+  ---
+  duration_ms: 345.33233
+  ...
+# Subtest: \#5-B: a HIT whose row went 'closing' cross-process is denied + the stale plane is dropped
+ok 55 - \#5-B: a HIT whose row went 'closing' cross-process is denied + the stale plane is dropped
+  ---
+  duration_ms: 280.570323
+  ...
+# Subtest: resource_gone flips an active sandbox to 'closing' (NOT 'failed') so teardown still converges its mounts
+ok 56 - resource_gone flips an active sandbox to 'closing' (NOT 'failed') so teardown still converges its mounts
+  ---
+  duration_ms: 294.787403
+  ...
+# [16:58:17.207] [32mINFO[39m (146): [36mmarkSandboxResourceGone: row already terminal / owned by a concurrent teardown — no-op[39m
+#     domain: "sandbox"
+#     component: "service"
+#     scope: "sandbox.service"
+#     runtimeId: "c44dcb45-196f-4ba1-8e77-ad28b5a1fe80"
+# Subtest: \#3 closing reaper with a runtimeId does DATA-FREE convergence of the STALE runtime, never the re-provisioned active one
+ok 57 - \#3 closing reaper with a runtimeId does DATA-FREE convergence of the STALE runtime, never the re-provisioned active one
+  ---
+  duration_ms: 651.94108
+  ...
+# Subtest: \#6: casFlipSandboxClosing bumps + returns the epoch; a re-flip supersedes the prior lease
+ok 58 - \#6: casFlipSandboxClosing bumps + returns the epoch; a re-flip supersedes the prior lease
+  ---
+  duration_ms: 20.353454
+  ...
+# Subtest: \#6: casFlipSandboxClosing on a terminal row does not flip and returns no epoch
+ok 59 - \#6: casFlipSandboxClosing on a terminal row does not flip and returns no epoch
+  ---
+  duration_ms: 20.790989
+  ...
+# [16:58:17.859] [32mINFO[39m (146): [36mdata-free teardown: converged a stale 'closing' runtime whose session was re-provisioned[39m
+#     domain: "sandbox"
+#     component: "service"
+#     scope: "sandbox.service"
+#     sessionId: "731d7ae3-a3a0-4281-a281-d4caa916ce98"
+#     runtimeId: "70e4c313-40fc-4062-84a6-e4602daf935c"
+# Subtest: F-C: an empty/underiveable filesystem grant is a HARD DENY (never widens to WHOLE_SCOPE/[])
+ok 60 - F-C: an empty/underiveable filesystem grant is a HARD DENY (never widens to WHOLE_SCOPE/[])
+  ---
+  duration_ms: 5.141003
+  ...
+# Subtest: deriveConfinementScope: a filesystem grant → its prefixes; a commandline grant → WHOLE_SCOPE
+ok 61 - deriveConfinementScope: a filesystem grant → its prefixes; a commandline grant → WHOLE_SCOPE
+  ---
+  duration_ms: 1.630451
+  ...
+# Subtest: B4: a cross-prefix symlink is DENIED through the CORE (grant realpath recheck)
+ok 62 - B4: a cross-prefix symlink is DENIED through the CORE (grant realpath recheck)
+  ---
+  duration_ms: 37.968832
+  ...
+# [16:58:07.674] [33mWARN[39m (162): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:07.675] [33mWARN[39m (162): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# Subtest: B4: the reserved /.synapse-internal namespace is denied through the CORE
+ok 63 - B4: the reserved /.synapse-internal namespace is denied through the CORE
+  ---
+  duration_ms: 11.963154
+  ...
+# Subtest: B4: WHOLE_SCOPE root-jails within-root but a scoped grant confines to its prefix
+ok 64 - B4: WHOLE_SCOPE root-jails within-root but a scoped grant confines to its prefix
+  ---
+  duration_ms: 21.141003
+  ...
+# Subtest: B5: oversized write is rejected BEFORE hashing (reject-before-hash) and no file lands
+ok 65 - B5: oversized write is rejected BEFORE hashing (reject-before-hash) and no file lands
+  ---
+  duration_ms: 23.65003
+  ...
+# Subtest: B5: whole-file read is bounded by maxReadBytes (truncated)
+ok 66 - B5: whole-file read is bounded by maxReadBytes (truncated)
+  ---
+  duration_ms: 14.506959
+  ...
+# Subtest: bwrap-absent (isolation:null) → exec is a structural fail-closed (never runs unconfined)
+ok 67 - bwrap-absent (isolation:null) → exec is a structural fail-closed (never runs unconfined)
+  ---
+  duration_ms: 10.228844
+  ...
+# Subtest: layer-2 tools (fs_mkdir/fs_move/fs_remove) run confined through the CORE
+ok 68 - layer-2 tools (fs_mkdir/fs_move/fs_remove) run confined through the CORE
+  ---
+  duration_ms: 21.421998
+  ...
+# Subtest: B4: fs_move dest under a src-only scope is denied (both endpoints in one grant frame)
+ok 69 - B4: fs_move dest under a src-only scope is denied (both endpoints in one grant frame)
+  ---
+  duration_ms: 12.580204
+  ...
+# Subtest: P5b: list_dir({}) defaults the omitted path to /conversation (granted cwd), not '/'
+ok 70 - P5b: list_dir({}) defaults the omitted path to /conversation (granted cwd), not '/'
+  ---
+  duration_ms: 12.527746
+  ...
+# Subtest: P5b sanity: an EXPLICIT '/' under the same /conversation-only scope IS denied
+ok 71 - P5b sanity: an EXPLICIT '/' under the same /conversation-only scope IS denied
+  ---
+  duration_ms: 7.393
+  ...
+# Subtest: P6: fs_write with a stale FRACTIONAL expected_mtime_ms is REJECTED (guard honored, not dropped by asInt)
+ok 72 - P6: fs_write with a stale FRACTIONAL expected_mtime_ms is REJECTED (guard honored, not dropped by asInt)
+  ---
+  duration_ms: 34.030698
+  ...
+# Subtest: P6: a present-but-unparseable expected_mtime_ms fails CLOSED (invalid_request)
+ok 73 - P6: a present-but-unparseable expected_mtime_ms fails CLOSED (invalid_request)
+  ---
+  duration_ms: 4.386206
+  ...
+# Subtest: P6-schema: bare fs_edit with a stale expected_sha256 is REJECTED (precondition honored)
+ok 74 - P6-schema: bare fs_edit with a stale expected_sha256 is REJECTED (precondition honored)
+  ---
+  duration_ms: 25.263537
+  ...
+# Subtest: P6-schema: bare fs_edit with a stale FRACTIONAL expected_mtime_ms is REJECTED
+ok 75 - P6-schema: bare fs_edit with a stale FRACTIONAL expected_mtime_ms is REJECTED
+  ---
+  duration_ms: 16.216835
+  ...
+# Subtest: advisory posture: a caller's EXPLICIT stale expected_sha256 / expected_mtime_ms is STILL rejected (posture relaxes only the forced self-CAS)
+ok 76 - advisory posture: a caller's EXPLICIT stale expected_sha256 / expected_mtime_ms is STILL rejected (posture relaxes only the forced self-CAS)
+  ---
+  duration_ms: 44.906446
+  ...
+# Subtest: P7: deriveConfinementAccess is FAIL-CLOSED (read/unknown tool → read; write tool needs a write grant)
+ok 77 - P7: deriveConfinementAccess is FAIL-CLOSED (read/unknown tool → read; write tool needs a write grant)
+  ---
+  duration_ms: 0.58778
+  ...
+# Subtest: Part A\#1: a binary fs_read (default utf-8) falls back to base64 on the body AND _meta (no U+FFFD corruption)
+ok 78 - Part A\#1: a binary fs_read (default utf-8) falls back to base64 on the body AND _meta (no U+FFFD corruption)
+  ---
+  duration_ms: 28.615322
+  ...
+# Subtest: Part A\#1: a UTF-8 fs_read still returns utf8 (no spurious base64 fallback)
+ok 79 - Part A\#1: a UTF-8 fs_read still returns utf8 (no spurious base64 fallback)
+  ---
+  duration_ms: 24.3253
+  ...
+# Subtest: Part A\#2: a non-zero-exit / killed command yields result.isError===true; a zero-exit yields falsy
+ok 80 - Part A\#2: a non-zero-exit / killed command yields result.isError===true; a zero-exit yields falsy
+  ---
+  duration_ms: 1.301384
+  ...
+# Subtest: B5: exec concurrency cap rejects an over-cap concurrent invocation
+ok 81 - B5: exec concurrency cap rejects an over-cap concurrent invocation
+  ---
+  duration_ms: 1079.302397
+  ...
+# Subtest: R3.3 disposed-guard: a fs op after dispose() fails CLOSED (runtime_constraint), not a raw fs error
+ok 82 - R3.3 disposed-guard: a fs op after dispose() fails CLOSED (runtime_constraint), not a raw fs error
+  ---
+  duration_ms: 27.32306
+  ...
+# Subtest: R3.7 drain: dispose() AWAITS an in-flight fs write so it lands on disk (not lost by the commit snapshot)
+ok 83 - R3.7 drain: dispose() AWAITS an in-flight fs write so it lands on disk (not lost by the commit snapshot)
+  ---
+  duration_ms: 737.729023
+  ...
+# Subtest: R3.7 drain: dispose() aborts AND drains an in-flight exec child (bounded, reported killed)
+ok 84 - R3.7 drain: dispose() aborts AND drains an in-flight exec child (bounded, reported killed)
+  ---
+  duration_ms: 230.830221
+  ...
+# Subtest: S11 — the product bridge exposes the WorkingSetBridge contract (pure spine delegation)
+ok 85 - S11 — the product bridge exposes the WorkingSetBridge contract (pure spine delegation)
+  ---
+  duration_ms: 1.590224
+  ...
+# Subtest: S12 — planReplication propagates DELETES (container file absent from mirror → Remove)
+ok 86 - S12 — planReplication propagates DELETES (container file absent from mirror → Remove)
+  ---
+  duration_ms: 1.291305
+  ...
+# Subtest: S12 — reconcileStatCache reuses a (size,mtime) match, fetches a mismatch/miss
+ok 87 - S12 — reconcileStatCache reuses a (size,mtime) match, fetches a mismatch/miss
+  ---
+  duration_ms: 0.731477
+  ...
+# Subtest: S12 — parseFindListing parses `%s %T@ %p` rows (truncated mtime)
+ok 88 - S12 — parseFindListing parses `%s %T@ %p` rows (truncated mtime)
+  ---
+  duration_ms: 0.338312
+  ...
+# [16:58:12.767] [33mWARN[39m (204): [36mdocument extraction is DISABLED (DOCUMENT_EXTRACTION_PROVIDER="none" is not a recognized provider) — PDF & office uploads will be SKIPPED, not parsed. Set DOCUMENT_EXTRACTION_PROVIDER=local + DOCEXTRACT_URL (the Tika sidecar) or =textin (+ credentials) to enable document parsing.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# [16:58:12.768] [33mWARN[39m (204): [36mper-session sandbox is DISABLED (SANDBOX_PROVIDER="none" or unset). Set SANDBOX_PROVIDER=local (same-host device-runtime) or =docker (DooD cloud-sandbox image) to enable it.[39m
+#     domain: "infra"
+#     component: "config"
+#     scope: "config"
+# Subtest: S12 — applyManifest replicates via tmp+Move and propagates Removes (never docker cp/tar)
+ok 89 - S12 — applyManifest replicates via tmp+Move and propagates Removes (never docker cp/tar)
+  ---
+  duration_ms: 48.450744
+  ...
+# Subtest: S12 — fetchChangedIntoMirror cats ONLY the stat-cache-mismatched file (the envd stat-cache contract)
+ok 90 - S12 — fetchChangedIntoMirror cats ONLY the stat-cache-mismatched file (the envd stat-cache contract)
+  ---
+  duration_ms: 2.006417
+  ...
+# Subtest: \#3 — a large file is STREAMED into the mirror (never whole-buffered, never skipped, never lost)
+ok 91 - \#3 — a large file is STREAMED into the mirror (never whole-buffered, never skipped, never lost)
+  ---
+  duration_ms: 3.119769
+  ...
+# Subtest: \#3 — an unreadable file is REPORTED (pull NOT durable), never silently lost
+ok 92 - \#3 — an unreadable file is REPORTED (pull NOT durable), never silently lost
+  ---
+  duration_ms: 0.932151
+  ...
+# Subtest: \#5 — empty directories round-trip: PULL mkdirs into the mirror, PUSH mkdirs into the VM, prune rmdirs a removed one
+ok 93 - \#5 — empty directories round-trip: PULL mkdirs into the mirror, PUSH mkdirs into the VM, prune rmdirs a removed one
+  ---
+  duration_ms: 0.909999
+  ...
+# Subtest: \#5 collision — a base FILE replaced by a VM DIR round-trips (prune-before-writes, no ENOTDIR abort)
+ok 94 - \#5 collision — a base FILE replaced by a VM DIR round-trips (prune-before-writes, no ENOTDIR abort)
+  ---
+  duration_ms: 21.654667
+  ...
+# Subtest: \#5 collision — a NESTED base DIR replaced by a VM FILE round-trips (empty-dir chain collapsed to fixpoint, no EISDIR)
+ok 95 - \#5 collision — a NESTED base DIR replaced by a VM FILE round-trips (empty-dir chain collapsed to fixpoint, no EISDIR)
+  ---
+  duration_ms: 15.943018
+  ...
+# Subtest: R4 F1 — delete-in-VM → pull PRUNES the mirror (a VM-deleted file does not resurrect from base)
+ok 96 - R4 F1 — delete-in-VM → pull PRUNES the mirror (a VM-deleted file does not resurrect from base)
+  ---
+  duration_ms: 1.331129
+  ...
+# Subtest: R4 F6 — a same-size same-SECOND in-place edit is NOT a false cache hit (envd full-ms key)
+ok 97 - R4 F6 — a same-size same-SECOND in-place edit is NOT a false cache hit (envd full-ms key)
+  ---
+  duration_ms: 0.234235
+  ...
+# Subtest: R4 F6 — docker (no mtimeKey) keeps its (size, second) key unchanged
+ok 98 - R4 F6 — docker (no mtimeKey) keeps its (size, second) key unchanged
+  ---
+  duration_ms: 0.376658
+  ...
+# Subtest: R4 — full-turn round-trip: base→push→edit-in-VM(+delete+create)→pull → mirror reflects edit+delete+create
+ok 99 - R4 — full-turn round-trip: base→push→edit-in-VM(+delete+create)→pull → mirror reflects edit+delete+create
+  ---
+  duration_ms: 0.931811
+  ...
+1..99
+# tests 99
+# suites 0
+# pass 99
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21799.257985
