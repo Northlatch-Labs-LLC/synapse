@@ -1,0 +1,35 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "description": "Keep-it-fixed rails (SYNAPSE-HANDOUT §4.4): security updates land as auto-PRs immediately; everything else arrives as weekly PRs for triage. Nothing automerges except security patch-level bumps, so every capability-affecting change still crosses the human gate.",
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "osvVulnerabilityAlerts": true,
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "Security and patch-level bumps: open immediately, automerge only patch; minor/major security bumps still need review because they can change behavior (INV-S1).",
+      "matchUpdateTypes": ["patch", "pin", "digest"],
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Vulnerability-driven updates skip the weekly schedule.",
+      "matchVulnerabilityAlertSeverity": ["CRITICAL", "HIGH", "MODERATE"],
+      "schedule": ["at any time"],
+      "labels": ["security"]
+    },
+    {
+      "description": "All non-security updates: weekly batch, no automerge.",
+      "matchUpdateTypes": ["minor", "major"],
+      "schedule": ["before 6am on monday"],
+      "automerge": false
+    }
+  ]
+}

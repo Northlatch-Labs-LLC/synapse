@@ -1,0 +1,28 @@
+# Northlatch brand manifest — single source of truth for brand strings (INV-S3).
+# Mirrors the Latch Round-1 contract (ARTEFACT.md §3) so both forks validate
+# against the same manifest shape.
+#
+# DEC-S1 (SYNAPSE-HANDOUT §9.1) is OPEN: the retail product name is a founder
+# decision (working name "Hive"). Until DEC-S1 lands, `product_name` stays the
+# interim technical identifier in lowercase and MUST NOT appear in any shipped
+# UI surface. Changing this file is the only way brand strings change;
+# hardcoded brand strings outside it fail CI (scripts/brand-lint.mjs).
+manifest_version: 1
+product_name: synapse # INTERIM — replace on DEC-S1; do not ship
+binary_name: synapse # INTERIM — replace on DEC-S1
+config_dir: ~/.synapse/ # INTERIM — replace on DEC-S1
+gateway_base_url: https://gateway.xlaunch.work
+gateway_auth: unified-key # INV-S4: one key, every model call
+billing_url: https://billing.xlaunch.work
+upstream_remote: https://github.com/zai-org/Synapse.git
+overlay_paths:
+  - product/*
+forbidden_marks_in_overlay: # INV-S3: upstream/vendor marks never appear in branded code
+  - ZCode
+  - Z.ai
+  - GLM
+  - Synapse
+notice_exempt_globs: # Apache-2.0 attribution legitimately names upstream
+  - "**/NOTICE*"
+  - "**/THIRD-PARTY*"
+  - "**/LICENSE*"

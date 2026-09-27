@@ -1,0 +1,98 @@
+name: ci
+
+# Blocking gate ladder — SYNAPSE-HANDOUT §4.4/§7 (DevOps standard, identical to
+# the Latch program). Gates run IN ORDER within one job so no later gate can go
+# green while an earlier one is red:
+#   install → brand-lint → audit (runtime, critical) → lint → typecheck → test
+# The image scan runs only after that ladder is green (needs: gates).
+#
+# Node 22 matches the upstream verify-boundary workflow's toolchain; the local
+# dev toolchain (node 26 / npm 12) additionally needs --allow-remote=cdn.sheetjs.com
+# for the xlsx remote tarball (npm 12 disables remote deps by default; npm 10,
+# bundled with node 22, does not — so no flag is needed here).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    services:
+      # The api unit suite has modules that construct real ioredis clients at
+      # module scope; without a reachable Redis they retry forever and hang the
+      # suite (see evidence/phase0/test-baseline.txt, run 2).
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      # The fs-helper Rust sidecar is not needed for these suites; upstream's
+      # verify-boundary workflow sets the same opt-out and the helper-backed
+      # test cases skip cleanly when the binary is absent.
+      ALLOW_MISSING_FS_HELPER: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install sandbox plane prerequisites
+        # 33 sandbox contract tests (local-bare-plane / core-catalog / data-plane
+        # suites) exercise bwrap isolation and ripgrep-backed search; without
+        # them the plane fail-closes with runtime_constraint and the tests fail
+        # (macOS dev hosts see exactly this — platform-gated, not regressions).
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Brand lint (INV-S3)
+        run: node scripts/brand-lint.mjs
+      - name: Runtime dependency audit (INV-S7)
+        run: npm audit --omit=dev --audit-level=critical
+      - name: Lint (zero-waiver)
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit + contract suites (behavior oracle)
+        run: |
+          npm test
+          npm run test:conformance
+      - name: Boundary verification
+        run: |
+          npm --prefix packages/mobile-app ci
+          npm run verify:boundary
+
+  image-scan:
+    needs: gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build api image
+        run: docker build -f infrastructure/Dockerfile.api -t synapse-api:ci .
+      - name: Trivy scan (CRITICAL/HIGH block, INV-S7/S8)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: synapse-api:ci
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: true
+          format: table
+      - name: Build web image
+        run: docker build -f infrastructure/Dockerfile.web -t synapse-web:ci .
+      - name: Trivy scan web image
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: synapse-web:ci
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: true
+          format: table
