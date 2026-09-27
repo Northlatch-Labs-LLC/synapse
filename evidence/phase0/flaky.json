@@ -1,7 +1,10 @@
 {
   "canonicalBaseline": {
     "run": 4,
-    "toolchain": { "node": "v22.13.1", "npm": "10.9.2" },
+    "toolchain": {
+      "node": "v22.13.1",
+      "npm": "10.9.2"
+    },
     "services": {
       "redis": "localhost:6379 (docker synapse-baseline-redis)",
       "postgres": "self-provisioned via testcontainers"
@@ -53,6 +56,13 @@
       "evidence": "Failed in full-suite run 10 (identical tree to run 9 where it passed); 3/3 green in isolated runs after.",
       "suspectedCause": "Process-env mutation racing sibling test files under `tsx --test --test-concurrency=4`; OTEL exporter boot tests read/overwrite shared env.",
       "action": "Tracked for Phase 1 hardening: serialize env-mutating boot tests (node:test `--test-isolation=process` per-file or a concurrency group). Not capability-affecting."
+    },
+    {
+      "test": "(b) recovery: sandbox row ref resolution under shared test DB (pg 57P01)",
+      "file": "src/modules/sandbox/reaper-recovery-loopback.test.ts",
+      "evidence": "G-S1 seal run: terminating connection due to administrator command during bootSharedTestDb — shared testcontainers Postgres torn down by a concurrently finishing file.",
+      "suspectedCause": "testcontainers shared-container teardown race under --test-concurrency=4.",
+      "action": "Recorded; candidate fix is a refcounted teardown barrier in test/helpers/db.ts (Phase-1 test-infra item). Not product code."
     }
   ]
 }

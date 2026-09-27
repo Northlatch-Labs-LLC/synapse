@@ -1,0 +1,283 @@
+## verify:boundary — local substitute for blocked CI (2026-09-27T16:54:04Z)
+## env: node v22.13.1, npm 10.9.2, Redis up, go go1.27.1, cargo present
+
+> synapse@0.28.0 verify:boundary
+> bash ./scripts/verify-boundary.sh
+
+
+[1;36m▶ build: device-protocol → shared → device-runtime → device-sdk → api → daemon[0m
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 prebuild
+> npm run build -w @synapse/device-protocol && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-runtime@0.28.0 prebuild
+> npm run build -w @synapse/shared && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/shared@0.28.0 prebuild
+> npm run build -w @synapse/device-protocol && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-runtime@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-sdk@0.28.0 prebuild
+> rm -rf dist tsconfig.tsbuildinfo
+
+
+> @synapse/device-sdk@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/api@0.28.0 build
+> tsc
+
+
+> @synapse/api@0.28.0 postbuild
+> node scripts/copy-installer-assets.mjs
+
+[copy-installer-assets] copied install.sh, install.ps1 -> dist/
+
+> @synapse/remote-agent-daemon@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/remote-agent-daemon@0.28.0 build
+> tsc -p tsconfig.build.json
+
+[1;32m✓ builds clean[0m
+
+[1;36m▶ guard:api + guard:layering + guard:datetime + guard:logging[0m
+
+> @synapse/api@0.28.0 guard:db
+> node scripts/guard-db-paradigm.mjs
+
+guard-db-paradigm: OK — no legacy DB-paradigm imports/types in 1141 files.
+
+> @synapse/api@0.28.0 guard:fk-policy
+> node scripts/derive-fk-policy.mjs --check
+
+✓ derive-fk-policy: manifest covers all tables/FKs; doc up-to-date.
+
+> @synapse/api@0.28.0 guard:soft-delete
+> node scripts/guard-soft-delete.mjs
+
+✓ guard-soft-delete: no naked deletes on 111 managed tables; 13 principal tables accounted for (8 closeable status-flip-closed by markUserDeleted, 5 anchored); read ratchet held across 22 files (71 naked root reads by table, non-increasing).
+
+> @synapse/api@0.28.0 guard:layering
+> node scripts/guard-layering.mjs
+
+guard-layering: clean (no new layering violations)
+
+> @synapse/api@0.28.0 guard:schemas
+> tsx scripts/gen-config-schemas.mts --check
+
+guard-datetime-boundaries: OK — no datetime boundary violations across 10 scopes.
+guard-logging: OK — no new console debt; all createLogger scopes map to the domain taxonomy (79 scopes).
+✓ trace-propagation guard clean (untraced_worker, daemon_raw_egress, ws_route_missing_otel_false, queue_enqueue_bypass, rogue_carrier_literal, bare_wire_trace_field, daemon_bare_detach, daemon_callback_turn_scope, carrier_contract_drift, ambient_extract_base, client_carrier_fabrication, sw_carrier_replay_missing, remote_agent_frame_parity, edge_marker_missing, edge_ratelimit_missing, ingress_marker_misuse, vectors_asserted_shared, vectors_asserted_daemon, vectors_asserted_device_protocol, vectors_asserted_cua_go, vectors_asserted_fs_helper_rust, cua_span_server_no_exit, fs_helper_span_server_kind, sidecar_stop_staged_flush)
+TAP version 13
+# Subtest: carrier_contract_drift: a clean fixture (real files) passes
+ok 1 - carrier_contract_drift: a clean fixture (real files) passes
+  ---
+  duration_ms: 24.150197
+  ...
+# Subtest: carrier_contract_drift: mutating a ledger literal fires the rule
+ok 2 - carrier_contract_drift: mutating a ledger literal fires the rule
+  ---
+  duration_ms: 14.85318
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 221.001849
+[guard-workspace-versions] OK: cohort @ 0.28.0 (6 pkgs + root), 6 bundles decoupled, lock in sync
+apply-patches: FAIL — --require-all but @fastify/otel absent from /Users/admin/Desktop/northlatch-harness/synapse/node_modules
+( PATH="$HOME/.nvm/versions/node/v22.13.1/bin:$PATH" npm run verify:boundary )  134.93s user 13.15s system 146% cpu 1:41.03 total
+BOUNDARY_EXIT=1
+
+## verify:boundary re-run — after otel patch-target restore — 2026-09-27T16:57:55Z
+
+> synapse@0.28.0 verify:boundary
+> bash ./scripts/verify-boundary.sh
+
+
+[1;36m▶ build: device-protocol → shared → device-runtime → device-sdk → api → daemon[0m
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 prebuild
+> npm run build -w @synapse/device-protocol && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-runtime@0.28.0 prebuild
+> npm run build -w @synapse/shared && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/shared@0.28.0 prebuild
+> npm run build -w @synapse/device-protocol && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-runtime@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-sdk@0.28.0 prebuild
+> rm -rf dist tsconfig.tsbuildinfo
+
+
+> @synapse/device-sdk@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/api@0.28.0 build
+> tsc
+
+src/instrumentation.boot-probe.ts(81,24): error TS2339: Property 'opentelemetry' does not exist on type 'FastifyRequest<RouteGenericInterface, Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ... 4 more ..., ResolveFastifyRequestType<...>>'.
+src/instrumentation.boot-probe.ts(87,24): error TS2339: Property 'opentelemetry' does not exist on type 'FastifyRequest<RouteGenericInterface, Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ... 4 more ..., ResolveFastifyRequestType<...>>'.
+src/modules/devices/control-plane.ts(389,45): error TS2353: Object literal may only specify known properties, and 'otel' does not exist in type 'FastifyContextConfig'.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/admin/Desktop/northlatch-harness/synapse/packages/api
+npm error workspace @synapse/api@0.28.0
+npm error location /Users/admin/Desktop/northlatch-harness/synapse/packages/api
+npm error command failed
+npm error command sh -c tsc
+( PATH="$HOME/.nvm/versions/node/v22.13.1/bin:$PATH" npm run verify:boundary )  160.10s user 9.94s system 157% cpu 1:48.24 total
+BOUNDARY_EXIT=2
+
+## verify:boundary run 3 — otel 0.21.0 + re-based patch — 2026-09-27T17:03:17Z
+
+> synapse@0.28.0 verify:boundary
+> bash ./scripts/verify-boundary.sh
+
+
+[1;36m▶ build: device-protocol → shared → device-runtime → device-sdk → api → daemon[0m
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 prebuild
+> npm run build -w @synapse/device-protocol && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-runtime@0.28.0 prebuild
+> npm run build -w @synapse/shared && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/shared@0.28.0 prebuild
+> npm run build -w @synapse/device-protocol && rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 prebuild
+> rm -rf dist tsconfig.build.tsbuildinfo
+
+
+> @synapse/device-protocol@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/shared@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-runtime@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/device-sdk@0.28.0 prebuild
+> rm -rf dist tsconfig.tsbuildinfo
+
+
+> @synapse/device-sdk@0.28.0 build
+> tsc -p tsconfig.build.json
+
+
+> @synapse/api@0.28.0 build
+> tsc
+
