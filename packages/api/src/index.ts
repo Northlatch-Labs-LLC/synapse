@@ -147,11 +147,14 @@ async function main() {
   // logs are now one logger, so level/format never drift. Fastify-compatible
   // req/res/err serializers + pino-pretty-in-dev are baked into the instance
   // (passing an instance bypasses Fastify's own serializer injection).
-  // Cast to FastifyBaseLogger so Fastify's `Logger` generic resolves to the
-  // default (not the concrete pino Logger type) — otherwise `app` would not be
-  // assignable to helpers typed as FastifyInstance<…, FastifyBaseLogger>.
+  // Fastify 5: a ready-made logger instance must be passed as `loggerInstance`
+  // — `logger` accepts only config, and an instance there fails validation
+  // (FST_ERR_LOG_INVALID_LOGGER_CONFIG). Cast to FastifyBaseLogger so
+  // Fastify's `Logger` generic resolves to the default (not the concrete pino
+  // Logger type) — otherwise `app` would not be assignable to helpers typed
+  // as FastifyInstance<…, FastifyBaseLogger>.
   const app = Fastify({
-    logger: logger as FastifyBaseLogger,
+    loggerInstance: logger as FastifyBaseLogger,
     // Stable per-request id. We do NOT derive it from the active span: Fastify
     // calls genReqId before @fastify/otel's onRequest span exists, so a
     // span-derived id would never match. Correlation across logs/traces is via
