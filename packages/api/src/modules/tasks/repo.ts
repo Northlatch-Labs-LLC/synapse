@@ -67,6 +67,22 @@ const ActionTokenPayloadSchema = z
  * writes with cross-module side effects) WITHOUT importing the db client.
  * The callback receives the tx executor the service threads into repo fns.
  */
+/** G-S1 ledger RBAC: a member's workspace trust level on the SAME tx (null when not a member). */
+export async function findWorkspaceMemberTrustLevelOn(
+  client: DatabaseTransaction,
+  workspaceMemberId: string,
+  workspaceId: string
+): Promise<string | null> {
+  const row = await client
+    .selectFrom("workspaceMembers")
+    .select("trustLevel")
+    .where("id", "=", workspaceMemberId)
+    .where("workspaceId", "=", workspaceId)
+    .limit(1)
+    .executeTakeFirst()
+  return row?.trustLevel ?? null
+}
+
 export function withTaskTransaction<T>(
   fn: (client: DatabaseTransaction) => Promise<T>
 ): Promise<T> {

@@ -93,6 +93,7 @@ const SCOPE_TO_DOMAIN: Readonly<Record<string, DomainScope>> = {
   "asr.registry": { domain: "asr", component: "registry" },
   audit: { domain: "audit" },
   "auth.better-auth": { domain: "auth", component: "better-auth" },
+  "auth.sso": { domain: "auth", component: "sso" },
   "auth-session-registry": { domain: "auth", component: "session-registry" },
   automation: { domain: "automation" },
   "automation.integrations": {

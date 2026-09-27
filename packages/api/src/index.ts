@@ -63,6 +63,7 @@ import memoryModule from "./modules/memory/index.js"
 import mcpPluginsModule from "./modules/mcp-plugins/index.js"
 import devicesModule from "./modules/devices/index.js"
 import runtimeAuthorizationsModule from "./modules/runtime-authorizations/index.js"
+import auditExportModule from "./modules/audit-export/index.js"
 import modelGroupsModule from "./modules/model-groups/index.js"
 import platformModule from "./modules/platform/index.js"
 import imModule from "./modules/im/index.js"
@@ -314,6 +315,7 @@ async function main() {
   await app.register(mcpPluginsModule)
   await app.register(devicesModule)
   await app.register(runtimeAuthorizationsModule)
+  await app.register(auditExportModule)
   await app.register(modelGroupsModule)
   await app.register(logsModule)
   await app.register(reportsModule)

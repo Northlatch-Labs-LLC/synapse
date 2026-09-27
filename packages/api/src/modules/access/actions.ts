@@ -61,6 +61,13 @@ export const ACCESS_ACTIONS = {
     resourceType: "workspace",
     permission: "manage_devices",
   },
+  // G-S1 signed audit export: rides the existing admin-level "manage"
+  // workspace permission rule (workspace admins or explicit manage grants)
+  // — auditors get the key, not the crown.
+  "workspace.export_audit": {
+    resourceType: "workspace",
+    permission: "manage",
+  },
   "workspace.manage_models": {
     resourceType: "workspace",
     permission: "manage_models",

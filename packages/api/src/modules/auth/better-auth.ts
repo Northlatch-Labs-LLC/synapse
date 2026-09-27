@@ -10,6 +10,7 @@ import { backfillGeneratedUserAvatar, selectUserDeletedState } from "./repo.js"
 import { AUTH_SESSION_MAX_AGE_SECONDS } from "@synapse/shared"
 import { disconnectSocketsForSession } from "../../infrastructure/websocket/auth-session-registry.js"
 import { deviceSessionCookie } from "./device-session-cookie.js"
+import { buildSsoOidcProviders } from "./sso-providers.js"
 
 const log = createLogger("auth.better-auth")
 
@@ -261,6 +262,8 @@ function buildFeishuProvider() {
 }
 
 const feishuProvider = buildFeishuProvider()
+// G-S1: enterprise OIDC providers from SSO_OIDC_PROVIDERS (empty by default).
+const ssoOidcProviders = buildSsoOidcProviders()
 
 /**
  * The single Better Auth instance. Owns the user/account/session/verification +
@@ -539,7 +542,18 @@ export const auth = betterAuth({
         },
       },
     }),
-    ...(feishuProvider ? [genericOAuth({ config: [feishuProvider] })] : []),
+    ...(feishuProvider || ssoOidcProviders.length > 0
+      ? [
+          genericOAuth({
+            config: [
+              ...(feishuProvider ? [feishuProvider] : []),
+              // G-S1 enterprise SSO: env-driven OIDC providers (empty ⇒
+              // login surface unchanged). See modules/auth/sso-providers.ts.
+              ...ssoOidcProviders,
+            ],
+          }),
+        ]
+      : []),
   ],
 })
 
