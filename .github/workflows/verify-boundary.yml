@@ -26,6 +26,16 @@ jobs:
       ALLOW_MISSING_FS_HELPER: "1"
     steps:
       - uses: actions/checkout@v4
+      - name: Install sandbox plane prerequisites + enable userns
+        # The boundary gate runs device-runtime's full suite, whose bwrap-backed
+        # exec/VFS tests need (a) the bubblewrap + ripgrep binaries and (b)
+        # unprivileged user namespaces actually permitted — ubuntu-latest 24.04
+        # ships AppArmor's userns restriction ON, so the binary resolves but
+        # every jail spawn is denied and the tests fail on misleading
+        # assertions. `|| true` keeps older images (no such key) portable.
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

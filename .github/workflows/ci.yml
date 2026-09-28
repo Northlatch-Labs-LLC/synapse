@@ -36,9 +36,9 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     env:
-      # The fs-helper Rust sidecar is not needed for these suites; upstream's
-      # verify-boundary workflow sets the same opt-out and the helper-backed
-      # test cases skip cleanly when the binary is absent.
+      # With the release-profile helper built below, this only relaxes the
+      # freshness preflight — presence is guaranteed, so helper-backed cases
+      # (S12 applyManifest et al.) run for real instead of skipping.
       ALLOW_MISSING_FS_HELPER: "1"
     steps:
       - uses: actions/checkout@v4
@@ -48,6 +48,21 @@ jobs:
         # them the plane fail-closes with runtime_constraint and the tests fail
         # (macOS dev hosts see exactly this — platform-gated, not regressions).
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep
+      - name: Enable unprivileged user namespaces (make bwrap actually usable)
+        # ubuntu-latest (24.04) ships AppArmor's userns restriction ON: the
+        # bwrap BINARY resolves (so bwrapAvailable() passes) but every jail
+        # spawn is denied at runtime — the first exec dies, releases its
+        # concurrency slot, and B5/R3.7 fail on misleading assertions (the
+        # "flaky on CI" class). Lift the restriction so confinement tests run
+        # real jails. Older images (22.04) lack the key; `|| true` keeps this
+        # step portable.
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - name: Build fs-helper (release profile)
+        # The API's materializer resolves the RELEASE profile only, while
+        # device-runtime's pretest hook builds debug by default — S12 failed
+        # with "binary not found" for exactly that mismatch. Build release
+        # before any test runs.
+        run: bash scripts/pretest-fs-helper.sh release
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
