@@ -130,7 +130,7 @@ function getStatusMeta(displayState: TaskDisplayState) {
   switch (displayState) {
     case "pending":
       return {
-        label: "待回答",
+        label: "Awaiting Answer",
         icon: "clock" as const,
         backgroundColor: "rgba(37, 99, 235, 0.10)",
         borderColor: "rgba(37, 99, 235, 0.18)",
@@ -138,7 +138,7 @@ function getStatusMeta(displayState: TaskDisplayState) {
       }
     case "answered":
       return {
-        label: "已完成",
+        label: "Completed",
         icon: "check-circle" as const,
         backgroundColor: "rgba(21, 128, 61, 0.10)",
         borderColor: "rgba(21, 128, 61, 0.18)",
@@ -146,7 +146,7 @@ function getStatusMeta(displayState: TaskDisplayState) {
       }
     case "approved":
       return {
-        label: "已批准",
+        label: "Approved",
         icon: "check-circle" as const,
         backgroundColor: "rgba(21, 128, 61, 0.10)",
         borderColor: "rgba(21, 128, 61, 0.18)",
@@ -154,7 +154,7 @@ function getStatusMeta(displayState: TaskDisplayState) {
       }
     case "rejected":
       return {
-        label: "待修改",
+        label: "Changes Requested",
         icon: "rotate-ccw" as const,
         backgroundColor: "rgba(245, 158, 11, 0.12)",
         borderColor: "rgba(245, 158, 11, 0.22)",
@@ -162,7 +162,7 @@ function getStatusMeta(displayState: TaskDisplayState) {
       }
     case "cancelled":
       return {
-        label: "已取消",
+        label: "Canceled",
         icon: "slash" as const,
         backgroundColor: "rgba(115, 115, 115, 0.10)",
         borderColor: "rgba(115, 115, 115, 0.18)",
@@ -170,7 +170,7 @@ function getStatusMeta(displayState: TaskDisplayState) {
       }
     case "expired":
       return {
-        label: "已过期",
+        label: "Expired",
         icon: "alert-circle" as const,
         backgroundColor: "rgba(220, 38, 38, 0.10)",
         borderColor: "rgba(220, 38, 38, 0.18)",
@@ -178,7 +178,7 @@ function getStatusMeta(displayState: TaskDisplayState) {
       }
     case "failed":
       return {
-        label: "失败",
+        label: "Failed",
         icon: "alert-triangle" as const,
         backgroundColor: "rgba(220, 38, 38, 0.10)",
         borderColor: "rgba(220, 38, 38, 0.18)",
@@ -192,73 +192,75 @@ function getStatusNote(
   viewerCanResolve: boolean,
   canResolve: boolean
 ) {
-  const targetName = task.target?.name?.trim() || "指定用户"
+  const targetName = task.target?.name?.trim() || "the assigned user"
   const displayState = getTaskDisplayState(task)
 
   if (task.kind === TASK_REQUEST_KIND.USER_INPUT) {
     if (displayState === "pending") {
       return canResolve || viewerCanResolve
-        ? "点击开始逐题作答"
-        : `等待 ${targetName} 回答`
+        ? "Tap to answer the questions"
+        : `Waiting for ${targetName} to answer`
     }
     if (displayState === "answered") {
-      return "点击查看答题结果"
+      return "Tap to view the answers"
     }
     if (displayState === "expired") {
-      return "此问答已过期"
+      return "This form has expired"
     }
     if (displayState === "cancelled") {
-      return "此问答已被取消"
+      return "This form was canceled"
     }
     if (displayState === "failed") {
-      return "此问答处理失败"
+      return "Failed to process this form"
     }
-    return "点击查看详情"
+    return "Tap to view details"
   }
 
   if (task.kind === TASK_REQUEST_KIND.PLAN_APPROVAL) {
     if (displayState === "pending") {
       return canResolve || viewerCanResolve
-        ? "点击审批或要求修改"
-        : `等待 ${targetName} 审批`
+        ? "Tap to approve or request changes"
+        : `Waiting for ${targetName} to approve`
     }
     if (displayState === "approved") {
-      return "计划已批准"
+      return "Plan approved"
     }
     if (displayState === "rejected") {
-      return "计划需要修改"
+      return "Plan needs changes"
     }
     if (displayState === "cancelled") {
-      return "该审批已被取消"
+      return "This approval was canceled"
     }
-    return "点击查看计划详情"
+    return "Tap to view the plan"
   }
 
   if (displayState === "pending") {
-    return canResolve ? "点击选择授权范围" : "等待有权限的成员处理"
+    return canResolve
+      ? "Tap to choose the authorization scope"
+      : "Waiting for an authorized member"
   }
   if (displayState === "approved") {
-    return "授权已批准"
+    return "Authorization approved"
   }
   if (displayState === "rejected") {
-    return "授权已拒绝"
+    return "Authorization denied"
   }
   if (displayState === "cancelled") {
-    return "授权请求已取消"
+    return "Authorization request canceled"
   }
-  return "点击查看详情"
+  return "Tap to view details"
 }
 
 function formatRuntimeAuthorizationPresetLabel(preset: string) {
   switch (preset) {
     case "once":
-      return "仅本次"
+      return "This time only"
     case "actor":
-      return "当前 Actor"
+      return "Current Actor"
     case "conversation":
-      return "当前会话"
+      return "This chat"
     case "workspace":
-      return "整个工作区"
+      return "Entire workspace"
     default:
       return preset
   }
@@ -271,12 +273,12 @@ function describeRuntimeAuthorizationSpec(
     return {
       summary:
         scope.filesystem.access === "write"
-          ? "文件系统写入权限"
-          : "文件系统只读权限",
+          ? "Filesystem write access"
+          : "Filesystem read-only access",
       detailLines:
         scope.filesystem.pathPrefixes.length > 0
           ? scope.filesystem.pathPrefixes
-          : ["整个文件系统"],
+          : ["Entire filesystem"],
     }
   }
 
@@ -291,8 +293,10 @@ function describeRuntimeAuthorizationSpec(
             : undefined
     return {
       summary:
-        scope.browser.action === "write" ? "浏览器写入操作" : "浏览器只读访问",
-      detailLines: [target || "整个浏览器环境"],
+        scope.browser.action === "write"
+          ? "Browser write actions"
+          : "Browser read-only access",
+      detailLines: [target || "Entire browser environment"],
     }
   }
 
@@ -309,29 +313,35 @@ function describeRuntimeAuthorizationSpec(
       const argvSummary = argv.length === 0 ? "" : ` ${argv.join(" ")}`
       const summaryLabel =
         cmd.commandMatchType === "argv_exact"
-          ? "结构化命令授权（精确）"
+          ? "Structured command grant (exact)"
           : cmd.commandMatchType === "argv_prefix"
-            ? "结构化命令授权（前缀）"
-            : "结构化命令授权（预批准）"
+            ? "Structured command grant (prefix)"
+            : "Structured command grant (pre-approved)"
       return {
-        summary: `${summaryLabel}：${cmd.program}${argvSummary}`,
+        summary: `${summaryLabel}: ${cmd.program}${argvSummary}`,
         detailLines: [
-          cmd.workingDirectory ? `工作目录：${cmd.workingDirectory}` : null,
-          cmd.allowBundledToolchain ? "允许使用 Synapse 自带工具链" : null,
+          cmd.workingDirectory
+            ? `Working directory: ${cmd.workingDirectory}`
+            : null,
+          cmd.allowBundledToolchain
+            ? "Allow the Synapse bundled toolchain"
+            : null,
           cmd.allowedEnv && cmd.allowedEnv.length > 0
-            ? `继承环境变量：${cmd.allowedEnv.join(", ")}`
+            ? `Inherited environment variables: ${cmd.allowedEnv.join(", ")}`
             : null,
         ].filter((value): value is string => Boolean(value)),
       }
     }
     if (cmd.executor === "sandbox") {
       return {
-        summary: "沙箱命令授权（隔离 shell）",
+        summary: "Sandbox command grant (isolated shell)",
         detailLines: [
-          "在 bwrap 沙箱内执行任意命令（无网络）",
-          cmd.workingDirectory ? `工作目录：${cmd.workingDirectory}` : null,
+          "Run any command inside the bwrap sandbox (no network)",
+          cmd.workingDirectory
+            ? `Working directory: ${cmd.workingDirectory}`
+            : null,
           cmd.allowedEnv && cmd.allowedEnv.length > 0
-            ? `继承环境变量：${cmd.allowedEnv.join(", ")}`
+            ? `Inherited environment variables: ${cmd.allowedEnv.join(", ")}`
             : null,
         ].filter((value): value is string => Boolean(value)),
       }
@@ -339,20 +349,24 @@ function describeRuntimeAuthorizationSpec(
     return {
       summary:
         cmd.commandMatchType === "exact"
-          ? `精确命令授权（${cmd.executor}）`
+          ? `Exact command grant (${cmd.executor})`
           : cmd.commandMatchType === "prefix"
-            ? `命令前缀授权（${cmd.executor}）`
-            : `命令行访问（${cmd.executor}）`,
+            ? `Command prefix grant (${cmd.executor})`
+            : `Command line access (${cmd.executor})`,
       detailLines: [
         cmd.commandText || cmd.executor,
-        cmd.workingDirectory ? `工作目录：${cmd.workingDirectory}` : null,
+        cmd.workingDirectory
+          ? `Working directory: ${cmd.workingDirectory}`
+          : null,
       ].filter((value): value is string => Boolean(value)),
     }
   }
 
   return {
     summary:
-      scope.cua?.access === "write" ? "桌面输入控制权限" : "桌面观察权限",
+      scope.cua?.access === "write"
+        ? "Desktop input control access"
+        : "Desktop observation access",
     detailLines: ["Computer Use / CUA"],
   }
 }
@@ -509,14 +523,16 @@ function ReadOnlyUserInputQuestion({
 
   return (
     <View style={styles.summarySection}>
-      <Text style={styles.summaryIndex}>{`题目 ${index + 1}`}</Text>
+      <Text style={styles.summaryIndex}>{`Question ${index + 1}`}</Text>
       <Text style={styles.summaryTitle}>{question.prompt}</Text>
       {question.description ? (
         <Text style={styles.summaryDescription}>{question.description}</Text>
       ) : null}
 
       {question.type === "text" ? (
-        <Text style={styles.summaryAnswer}>{answer?.text || "暂无回答"}</Text>
+        <Text style={styles.summaryAnswer}>
+          {answer?.text || "No answer yet"}
+        </Text>
       ) : (
         <>
           {(question.options || []).length ? (
@@ -537,7 +553,7 @@ function ReadOnlyUserInputQuestion({
 
           {fallbackSelectionSummary ? (
             <View style={styles.otherAnswerWrap}>
-              <Text style={styles.otherAnswerLabel}>已选答案</Text>
+              <Text style={styles.otherAnswerLabel}>Selected answers</Text>
               <Text style={styles.summaryAnswer}>
                 {fallbackSelectionSummary}
               </Text>
@@ -546,20 +562,20 @@ function ReadOnlyUserInputQuestion({
 
           {answer?.otherText ? (
             <View style={styles.otherAnswerWrap}>
-              <Text style={styles.otherAnswerLabel}>其他</Text>
+              <Text style={styles.otherAnswerLabel}>Other</Text>
               <Text style={styles.summaryAnswer}>{answer.otherText}</Text>
             </View>
           ) : null}
 
           {answer?.text ? (
             <View style={styles.otherAnswerWrap}>
-              <Text style={styles.otherAnswerLabel}>补充说明</Text>
+              <Text style={styles.otherAnswerLabel}>Additional notes</Text>
               <Text style={styles.summaryAnswer}>{answer.text}</Text>
             </View>
           ) : null}
 
           {!hasVisibleAnswer ? (
-            <Text style={styles.summaryAnswer}>暂无回答</Text>
+            <Text style={styles.summaryAnswer}>No answer yet</Text>
           ) : null}
         </>
       )}
@@ -712,7 +728,9 @@ export function ChatTaskCard({
       setOpen(false)
     } catch (error) {
       setSubmitError(
-        error instanceof Error ? error.message : "提交答题结果失败。"
+        error instanceof Error
+          ? error.message
+          : "Failed to submit your answers."
       )
     } finally {
       setSubmitting(false)
@@ -812,27 +830,27 @@ export function ChatTaskCard({
   const kindMeta =
     task.kind === TASK_REQUEST_KIND.USER_INPUT
       ? {
-          label: "表单",
+          label: "Form",
           icon: "help-circle" as const,
         }
       : task.kind === TASK_REQUEST_KIND.PLAN_APPROVAL
         ? {
-            label: "计划审批",
+            label: "Plan Approval",
             icon: "git-branch" as const,
           }
         : {
-            label: "授权",
+            label: "Authorization",
             icon: "shield" as const,
           }
 
   const cardTitle =
     task.kind === TASK_REQUEST_KIND.USER_INPUT
-      ? task.userInput?.title || "表单"
+      ? task.userInput?.title || "Form"
       : task.kind === TASK_REQUEST_KIND.PLAN_APPROVAL
-        ? task.planApproval?.title || "计划审批"
+        ? task.planApproval?.title || "Plan Approval"
         : task.runtimeAuthorization
-          ? `授权 ${task.runtimeAuthorization.runtimeToolStableKey}`
-          : "授权请求"
+          ? `Authorization: ${task.runtimeAuthorization.runtimeToolStableKey}`
+          : "Authorization Request"
 
   const cardDescription =
     task.kind === TASK_REQUEST_KIND.USER_INPUT
@@ -847,7 +865,7 @@ export function ChatTaskCard({
       : task.kind === TASK_REQUEST_KIND.PLAN_APPROVAL
         ? task.resolutionNote
         : task.runtimeAuthorization?.approvedGrant
-          ? "已生成授权范围"
+          ? "Authorization scope generated"
           : task.runtimeAuthorization?.exposureDisplayName
 
   return (
@@ -936,7 +954,7 @@ export function ChatTaskCard({
             <View style={styles.sheetHeader}>
               <Text style={styles.sheetEyebrow}>
                 {canResolveUserInput && currentField && userInput
-                  ? `第 ${currentIndex + 1} / ${userInput.questions.length} 题`
+                  ? `Question ${currentIndex + 1} of ${userInput.questions.length}`
                   : statusMeta.label}
               </Text>
               <Text style={styles.sheetTitle}>{cardTitle}</Text>
@@ -966,7 +984,7 @@ export function ChatTaskCard({
                         {currentField.header}
                       </Text>
                       {currentField.required ? (
-                        <Text style={styles.questionRequired}>必填</Text>
+                        <Text style={styles.questionRequired}>Required</Text>
                       ) : null}
                     </View>
                     <Text style={styles.questionTitle}>
@@ -989,7 +1007,9 @@ export function ChatTaskCard({
                             text: value,
                           }))
                         }}
-                        placeholder={currentField.placeholder || "请输入内容"}
+                        placeholder={
+                          currentField.placeholder || "Enter your answer"
+                        }
                         placeholderTextColor={theme.colors.textSoft}
                         style={[
                           styles.textAnswerInput,
@@ -1019,7 +1039,7 @@ export function ChatTaskCard({
 
                     {currentField.allowOther ? (
                       <View style={styles.otherAnswerWrap}>
-                        <Text style={styles.otherAnswerLabel}>其他</Text>
+                        <Text style={styles.otherAnswerLabel}>Other</Text>
                         <TextInput
                           multiline
                           value={currentDraft.otherText}
@@ -1034,7 +1054,7 @@ export function ChatTaskCard({
                                   : draft.selectedOptionIds,
                             }))
                           }}
-                          placeholder="补充你的答案"
+                          placeholder="Add your own answer"
                           placeholderTextColor={theme.colors.textSoft}
                           style={styles.otherAnswerInput}
                           editable={!submitting}
@@ -1057,7 +1077,7 @@ export function ChatTaskCard({
 
                 <View style={styles.sheetActions}>
                   <Button
-                    label={currentIndex > 0 ? "上一题" : "关闭"}
+                    label={currentIndex > 0 ? "Previous" : "Close"}
                     variant="secondary"
                     onPress={() => {
                       if (currentIndex > 0) {
@@ -1071,10 +1091,10 @@ export function ChatTaskCard({
                   <Button
                     label={
                       submitting
-                        ? "提交中..."
+                        ? "Submitting..."
                         : currentIndex >= userInput.questions.length - 1
-                          ? "提交答案"
-                          : "下一题"
+                          ? "Submit Answers"
+                          : "Next"
                     }
                     onPress={() => goToNextQuestion()}
                     disabled={
@@ -1103,7 +1123,7 @@ export function ChatTaskCard({
                   ) : task.kind === TASK_REQUEST_KIND.PLAN_APPROVAL ? (
                     <>
                       <View style={styles.summarySection}>
-                        <Text style={styles.summaryIndex}>计划内容</Text>
+                        <Text style={styles.summaryIndex}>Plan</Text>
                         {task.planApproval?.planMarkdown ? (
                           <View style={styles.summaryMarkdownWrap}>
                             <ChatMarkdown
@@ -1112,7 +1132,9 @@ export function ChatTaskCard({
                             />
                           </View>
                         ) : (
-                          <Text style={styles.summaryAnswer}>暂无计划内容</Text>
+                          <Text style={styles.summaryAnswer}>
+                            No plan content yet
+                          </Text>
                         )}
                       </View>
                       {(task.planApproval?.checklist || []).map(
@@ -1123,7 +1145,7 @@ export function ChatTaskCard({
                           >
                             <Text
                               style={styles.summaryIndex}
-                            >{`检查项 ${index + 1}`}</Text>
+                            >{`Checklist item ${index + 1}`}</Text>
                             <Text style={styles.summaryTitle}>{step.step}</Text>
                             <Text style={styles.summaryAnswer}>
                               {step.status}
@@ -1133,7 +1155,7 @@ export function ChatTaskCard({
                       )}
                       {task.resolutionNote ? (
                         <View style={styles.summarySection}>
-                          <Text style={styles.summaryIndex}>备注</Text>
+                          <Text style={styles.summaryIndex}>Note</Text>
                           <Text style={styles.summaryAnswer}>
                             {task.resolutionNote}
                           </Text>
@@ -1141,12 +1163,12 @@ export function ChatTaskCard({
                       ) : null}
                       {canResolvePlanApproval ? (
                         <View style={styles.summarySection}>
-                          <Text style={styles.summaryIndex}>审批备注</Text>
+                          <Text style={styles.summaryIndex}>Review note</Text>
                           <TextInput
                             multiline
                             value={resolutionNoteDraft}
                             onChangeText={setResolutionNoteDraft}
-                            placeholder="可选：填写审批意见或修改建议"
+                            placeholder="Optional: add review comments or revision suggestions"
                             placeholderTextColor={theme.colors.textSoft}
                             style={styles.otherAnswerInput}
                             editable={!submitting}
@@ -1157,25 +1179,28 @@ export function ChatTaskCard({
                   ) : (
                     <>
                       <View style={styles.summarySection}>
-                        <Text style={styles.summaryIndex}>设备</Text>
+                        <Text style={styles.summaryIndex}>Device</Text>
                         <Text style={styles.summaryTitle}>
                           {task.runtimeAuthorization?.runtimeDisplayName ||
                             "Device"}
                         </Text>
                         <Text style={styles.summaryDescription}>
-                          {task.runtimeAuthorization?.reason || "等待授权"}
+                          {task.runtimeAuthorization?.reason ||
+                            "Awaiting authorization"}
                         </Text>
                       </View>
                       <View style={styles.summarySection}>
-                        <Text style={styles.summaryIndex}>暴露能力</Text>
+                        <Text style={styles.summaryIndex}>
+                          Exposed capability
+                        </Text>
                         <Text style={styles.summaryAnswer}>
                           {task.runtimeAuthorization?.exposureDisplayName ||
-                            "未提供"}
+                            "Not provided"}
                         </Text>
                       </View>
                       {task.runtimeAuthorization?.requestedAction ? (
                         <DeviceGrantSpecSection
-                          eyebrow="请求操作"
+                          eyebrow="Requested action"
                           summary={
                             describeRuntimeAuthorizationRequestedAction(
                               task.runtimeAuthorization.requestedAction
@@ -1209,7 +1234,9 @@ export function ChatTaskCard({
                       {(task.runtimeAuthorization?.availablePresets || [])
                         .length ? (
                         <View style={styles.summarySection}>
-                          <Text style={styles.summaryIndex}>授权范围</Text>
+                          <Text style={styles.summaryIndex}>
+                            Authorization scope
+                          </Text>
                           <Text style={styles.summaryAnswer}>
                             {(task.runtimeAuthorization?.availablePresets || [])
                               .map((preset) =>
@@ -1221,7 +1248,9 @@ export function ChatTaskCard({
                       ) : null}
                       {task.runtimeAuthorization?.approvedPreset ? (
                         <View style={styles.summarySection}>
-                          <Text style={styles.summaryIndex}>已批准范围</Text>
+                          <Text style={styles.summaryIndex}>
+                            Approved scope
+                          </Text>
                           <Text style={styles.summaryAnswer}>
                             {formatRuntimeAuthorizationPresetLabel(
                               task.runtimeAuthorization.approvedPreset
@@ -1232,7 +1261,7 @@ export function ChatTaskCard({
                       {task.runtimeAuthorization?.approvedGrant ? (
                         <>
                           <DeviceGrantSpecSection
-                            eyebrow="已批准授权"
+                            eyebrow="Approved grant"
                             summary={
                               describeRuntimeAuthorizationSpec(
                                 task.runtimeAuthorization.approvedGrant
@@ -1250,7 +1279,7 @@ export function ChatTaskCard({
                       ) : null}
                       {task.resolutionNote ? (
                         <View style={styles.summarySection}>
-                          <Text style={styles.summaryIndex}>备注</Text>
+                          <Text style={styles.summaryIndex}>Note</Text>
                           <Text style={styles.summaryAnswer}>
                             {task.resolutionNote}
                           </Text>
@@ -1258,12 +1287,12 @@ export function ChatTaskCard({
                       ) : null}
                       {canResolveRuntimeAuthorization ? (
                         <View style={styles.summarySection}>
-                          <Text style={styles.summaryIndex}>审批备注</Text>
+                          <Text style={styles.summaryIndex}>Review note</Text>
                           <TextInput
                             multiline
                             value={resolutionNoteDraft}
                             onChangeText={setResolutionNoteDraft}
-                            placeholder="可选：填写授权说明"
+                            placeholder="Optional: add an authorization note"
                             placeholderTextColor={theme.colors.textSoft}
                             style={styles.otherAnswerInput}
                             editable={!submitting}
@@ -1283,7 +1312,7 @@ export function ChatTaskCard({
                   {canResolvePlanApproval ? (
                     <>
                       <Button
-                        label={submitting ? "处理中..." : "要求修改"}
+                        label={submitting ? "Processing..." : "Request Changes"}
                         variant="secondary"
                         onPress={() =>
                           void submitTaskResolution(
@@ -1291,21 +1320,21 @@ export function ChatTaskCard({
                               decision: "revise",
                               note: resolutionNoteDraft.trim() || undefined,
                             },
-                            "提交审批结果失败。"
+                            "Failed to submit your review."
                           )
                         }
                         style={styles.actionButton}
                         disabled={submitting}
                       />
                       <Button
-                        label={submitting ? "处理中..." : "批准计划"}
+                        label={submitting ? "Processing..." : "Approve Plan"}
                         onPress={() =>
                           void submitTaskResolution(
                             {
                               decision: "approve",
                               note: resolutionNoteDraft.trim() || undefined,
                             },
-                            "提交审批结果失败。"
+                            "Failed to submit your review."
                           )
                         }
                         style={styles.actionButton}
@@ -1320,7 +1349,7 @@ export function ChatTaskCard({
                             key={preset}
                             label={
                               submitting
-                                ? "处理中..."
+                                ? "Processing..."
                                 : formatRuntimeAuthorizationPresetLabel(preset)
                             }
                             onPress={() =>
@@ -1334,7 +1363,7 @@ export function ChatTaskCard({
                                       note:
                                         resolutionNoteDraft.trim() || undefined,
                                     },
-                                    "提交授权结果失败。"
+                                    "Failed to submit the authorization decision."
                                   )
                                 : undefined
                             }
@@ -1346,7 +1375,7 @@ export function ChatTaskCard({
                         )
                       )}
                       <Button
-                        label={submitting ? "处理中..." : "拒绝"}
+                        label={submitting ? "Processing..." : "Deny"}
                         variant="secondary"
                         onPress={() =>
                           void submitTaskResolution(
@@ -1354,7 +1383,7 @@ export function ChatTaskCard({
                               decision: "reject",
                               note: resolutionNoteDraft.trim() || undefined,
                             },
-                            "提交授权结果失败。"
+                            "Failed to submit the authorization decision."
                           )
                         }
                         style={styles.singleActionButton}
@@ -1363,7 +1392,7 @@ export function ChatTaskCard({
                     </View>
                   ) : (
                     <Button
-                      label="关闭"
+                      label="Close"
                       variant="secondary"
                       onPress={() => setOpen(false)}
                       style={styles.singleActionButton}

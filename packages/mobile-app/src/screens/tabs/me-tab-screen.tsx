@@ -69,7 +69,7 @@ export default function MeTabScreen() {
 
   async function handleSaveProfile() {
     if (!name.trim()) {
-      setError("名称不能为空。")
+      setError("Name cannot be empty.")
       return
     }
 
@@ -80,7 +80,9 @@ export default function MeTabScreen() {
       await updateProfile({ name: name.trim() })
     } catch (nextError) {
       setError(
-        nextError instanceof Error ? nextError.message : "保存资料失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to save profile."
       )
     } finally {
       setSaving(false)
@@ -100,10 +102,12 @@ export default function MeTabScreen() {
       })
       setFriendIdProfile(nextProfile)
       setFriendIdDraft(nextProfile.identityId)
-      setFriendIdMessage(`好友 ID 已更新为 ${nextProfile.identityId}`)
+      setFriendIdMessage(`Friend ID updated to ${nextProfile.identityId}`)
     } catch (nextError) {
       setFriendIdMessage(
-        nextError instanceof Error ? nextError.message : "保存好友 ID 失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to save friend ID."
       )
     } finally {
       setFriendIdSaving(false)
@@ -125,12 +129,14 @@ export default function MeTabScreen() {
       setFriendIdDraft(nextProfile.identityId)
       setFriendIdMessage(
         nextProfile.identitySearchEnabled
-          ? "已开启通过好友 ID 搜索。"
-          : "已关闭通过好友 ID 搜索。"
+          ? "Search by friend ID enabled."
+          : "Search by friend ID disabled."
       )
     } catch (nextError) {
       setFriendIdMessage(
-        nextError instanceof Error ? nextError.message : "更新搜索开关失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to update the search setting."
       )
     } finally {
       setFriendIdSaving(false)
@@ -139,7 +145,7 @@ export default function MeTabScreen() {
 
   return (
     <ScreenScroll bottomPadding={52} topPadding={0}>
-      <MobilePageHeader title="我的" />
+      <MobilePageHeader title="Me" />
 
       <SectionBlock>
         <View style={styles.profileCard}>
@@ -150,24 +156,28 @@ export default function MeTabScreen() {
             icon="user"
           />
           <View style={styles.profileBody}>
-            <Text style={styles.profileName}>{user?.name || "未命名用户"}</Text>
-            <Text style={styles.profileEmail}>{user?.email || "未登录"}</Text>
+            <Text style={styles.profileName}>
+              {user?.name || "Unnamed user"}
+            </Text>
+            <Text style={styles.profileEmail}>
+              {user?.email || "Not signed in"}
+            </Text>
           </View>
           {workspaceName ? <Pill label={workspaceName} tone="primary" /> : null}
         </View>
       </SectionBlock>
 
       <SectionBlock>
-        <SectionTitleRow title="个人资料" />
+        <SectionTitleRow title="Profile" />
         <Field
-          label="显示名称"
+          label="Display name"
           value={name}
           onChangeText={setName}
-          placeholder="输入你希望在移动端展示的名称"
+          placeholder="Enter the name you want to show on mobile"
         />
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Button
-          label={saving ? "保存中..." : "保存个人资料"}
+          label={saving ? "Saving..." : "Save profile"}
           icon="save"
           onPress={() => void handleSaveProfile()}
           disabled={saving}
@@ -175,22 +185,22 @@ export default function MeTabScreen() {
       </SectionBlock>
 
       <SectionBlock>
-        <SectionTitleRow title="好友 ID" />
+        <SectionTitleRow title="Friend ID" />
         <Field
-          label="唯一 ID"
+          label="Unique ID"
           value={friendIdDraft}
           onChangeText={setFriendIdDraft}
-          placeholder="输入你的好友 ID"
+          placeholder="Enter your friend ID"
           autoCapitalize="none"
           autoCorrect={false}
-          hint="好友 ID 整个平台唯一，默认关闭被搜索。"
+          hint="Friend IDs are unique across the platform. Search is off by default."
         />
         {friendIdMessage ? (
           <Text style={styles.workspaceMeta}>{friendIdMessage}</Text>
         ) : null}
         <View style={styles.friendIdActions}>
           <Button
-            label={friendIdSaving ? "保存中..." : "保存 ID"}
+            label={friendIdSaving ? "Saving..." : "Save ID"}
             icon="save"
             variant="secondary"
             onPress={() => void handleSaveFriendId()}
@@ -201,7 +211,9 @@ export default function MeTabScreen() {
           />
           <Button
             label={
-              friendIdProfile?.identitySearchEnabled ? "关闭搜索" : "开启搜索"
+              friendIdProfile?.identitySearchEnabled
+                ? "Disable search"
+                : "Enable search"
             }
             icon={friendIdProfile?.identitySearchEnabled ? "eye-off" : "eye"}
             variant="secondary"
@@ -214,18 +226,20 @@ export default function MeTabScreen() {
 
       <SectionBlock>
         <SectionTitleRow
-          title="工作区"
+          title="Workspace"
           action={
             !needsOnboarding ? (
-              <Text style={styles.workspaceMeta}>{workspaces.length} 个</Text>
+              <Text style={styles.workspaceMeta}>
+                {workspaces.length} workspaces
+              </Text>
             ) : null
           }
         />
         {needsOnboarding ? (
           <EmptyState
             icon="briefcase"
-            title="当前还没有工作区"
-            description="请先在 Web 端创建 workspace，再回到移动端继续。"
+            title="No workspaces yet"
+            description="Create a workspace on the web first, then come back to continue on mobile."
           />
         ) : (
           <View style={styles.listShell}>
@@ -270,7 +284,7 @@ export default function MeTabScreen() {
                         active && styles.workspaceStateActive,
                       ]}
                     >
-                      {active ? "当前" : "切换"}
+                      {active ? "Current" : "Switch"}
                     </Text>
                   </View>
                 </Pressable>
@@ -281,16 +295,16 @@ export default function MeTabScreen() {
       </SectionBlock>
 
       <SectionBlock>
-        <SectionTitleRow title="设备操作" />
+        <SectionTitleRow title="Device Actions" />
         <View style={styles.listShell}>
           <ActionRow
-            label="退出登录"
+            label="Sign out"
             icon="log-out"
             danger
             onPress={() => void signOut()}
           />
         </View>
-        <Text style={styles.connectionHint}>API：{getApiBaseForDisplay()}</Text>
+        <Text style={styles.connectionHint}>API: {getApiBaseForDisplay()}</Text>
       </SectionBlock>
     </ScreenScroll>
   )

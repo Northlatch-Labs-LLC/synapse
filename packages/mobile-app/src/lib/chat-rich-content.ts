@@ -44,10 +44,10 @@ export function serializeMarkdownBlocks(blocks: CanonicalContentBlock[]) {
 }
 
 export function getAttachmentLabel(category: ChatPreviewCategory) {
-  if (category === "image") return "图片"
-  if (category === "video") return "视频"
-  if (category === "audio") return "音频"
-  return "文件"
+  if (category === "image") return "Image"
+  if (category === "video") return "Video"
+  if (category === "audio") return "Audio"
+  return "File"
 }
 
 export function isMarkdownMimeType(mimeType: string) {
