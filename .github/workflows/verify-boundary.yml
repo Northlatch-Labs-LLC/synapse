@@ -40,7 +40,7 @@ jobs:
         # every jail spawn is denied and the tests fail on misleading
         # assertions. `|| true` keeps older images (no such key) portable.
         run: |
-          sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep libx11-dev libxtst-dev libxkbfile-dev
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
       - uses: actions/setup-node@v4
         with:

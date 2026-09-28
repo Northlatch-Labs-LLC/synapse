@@ -53,7 +53,7 @@ jobs:
         # suites) exercise bwrap isolation and ripgrep-backed search; without
         # them the plane fail-closes with runtime_constraint and the tests fail
         # (macOS dev hosts see exactly this — platform-gated, not regressions).
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep libx11-dev libxtst-dev libxkbfile-dev
       - name: Enable unprivileged user namespaces (make bwrap actually usable)
         # ubuntu-latest (24.04) ships AppArmor's userns restriction ON: the
         # bwrap BINARY resolves (so bwrapAvailable() passes) but every jail
