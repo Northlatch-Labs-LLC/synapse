@@ -42,6 +42,12 @@ jobs:
       ALLOW_MISSING_FS_HELPER: "1"
     steps:
       - uses: actions/checkout@v4
+        # Bundle sidecar archives are git-LFS objects; checkout@v4 skips LFS
+        # content by default, leaving pointer files whose sha256 can never match
+        # the manifest — the requirePrestaged suites then fail on "no matching
+        # archive" although the archives are committed.
+        with:
+          lfs: true
       - name: Install sandbox plane prerequisites
         # 33 sandbox contract tests (local-bare-plane / core-catalog / data-plane
         # suites) exercise bwrap isolation and ripgrep-backed search; without
@@ -91,6 +97,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        # Bundle sidecar archives are git-LFS objects; checkout@v4 skips LFS
+        # content by default, leaving pointer files whose sha256 can never match
+        # the manifest — the requirePrestaged suites then fail on "no matching
+        # archive" although the archives are committed.
+        with:
+          lfs: true
       - name: Build api image
         run: docker build -f infrastructure/Dockerfile.api -t synapse-api:ci .
       - name: Trivy scan (CRITICAL/HIGH block, INV-S7/S8)

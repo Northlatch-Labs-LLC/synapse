@@ -64,7 +64,7 @@
     "@synapse/device-runtime-bundles-linux-x64": "0.1.0",
     "@synapse/device-runtime-bundles-win32-arm64": "0.1.0",
     "@synapse/device-runtime-bundles-win32-x64": "0.1.0",
-    "chrome-devtools-mcp": "^1.10.1"
+    "chrome-devtools-mcp": "1.10.1"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",

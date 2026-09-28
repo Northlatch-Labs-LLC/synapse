@@ -26,6 +26,12 @@ jobs:
       ALLOW_MISSING_FS_HELPER: "1"
     steps:
       - uses: actions/checkout@v4
+        # Bundle sidecar archives are git-LFS objects; checkout@v4 skips LFS
+        # content by default, leaving pointer files whose sha256 can never match
+        # the manifest — the requirePrestaged suites then fail on "no matching
+        # archive" although the archives are committed.
+        with:
+          lfs: true
       - name: Install sandbox plane prerequisites + enable userns
         # The boundary gate runs device-runtime's full suite, whose bwrap-backed
         # exec/VFS tests need (a) the bubblewrap + ripgrep binaries and (b)
