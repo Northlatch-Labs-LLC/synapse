@@ -144,8 +144,8 @@ type QqFormState = TransportAccountOwnerFormState & {
   allowProactiveBestEffort: boolean
   /**
    * Allowlist of URL hostnames that may appear in outbound text. QQ
-   * console must have these registered under "消息URL配置" or the send
-   * will be rejected.
+   * console must have these registered under "Message URL configuration"
+   * or the send will be rejected.
    */
   configuredUrlDomains: string
 }
@@ -736,8 +736,8 @@ function QqAccountConfigEditor({
           placeholder={"dashboard.example.com\nlinks.example.com"}
         />
         <p className="text-xs text-muted-foreground">
-          Must match QQ console &quot;消息URL配置&quot; entries. Wildcards and
-          IPs are rejected by the server normalizer.
+          Must match QQ console &quot;Message URL configuration&quot; entries.
+          Wildcards and IPs are rejected by the server normalizer.
         </p>
       </div>
       <div className="flex justify-end">
@@ -3173,9 +3173,10 @@ export default function ImPage() {
               className="min-h-24 w-full rounded-md border bg-background px-3 py-2 text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Must match domains registered under QQ console &quot;消息URL
-              配置&quot;. Any unlisted hostname in an outbound message will fail
-              locally (no quota consumed). Wildcards and IPs are rejected.
+              Must match domains registered under QQ console &quot;Message URL
+              configuration&quot;. Any unlisted hostname in an outbound message
+              will fail locally (no quota consumed). Wildcards and IPs are
+              rejected.
             </p>
           </div>
 

@@ -22,21 +22,21 @@ import { Card, CardContent } from "@/components/ui/card"
 const shareHighlights = [
   {
     icon: ArrowRightLeft,
-    title: "像联系人一样引入",
+    title: "Add them like contacts",
     description:
-      "用户、Actor、Remote Agent 都能跨工作区建立关系，再被带进当前团队。",
+      "Users, Actors, and Remote Agents connect across workspaces, then join your team.",
   },
   {
     icon: ShieldCheck,
-    title: "共享后继续工作",
+    title: "They keep working after joining",
     description:
-      "共享来的用户和 Actor 不只聊天，拿到授权后还能继续接住文档、数据和流程。",
+      "Shared users and Agents do more than chat — once authorized, they take on documents, data, and processes.",
   },
   {
     icon: SquareTerminal,
-    title: "Remote Agent 保留外部栈",
+    title: "Remote Agents keep their stack",
     description:
-      "Remote Agent 通过桥接进入同一条群聊，但继续保留自己的运行时和工具链。",
+      "Remote Agents join the same group through a bridge and keep their own runtime and toolchain.",
   },
 ] as const
 
@@ -70,39 +70,44 @@ type ShareConversationMessage =
 const shareConversationMessages: ShareConversationMessage[] = [
   {
     kind: "system",
-    content: "Scout（共享 Actor）加入了群聊",
+    content: "Scout (shared Actor) joined the group",
   },
   {
     kind: "system",
-    content: "Code Runner（Remote Agent）通过桥接接入",
+    content: "Code Runner (Remote Agent) connected through the bridge",
   },
   {
     kind: "user",
     name: "Ava",
     initials: "AV",
     tone: "bg-slate-950 text-white",
-    content: "帮我把官网首页文案收尾，再顺手检查一遍桌面端提交流程。",
+    content:
+      "Wrap up the homepage copy for me, then run a quick check on the desktop submit flow.",
   },
   {
     kind: "actor",
-    name: "Scout · 共享 Actor",
+    name: "Scout · Shared Actor",
     initials: "SC",
     tone: "bg-sky-100 text-sky-950",
     content:
-      "文案我先改。如果还要继续替你检查提交流程，我需要申请使用你已接入的桌面浏览器。",
-    meta: "可发起当前会话授权申请",
+      "I'll handle the copy first. To check the submit flow for you, I need to request the desktop browser you've connected.",
+    meta: "Can request authorization for this session",
   },
   {
     kind: "request",
-    title: "桌面浏览器访问申请",
+    title: "Desktop browser access request",
     content:
-      "共享 Actor 想继续操作你已接入的桌面浏览器，检查提交流程是否正常。",
-    items: ["申请方：Scout", "范围：当前会话", "资源：桌面设备 / 浏览器"],
-    status: "待你授权",
+      "A shared Actor wants to operate the desktop browser you've connected to verify the submit flow.",
+    items: [
+      "Requested by: Scout",
+      "Scope: current session",
+      "Resource: desktop device / browser",
+    ],
+    status: "Awaiting your approval",
   },
   {
     kind: "system",
-    content: "Ava 已批准本次申请，仅当前会话生效",
+    content: "Ava approved the request — valid for this session only",
   },
   {
     kind: "remote",
@@ -110,8 +115,8 @@ const shareConversationMessages: ShareConversationMessage[] = [
     initials: "CD",
     tone: "bg-amber-100 text-amber-950",
     content:
-      "我会在自己的外部 runtime 里同步改官网首页文案，完成后直接把 diff 发回群里。",
-    meta: "外部运行时持续在线",
+      "I'll update the homepage copy in my own external runtime and post the diff back to the group when it's done.",
+    meta: "External runtime stays online",
   },
 ] as const
 
@@ -147,11 +152,11 @@ export function LandingShareNetworkSection() {
         <div className="grid gap-12 lg:grid-cols-[0.84fr_1.16fr] lg:items-center lg:gap-14">
           <LandingReveal className="max-w-xl" x={-24}>
             <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-              像加同事一样，把 Agent 接进来
+              Add Agents the way you add colleagues
             </h2>
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-              共享来的 Agent 能在会话里申请授权，Remote Agent
-              也能带着自己的运行时一起协作。
+              Shared Agents can request authorization in the session, and Remote
+              Agents collaborate with their own runtimes.
             </p>
 
             <LandingStagger className="mt-8 space-y-4" delay={0.08}>
@@ -188,10 +193,11 @@ export function LandingShareNetworkSection() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <div className="text-sm font-semibold text-slate-950">
-                      官网首页迭代群
+                      Homepage iteration group
                     </div>
                     <div className="mt-1 text-[11px] text-slate-500">
-                      共享 Actor 申请桌面授权，Remote Agent 同群协作
+                      A shared Actor requests desktop access while a Remote
+                      Agent works in the same group
                     </div>
                   </div>
                   <AvatarGroup>

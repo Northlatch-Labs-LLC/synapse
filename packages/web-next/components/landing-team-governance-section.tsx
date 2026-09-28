@@ -15,24 +15,33 @@ import {
 } from "@/components/landing-motion"
 import { Card, CardContent } from "@/components/ui/card"
 
-const personalEnvironment = ["个人工具", "个人记忆", "本地设备"] as const
+const personalEnvironment = [
+  "Personal tools",
+  "Personal memory",
+  "Local devices",
+] as const
 
-const teamEnvironment = ["团队工具", "共享角色", "统一权限"] as const
+const teamEnvironment = [
+  "Team tools",
+  "Shared roles",
+  "Unified permissions",
+] as const
 
 const roleRows = [
   {
-    role: "平台管理员",
-    summary: "管理成员、模型组和平台级配置。",
+    role: "Platform admin",
+    summary: "Manages members, model groups, and platform-level settings.",
     tone: "bg-slate-950 text-white",
   },
   {
-    role: "工作区管理员",
-    summary: "安装插件、分配角色、配置设备和资源。",
+    role: "Workspace admin",
+    summary:
+      "Installs plugins, assigns roles, and configures devices and resources.",
     tone: "bg-sky-100 text-sky-950",
   },
   {
-    role: "成员",
-    summary: "发起任务、查看结果、使用被授权能力。",
+    role: "Member",
+    summary: "Starts tasks, views results, and uses authorized capabilities.",
     tone: "bg-slate-100 text-slate-700",
   },
 ] as const
@@ -40,23 +49,23 @@ const roleRows = [
 const auditItems = [
   {
     time: "09:42",
-    action: "Browser Operator 装入团队环境",
-    detail: "由工作区管理员发起。",
+    action: "Browser Operator installed in the team environment",
+    detail: "Initiated by the workspace admin.",
   },
   {
     time: "09:45",
-    action: "Risk Analyst 获得 SQL Access",
-    detail: "权限范围限制为只读查询。",
+    action: "Risk Analyst granted SQL Access",
+    detail: "Scope limited to read-only queries.",
   },
   {
     time: "09:47",
-    action: "Celine 在个人环境启用 Docs Connector",
-    detail: "仅个人可见，不影响团队环境。",
+    action: "Celine enabled Docs Connector in her personal environment",
+    detail: "Visible to her only; no impact on the team environment.",
   },
   {
     time: "09:52",
-    action: "凌晨巡检任务触发并写入共享记忆",
-    detail: "事件链路完整记录。",
+    action: "Overnight inspection task triggered and wrote to shared memory",
+    detail: "Full event trail recorded.",
   },
 ] as const
 
@@ -72,10 +81,12 @@ export function LandingTeamGovernanceSection() {
       <div className="landing-priority-frame relative mx-auto flex max-w-7xl flex-col px-6 lg:px-8">
         <LandingReveal className="landing-priority-copy mx-auto max-w-3xl text-center">
           <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-            管理数字团队，也该像管理真实团队一样清楚
+            Manage digital teams with the same clarity as real ones
           </h2>
           <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-            个人环境和团队环境并行，角色权限、资源归属和关键动作都能看清、回收、追溯
+            Personal and team environments run side by side — role permissions,
+            resource ownership, and key actions stay visible, revocable, and
+            traceable
           </p>
         </LandingReveal>
 
@@ -97,10 +108,11 @@ export function LandingTeamGovernanceSection() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-slate-950">
-                        个人和团队并行
+                        Personal and team, side by side
                       </div>
                       <div className="mt-1 text-[11px] text-slate-500">
-                        个人可以保留自己的工具和记忆，团队也能统一配置公共能力
+                        Individuals keep their own tools and memory; teams
+                        configure shared capabilities centrally
                       </div>
                     </div>
                   </div>
@@ -118,10 +130,11 @@ export function LandingTeamGovernanceSection() {
                           </div>
                           <div>
                             <div className="text-sm font-semibold text-slate-950">
-                              个人环境
+                              Personal environment
                             </div>
                             <div className="mt-1 text-[11px] text-slate-500">
-                              给自己配工具，也可以选择共享给团队
+                              Set up tools for yourself, share them with the
+                              team when you choose
                             </div>
                           </div>
                         </div>
@@ -145,7 +158,7 @@ export function LandingTeamGovernanceSection() {
                           <ArrowRightLeft className="size-4" />
                         </div>
                         <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] leading-none text-slate-500">
-                          可共享
+                          Shareable
                         </div>
                       </div>
                     </LandingStaggerItem>
@@ -158,10 +171,11 @@ export function LandingTeamGovernanceSection() {
                           </div>
                           <div>
                             <div className="text-sm font-semibold text-slate-950">
-                              团队环境
+                              Team environment
                             </div>
                             <div className="mt-1 text-[11px] text-slate-500">
-                              统一配置公共能力，供多人复用
+                              Centrally configured capabilities, reused across
+                              the team
                             </div>
                           </div>
                         </div>
@@ -192,10 +206,10 @@ export function LandingTeamGovernanceSection() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-slate-950">
-                        权限分层
+                        Layered permissions
                       </div>
                       <div className="mt-1 text-[11px] text-slate-500">
-                        谁能装、谁能用、谁能改，一眼看清
+                        Who installs, who uses, who changes — clear at a glance
                       </div>
                     </div>
                   </div>
@@ -222,7 +236,7 @@ export function LandingTeamGovernanceSection() {
                           <div
                             className={`rounded-full px-2.5 py-1 text-[11px] leading-none ${item.tone}`}
                           >
-                            生效中
+                            Active
                           </div>
                         </div>
                       </LandingStaggerItem>
@@ -241,10 +255,10 @@ export function LandingTeamGovernanceSection() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-slate-950">
-                        审计留痕
+                        Audit trail
                       </div>
                       <div className="mt-1 text-[11px] text-slate-500">
-                        关键动作和环境变化都有记录
+                        Key actions and environment changes are all recorded
                       </div>
                     </div>
                   </div>

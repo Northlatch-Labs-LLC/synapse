@@ -10,11 +10,11 @@ import {
 } from "react"
 
 const headlineSteps = [
-  { lead: "像", tail: "一样思考" },
-  { lead: "像", tail: "一样管理" },
-  { lead: "像", tail: "一样记忆" },
-  { lead: "与", tail: "一起协作" },
-  { lead: "与", tail: "一起交互" },
+  { lead: "think like", tail: "" },
+  { lead: "manage like", tail: "" },
+  { lead: "remember like", tail: "" },
+  { lead: "work like", tail: "" },
+  { lead: "chat like", tail: "" },
 ] as const
 
 const IDLE_MS = 2100
@@ -25,7 +25,7 @@ const CHAR_HEIGHT = "1.12em"
 function HumanMark() {
   return (
     <span className="mx-0.5 inline-flex items-center justify-center rounded-[0.38em] bg-primary/12 px-[0.24em] py-[0.08em] text-primary shadow-[inset_0_0_0_1px_rgba(59,130,246,0.08)] sm:mx-1 sm:px-[0.3em]">
-      人类
+      humans
     </span>
   )
 }
@@ -235,7 +235,7 @@ export function LandingHeroHeadline() {
       <ProbeStrip ref={probeRef} />
 
       <div className="inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 leading-none whitespace-nowrap sm:gap-x-1.5">
-        <span>让 AI</span>
+        <span>Let AI</span>
         <span className="inline-flex items-center text-primary">
           {renderChar(0)}
         </span>

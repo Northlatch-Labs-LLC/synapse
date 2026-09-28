@@ -21,9 +21,9 @@ import { Button } from "@/components/ui/button"
 import { IS_REPO_LINK_MODE, SYNAPSE_REPO_URL } from "@/lib/repo-link-mode"
 
 export const metadata: Metadata = {
-  title: "把 AI 组织成团队",
+  title: "Turn AI into a Team",
   description:
-    "Synapse 是面向团队的 AI 协作运行时，让可共享的同事、记忆、授权、插件、本地执行与远端 Agent 在同一套中枢里协同运转。",
+    "Synapse is the AI collaboration runtime for teams — shareable coworkers, memory, authorizations, plugins, local execution, and remote agents, all working together in one hub.",
 }
 
 export default function HomePage() {
@@ -49,43 +49,43 @@ export default function HomePage() {
                 href="#difference"
                 className="transition-colors hover:text-foreground/90"
               >
-                协作
+                Collaboration
               </Link>
               <Link
                 href="#sharing"
                 className="transition-colors hover:text-foreground/90"
               >
-                共享
+                Sharing
               </Link>
               <Link
                 href="#capabilities"
                 className="transition-colors hover:text-foreground/90"
               >
-                角色
+                Roles
               </Link>
               <Link
                 href="#plugins"
                 className="transition-colors hover:text-foreground/90"
               >
-                插件
+                Plugins
               </Link>
               <Link
                 href="#reach"
                 className="transition-colors hover:text-foreground/90"
               >
-                执行
+                Execution
               </Link>
               <Link
                 href="#events"
                 className="transition-colors hover:text-foreground/90"
               >
-                事件
+                Events
               </Link>
               <Link
                 href="#trust"
                 className="transition-colors hover:text-foreground/90"
               >
-                治理
+                Governance
               </Link>
             </nav>
           </div>
@@ -105,8 +105,9 @@ export default function HomePage() {
                 className="animate-fade-up mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg"
                 style={{ animationDelay: "160ms" }}
               >
-                不是再多一个聊天框，而是把角色、群聊、记忆、授权和执行放进同一个
-                AI 组织运行时
+                Not another chat window — roles, group chats, memory,
+                authorizations, and execution, all inside one AI organization
+                runtime
               </p>
 
               <div
@@ -121,12 +122,12 @@ export default function HomePage() {
                       rel="noopener noreferrer"
                     >
                       <Github data-icon="inline-start" className="size-4" />
-                      GitHub 开源仓库
+                      Open source on GitHub
                     </a>
                   </Button>
                 ) : (
                   <Button asChild size="lg">
-                    <Link href="/register">创建团队</Link>
+                    <Link href="/register">Create a team</Link>
                   </Button>
                 )}
                 <Button
@@ -135,7 +136,7 @@ export default function HomePage() {
                   variant="outline"
                   className="border-border/70 bg-white/70"
                 >
-                  <Link href="#trust">了解私有部署</Link>
+                  <Link href="#trust">Learn about self-hosting</Link>
                 </Button>
               </div>
             </div>
@@ -169,11 +170,12 @@ export default function HomePage() {
             y={28}
           >
             <h2 className="font-display text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-              把 AI 从聊天窗口，升级成团队能力
+              Turn AI from a chat window into a team capability
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
-              不再围着单个 Bot
-              临时拼流程，让角色、记忆、资源授权、事件唤醒和执行环境都进入同一个中枢
+              No more improvising workflows around a single bot — bring roles,
+              memory, resource authorizations, event triggers, and execution
+              environments into the same hub
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               {IS_REPO_LINK_MODE ? (
@@ -184,16 +186,16 @@ export default function HomePage() {
                     rel="noopener noreferrer"
                   >
                     <Github data-icon="inline-start" className="size-4" />
-                    GitHub 开源仓库
+                    Open source on GitHub
                   </a>
                 </Button>
               ) : (
                 <Button asChild size="lg">
-                  <Link href="/register">创建团队</Link>
+                  <Link href="/register">Create a team</Link>
                 </Button>
               )}
               <Button asChild size="lg" variant="outline">
-                <Link href="#trust">了解私有部署</Link>
+                <Link href="#trust">Learn about self-hosting</Link>
               </Button>
             </div>
           </LandingReveal>

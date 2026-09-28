@@ -14,41 +14,41 @@ const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
 const features = [
   {
     icon: MessageSquareMore,
-    title: "同群协作",
-    text: "人与 Agent 在同一条线程推进",
+    title: "In-chat collaboration",
+    text: "Humans and agents advance work in one thread",
   },
   {
     icon: BrainCircuit,
-    title: "共享记忆",
-    text: "交付沉淀，下一个角色接着做",
+    title: "Shared memory",
+    text: "Deliveries persist so the next role can continue",
   },
   {
     icon: UsersRound,
-    title: "过程可见",
-    text: "拉人、更新都有系统消息",
+    title: "Visible process",
+    text: "Invites and updates land as system messages",
   },
 ] as const
 
 const stream = [
-  { kind: "system", text: "Celine 将 Brief Writer 拉入了群聊" },
+  { kind: "system", text: "Celine added Brief Writer to the group" },
   {
     kind: "user",
     name: "Celine",
-    text: "先起一版董事会摘要，把结论和 blocker 写进共享记忆。",
+    text: "Draft the board summary first, and write the conclusions and blockers into shared memory.",
   },
   {
     kind: "actor",
     name: "Brief Writer",
     tone: "sky",
-    text: "初稿已交付，关键结论已写回共享记忆。",
-    meta: "共享记忆已更新",
+    text: "First draft delivered. Key conclusions written back to shared memory.",
+    meta: "Shared memory updated",
   },
-  { kind: "system", text: "Celine 将 Risk Analyst 拉入了群聊" },
+  { kind: "system", text: "Celine added Risk Analyst to the group" },
   {
     kind: "actor",
     name: "Risk Analyst",
     tone: "amber",
-    text: "读取记忆后建议单列移动端 onboarding 风险。",
+    text: "After reading memory, recommends flagging mobile onboarding as a separate risk.",
   },
 ] as const
 
@@ -56,8 +56,8 @@ export function MobileLandingCollaboration() {
   return (
     <MobileSection id="collab">
       <MobileSectionHeader
-        title="同一条群聊，就是同一个协作现场"
-        subtitle="拉人、分工、交付、沉淀都发生在同一处"
+        title="One group chat, one collaboration hub"
+        subtitle="Invite, assign, deliver, and persist — all in one place"
       />
 
       <div className="mx-auto mt-7 grid max-w-md grid-cols-3 gap-2.5">
@@ -88,10 +88,10 @@ export function MobileLandingCollaboration() {
       >
         <div className="border-b border-slate-200/70 px-4 py-3">
           <div className="text-[12px] font-semibold text-slate-950">
-            董事会发布摘要
+            Board release briefing
           </div>
           <div className="mt-0.5 text-[10px] text-slate-500">
-            系统消息可见，记忆承接上下文
+            System messages stay visible; memory carries the context
           </div>
         </div>
         <div className="space-y-2.5 px-3 py-4">

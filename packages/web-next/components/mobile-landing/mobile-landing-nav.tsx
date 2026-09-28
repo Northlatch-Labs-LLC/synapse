@@ -9,13 +9,13 @@ import { AnimatePresence, m } from "framer-motion"
 import { IS_REPO_LINK_MODE, SYNAPSE_REPO_URL } from "@/lib/repo-link-mode"
 
 const navItems = [
-  { href: "#collab", label: "协作" },
-  { href: "#sharing", label: "共享" },
-  { href: "#roles", label: "角色" },
-  { href: "#plugins", label: "插件" },
-  { href: "#reach", label: "执行" },
-  { href: "#events", label: "事件" },
-  { href: "#trust", label: "治理" },
+  { href: "#collab", label: "Collaboration" },
+  { href: "#sharing", label: "Sharing" },
+  { href: "#roles", label: "Roles" },
+  { href: "#plugins", label: "Plugins" },
+  { href: "#reach", label: "Execution" },
+  { href: "#events", label: "Events" },
+  { href: "#trust", label: "Governance" },
 ] as const
 
 export function MobileLandingNav() {
@@ -65,15 +65,15 @@ export function MobileLandingNav() {
               href="/?desktop=1"
               prefetch={false}
               className="flex items-center gap-1 rounded-full border border-slate-200/80 bg-white/70 px-2.5 py-1 text-[11px] text-slate-500 transition-colors active:bg-white"
-              title="访问桌面版"
+              title="Open the desktop version"
             >
               <MonitorSmartphone className="size-3.5" />
-              桌面版
+              Desktop
             </Link>
             <button
               type="button"
               aria-expanded={open}
-              aria-label="打开菜单"
+              aria-label="Open menu"
               onClick={() => setOpen((value) => !value)}
               className="flex size-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/85 text-slate-700 transition-colors active:bg-white"
             >
@@ -130,7 +130,7 @@ export function MobileLandingNav() {
                   className="flex flex-1 items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-center text-sm font-medium text-white"
                 >
                   <Github className="size-4" />
-                  GitHub 开源仓库
+                  GitHub open-source repo
                 </a>
               ) : (
                 <>
@@ -139,14 +139,14 @@ export function MobileLandingNav() {
                     onClick={() => setOpen(false)}
                     className="flex-1 rounded-full bg-slate-950 px-4 py-2.5 text-center text-sm font-medium text-white"
                   >
-                    创建团队
+                    Create a team
                   </Link>
                   <Link
                     href="/login"
                     onClick={() => setOpen(false)}
                     className="flex-1 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-center text-sm font-medium text-slate-700"
                   >
-                    登录
+                    Sign in
                   </Link>
                 </>
               )}

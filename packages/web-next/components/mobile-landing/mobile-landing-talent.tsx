@@ -20,73 +20,73 @@ type Role = {
 const roles: Role[] = [
   {
     name: "Mira",
-    role: "研究侦察员",
+    role: "Research scout",
     initials: "MI",
-    summary: "把模糊问题拆成有依据的研究结论",
+    summary: "Turns fuzzy questions into evidence-backed findings",
     tone: "bg-sky-100 text-sky-950",
     accent: "from-sky-100/70 via-sky-50/40 to-white",
   },
   {
     name: "Orian",
-    role: "推进协调员",
+    role: "Delivery coordinator",
     initials: "OR",
-    summary: "把目标拆成 owner、节点和 blocker",
+    summary: "Breaks goals into owners, milestones, and blockers",
     tone: "bg-amber-100 text-amber-950",
     accent: "from-amber-100/70 via-amber-50/40 to-white",
   },
   {
     name: "Lyra",
-    role: "内容主笔",
+    role: "Staff writer",
     initials: "LY",
-    summary: "按你的语气快速起草对外文案",
+    summary: "Drafts external copy in your voice, fast",
     tone: "bg-cyan-100 text-cyan-950",
     accent: "from-cyan-100/70 via-cyan-50/40 to-white",
   },
   {
     name: "Kite",
-    role: "数据分析师",
+    role: "Data analyst",
     initials: "KI",
-    summary: "把指标波动翻译成可执行判断",
+    summary: "Translates metric shifts into actionable calls",
     tone: "bg-orange-100 text-orange-950",
     accent: "from-orange-100/70 via-orange-50/40 to-white",
   },
   {
     name: "Soren",
-    role: "风险审阅官",
+    role: "Risk reviewer",
     initials: "SO",
-    summary: "沿你的标准补齐风险和边界提醒",
+    summary: "Flags risks and boundary reminders to your standards",
     tone: "bg-emerald-100 text-emerald-950",
     accent: "from-emerald-100/70 via-emerald-50/40 to-white",
   },
   {
     name: "Ivy",
-    role: "项目 PMO",
+    role: "Project PMO",
     initials: "IV",
-    summary: "跟住状态、延期和责任人",
+    summary: "Tracks status, delays, and owners",
     tone: "bg-violet-100 text-violet-950",
     accent: "from-violet-100/70 via-violet-50/40 to-white",
   },
   {
     name: "Aria",
-    role: "品牌编辑",
+    role: "Brand editor",
     initials: "AR",
-    summary: "学会你的品牌语气与表达禁区",
+    summary: "Learns your brand voice and no-go phrases",
     tone: "bg-rose-100 text-rose-950",
     accent: "from-rose-100/70 via-rose-50/40 to-white",
   },
   {
     name: "Vega",
-    role: "产品分析师",
+    role: "Product analyst",
     initials: "VE",
-    summary: "从行为信号里找出产品拐点",
+    summary: "Finds product turning points in behavior signals",
     tone: "bg-sky-100 text-sky-950",
     accent: "from-sky-100/70 via-sky-50/40 to-white",
   },
   {
     name: "Eden",
-    role: "CEO 助理",
+    role: "CEO assistant",
     initials: "ED",
-    summary: "跟住优先级、会议和关键待办",
+    summary: "Keeps priorities, meetings, and key to-dos on track",
     tone: "bg-violet-100 text-violet-950",
     accent: "from-violet-100/70 via-violet-50/40 to-white",
   },
@@ -131,8 +131,8 @@ export function MobileLandingTalent() {
   return (
     <MobileSection id="roles">
       <MobileSectionHeader
-        title="按岗位搭团队，而不是堆一排 Bot"
-        subtitle="研究、写作、运营、客服等角色直接上岗，也支持自定义岗位"
+        title="Staff a team by role, not a row of bots"
+        subtitle="Research, writing, ops, and support roles onboard instantly, with custom roles supported"
       />
 
       <div className="relative -mx-5 mt-7">
@@ -183,7 +183,7 @@ export function MobileLandingTalent() {
                   </p>
                   <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500">
                     <span className="rounded-full border border-white/70 bg-white/80 px-2 py-0.5 backdrop-blur">
-                      可加入工作区
+                      Can join a workspace
                     </span>
                     <span className="font-medium tracking-wider text-slate-400">
                       0{idx + 1} / 0{roles.length}
@@ -202,7 +202,7 @@ export function MobileLandingTalent() {
             <button
               key={role.name}
               type="button"
-              aria-label={`查看 ${role.name}`}
+              aria-label={`View ${role.name}`}
               onClick={() => scrollTo(idx)}
               className={cn(
                 "h-1.5 rounded-full transition-all",

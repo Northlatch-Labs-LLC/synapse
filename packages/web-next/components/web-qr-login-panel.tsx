@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 function getErrorMessage(error: unknown) {
   if (error instanceof ApiError) return error.message
   if (error instanceof Error) return error.message
-  return "登录失败，请重试。"
+  return "Sign-in failed. Please try again."
 }
 
 type DeviceState = "loading" | "pending" | "approved" | "error" | "expired"
@@ -128,33 +128,39 @@ export function WebQrLoginPanel({ redirect }: { redirect: string | null }) {
         {deviceState === "loading" ? (
           <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
             <LoaderCircle className="size-5 animate-spin" />
-            <span>正在生成登录二维码...</span>
+            <span>Generating sign-in QR code...</span>
           </div>
         ) : deviceState === "pending" && qrCodeUrl ? (
           <>
             <Image
               src={qrCodeUrl}
-              alt="登录二维码"
+              alt="Sign-in QR code"
               width={220}
               height={220}
               unoptimized
               className="size-[220px]"
             />
             <p className="text-sm font-medium text-muted-foreground">
-              请使用 Synapse App 扫码，并在手机上确认登录
+              Scan with the Synapse app and confirm sign-in on your phone
             </p>
           </>
         ) : (
           <div className="space-y-2 px-4 text-center">
             <p className="text-sm font-medium text-foreground">
-              {deviceState === "approved" ? "已确认登录" : null}
-              {deviceState === "expired" ? "二维码已过期" : null}
-              {deviceState === "error" ? "二维码生成失败" : null}
+              {deviceState === "approved" ? "Sign-in confirmed" : null}
+              {deviceState === "expired" ? "QR code expired" : null}
+              {deviceState === "error" ? "Failed to generate QR code" : null}
             </p>
             <p className="text-sm text-muted-foreground">
-              {deviceState === "approved" ? "正在完成登录，请稍候。" : null}
-              {deviceState === "expired" ? "请重新生成二维码后继续。" : null}
-              {deviceState === "error" ? "请重试以重新生成二维码。" : null}
+              {deviceState === "approved"
+                ? "Finishing sign-in, please wait."
+                : null}
+              {deviceState === "expired"
+                ? "Generate a new QR code to continue."
+                : null}
+              {deviceState === "error"
+                ? "Retry to generate a new QR code."
+                : null}
             </p>
           </div>
         )}
@@ -177,7 +183,7 @@ export function WebQrLoginPanel({ redirect }: { redirect: string | null }) {
           }}
         >
           <RefreshCcw className="mr-2 size-4" />
-          重新生成二维码
+          Regenerate QR code
         </Button>
       ) : null}
     </div>

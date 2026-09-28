@@ -1,6 +1,6 @@
 import { ApiError } from "@/lib/api"
 
-type AuthActionLabel = "登录" | "注册" | "授权"
+type AuthActionLabel = "Sign in" | "Sign up" | "Authorize"
 
 /**
  * Map an auth failure to one of three user-facing messages. We deliberately do
@@ -13,18 +13,18 @@ type AuthActionLabel = "登录" | "注册" | "授权"
  */
 export function getAuthErrorMessage(
   error: unknown,
-  actionLabel: AuthActionLabel = "授权"
+  actionLabel: AuthActionLabel = "Authorize"
 ): string {
   const status = error instanceof ApiError ? error.status : undefined
   const code = error instanceof ApiError ? error.code : undefined
 
   if (status === 429) {
-    return "尝试次数过多，请稍后再试。"
+    return "Too many attempts. Please try again later."
   }
   if (status === 401 || code === "INVALID_EMAIL_OR_PASSWORD") {
-    return "邮箱或密码有误。"
+    return "Incorrect email or password."
   }
-  return `${actionLabel}失败，请重试。`
+  return `${actionLabel} failed. Please try again.`
 }
 
 /**
@@ -35,8 +35,8 @@ export function getAuthErrorMessage(
  */
 export function getOAuthErrorMessage(
   code: string | null | undefined,
-  actionLabel: AuthActionLabel = "授权"
+  actionLabel: AuthActionLabel = "Authorize"
 ): string {
-  if (code === "access_denied") return "已取消授权。"
-  return `${actionLabel}失败，请重试。`
+  if (code === "access_denied") return "Authorization was cancelled."
+  return `${actionLabel} failed. Please try again.`
 }

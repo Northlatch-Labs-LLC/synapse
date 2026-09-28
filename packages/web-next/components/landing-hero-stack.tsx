@@ -31,37 +31,41 @@ const participants = [
 
 const chatPreview = [
   {
-    sender: "Lin · 发起人",
+    sender: "Lin · Initiator",
     avatar: "LI",
     avatarTone: "bg-slate-950 text-white",
-    content: "明早董事会要一版发布摘要，把结论、指标和风险一次拉齐。",
+    content:
+      "The board needs a release summary by tomorrow morning — conclusions, metrics, and risks in one pass.",
     style:
       "ml-auto max-w-[80%] rounded-[24px] rounded-br-md bg-slate-950 px-4 py-3 text-white shadow-[0_16px_36px_-26px_rgba(15,23,42,0.95)]",
     align: "end",
   },
   {
-    sender: "调度秘书",
+    sender: "Dispatcher",
     avatar: "SE",
     avatarTone: "bg-emerald-100 text-emerald-900",
-    content: "已接单，研究、协调和审阅角色已进入同一条线程。",
+    content:
+      "On it. Research, coordination, and review roles have joined the same thread.",
     style:
       "max-w-[78%] rounded-[24px] rounded-bl-md border border-emerald-200/80 bg-emerald-50 px-4 py-3 text-slate-800",
     align: "start",
   },
   {
-    sender: "Mira · 研究角色",
+    sender: "Mira · Research role",
     avatar: "MI",
     avatarTone: "bg-sky-100 text-sky-900",
-    content: "最新转化已补齐，移动端 onboarding 下滑建议在摘要里单列提示。",
+    content:
+      "Latest conversion numbers are in. The mobile onboarding dip deserves its own callout in the summary.",
     style:
       "max-w-[78%] rounded-[24px] rounded-bl-md border border-sky-200/80 bg-sky-50 px-4 py-3 text-slate-800",
     align: "start",
   },
   {
-    sender: "Orian · 协调角色",
+    sender: "Orian · Coordination role",
     avatar: "OR",
     avatarTone: "bg-amber-100 text-amber-900",
-    content: "阻塞项已同步给 owner，预计今晚 22:30 前给出明确 ETA。",
+    content:
+      "Blockers are with the owners. A firm ETA is expected before 22:30 tonight.",
     style:
       "max-w-[78%] rounded-[24px] rounded-bl-md border border-amber-200/80 bg-amber-50 px-4 py-3 text-slate-800",
     align: "start",
@@ -70,41 +74,45 @@ const chatPreview = [
 
 const memorySections = [
   {
-    label: "共享记忆 / 发布摘要",
+    label: "Shared memory / Release summary",
     tone: "text-slate-950",
     items: [
-      "董事会版本先给结论，再解释风险和下一步。",
-      "Q2 叙事已经挂进该群，后续角色进来可以直接接力。",
-      "移动端 onboarding 是本轮重点观察项，摘要里保留原始依据。",
+      "Board version leads with conclusions, then risks and next steps.",
+      "The Q2 narrative is attached to this group, so incoming roles can pick up the thread.",
+      "Mobile onboarding is the key watch item this round; keep the raw evidence in the summary.",
     ],
   },
   {
-    label: "已挂载资料",
+    label: "Attached materials",
     tone: "text-slate-600",
-    items: ["Q2 叙事 v4", "发布检查表", "上轮复盘摘要"],
+    items: [
+      "Q2 narrative v4",
+      "Release checklist",
+      "Last round's retrospective summary",
+    ],
   },
 ]
 
 const toolRows = [
   {
     icon: Globe,
-    name: "联网检索",
-    scope: "工作区",
-    access: "已授权",
+    name: "Web search",
+    scope: "Workspace",
+    access: "Authorized",
     tone: "bg-sky-500/12 text-sky-700",
   },
   {
     icon: BrainCircuit,
-    name: "共享记忆",
-    scope: "当前会话",
-    access: "已挂载",
+    name: "Shared memory",
+    scope: "Current session",
+    access: "Mounted",
     tone: "bg-violet-500/12 text-violet-700",
   },
   {
     icon: Wrench,
-    name: "桌面设备",
-    scope: "设备",
-    access: "待批准",
+    name: "Desktop device",
+    scope: "Device",
+    access: "Pending approval",
     tone: "bg-amber-500/14 text-amber-700",
   },
 ]
@@ -127,10 +135,10 @@ function ChatSurface() {
           <div>
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
               <MessageSquareMore className="size-4 text-slate-500" />
-              发布战情群
+              Release war room
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              多个成员和多个角色在同一条线程里推进
+              Members and roles pushing work forward in one thread
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -148,7 +156,7 @@ function ChatSurface() {
               variant="outline"
               className="border-border/60 bg-background/80"
             >
-              6 人在线
+              6 online
             </Badge>
           </div>
         </div>
@@ -195,10 +203,11 @@ function MemorySurface() {
       <div className="border-b border-slate-200 px-5 py-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
           <BookOpenText className="size-4 text-slate-600" />
-          群聊记忆
+          Group memory
         </div>
         <p className="mt-1 text-sm text-slate-600">
-          上下文沉淀成结构化记忆，而不是散落在历史消息里
+          Context settles into structured memory instead of scattering across
+          message history
         </p>
       </div>
       <CardContent className="space-y-5 p-5">
@@ -230,10 +239,11 @@ function ToolSurface() {
       <div className="border-b border-slate-200 px-5 py-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
           <ShieldCheck className="size-4 text-emerald-600" />
-          资源授权
+          Resource authorization
         </div>
         <p className="mt-1 text-sm text-slate-600">
-          资源先进入工作区，再按规则交给合适的角色调用
+          Resources enter the workspace first, then go by rule to the roles that
+          need them
         </p>
       </div>
       <CardContent className="space-y-4 p-5">
@@ -270,10 +280,10 @@ function ToolSurface() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-sm font-semibold text-slate-950">
-                授权链路
+                Authorization flow
               </div>
               <p className="mt-1 text-sm text-slate-600">
-                角色请求 · Scope 校验 · 审计执行
+                Role request · Scope check · Audited execution
               </p>
             </div>
             <ChevronRight className="size-4 text-emerald-600" />

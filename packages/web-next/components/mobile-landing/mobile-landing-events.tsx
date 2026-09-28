@@ -20,33 +20,33 @@ import {
 const sources = [
   {
     icon: ServerCog,
-    title: "服务器推送",
-    text: "异常事件直接推入运行时",
-    status: "已触发",
+    title: "Server push",
+    text: "Exceptions push straight into the runtime",
+    status: "Triggered",
     active: true,
   },
   {
     icon: MessageSquareText,
-    title: "飞书 IM",
-    text: "群消息、@ 提及、机器人指令",
-    status: "等待中",
+    title: "Feishu IM",
+    text: "Group messages, @ mentions, bot commands",
+    status: "Waiting",
     active: false,
   },
   {
     icon: AlarmClockCheck,
-    title: "定时触发",
-    text: "巡检、日报、周期任务",
-    status: "已配置",
+    title: "Scheduled triggers",
+    text: "Inspections, daily reports, recurring tasks",
+    status: "Configured",
     active: false,
   },
 ] as const
 
 const steps = [
-  { title: "创建 incident 群聊", state: "done" },
-  { title: "拉入值班 SRE", state: "done" },
-  { title: "调用内网日志服务", state: "active" },
-  { title: "拉入诊断角色", state: "pending" },
-  { title: "更新共享记忆", state: "pending" },
+  { title: "Create incident group", state: "done" },
+  { title: "Add on-call SRE", state: "done" },
+  { title: "Query internal log service", state: "active" },
+  { title: "Add diagnostics role", state: "pending" },
+  { title: "Update shared memory", state: "pending" },
 ] as const
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
@@ -55,8 +55,8 @@ export function MobileLandingEvents() {
   return (
     <MobileSection id="events">
       <MobileSectionHeader
-        title="工作不一定从你开口开始"
-        subtitle="Webhook、IM、定时与系统信号都能直接叫醒团队"
+        title="Work doesn't wait for you to speak"
+        subtitle="Webhooks, IM, schedules, and system signals can wake the team directly"
       />
 
       <div className="mx-auto mt-7 max-w-md space-y-2.5">
@@ -71,9 +71,15 @@ export function MobileLandingEvents() {
               <Icon className="size-[14px]" />
             </div>
             <div className="text-[12.5px] leading-5 text-slate-700">
-              {idx === 0 ? "人、服务、消息、系统信号都能成为入口" : null}
-              {idx === 1 ? "事件进来后，群聊、角色、资源自动就位" : null}
-              {idx === 2 ? "定时、Webhook、状态变化都能长期值守" : null}
+              {idx === 0
+                ? "People, services, messages, and system signals can all be entry points"
+                : null}
+              {idx === 1
+                ? "When an event lands, the chat, roles, and resources line up automatically"
+                : null}
+              {idx === 2
+                ? "Schedules, webhooks, and state changes stand watch around the clock"
+                : null}
             </div>
           </MobileReveal>
         ))}
@@ -143,20 +149,20 @@ export function MobileLandingEvents() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-[13px] font-semibold text-slate-950">
-              自动工作流
+              Automated workflow
             </div>
             <div className="mt-0.5 text-[10px] text-slate-500">
-              当前由服务器推送触发
+              Currently triggered by server push
             </div>
           </div>
           <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] leading-none text-emerald-700">
-            运行中
+            Running
           </span>
         </div>
         <div className="mt-3 rounded-[20px] border border-slate-200 bg-white/88 p-3">
           <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500">
             <ServerCog className="size-3.5 text-slate-700" />
-            PROD API / CPU 持续异常
+            PROD API / CPU anomaly persists
           </div>
           <div className="mt-3 space-y-2.5">
             {steps.map((step, idx) => (
