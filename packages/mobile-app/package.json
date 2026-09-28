@@ -22,7 +22,7 @@
     "lint:fix": "eslint app src --fix"
   },
   "dependencies": {
-    "@better-auth/core": "1.6.13",
+    "@better-auth/core": "1.7.6",
     "@better-auth/expo": "1.7.6",
     "@expo/vector-icons": "^15.0.3",
     "@react-navigation/native": "^7.1.8",
@@ -79,9 +79,6 @@
     "eslint-config-expo": "^56.0.4",
     "react-test-renderer": "19.1.0",
     "typescript": "~5.9.2"
-  },
-  "overrides": {
-    "@better-auth/core": "1.6.13"
   },
   "private": true
 }
