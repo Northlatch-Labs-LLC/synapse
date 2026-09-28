@@ -24,19 +24,21 @@ import {
 const accessHighlights = [
   {
     icon: LaptopMinimal,
-    title: "云上协作，本地执行",
+    title: "Collaborate in the cloud, execute locally",
     description:
-      "任务在云端被分工和讨论，真正执行可以继续落到你的设备和浏览器。",
+      "Tasks are divided and discussed in the cloud; execution can still land on your devices and browsers.",
   },
   {
     icon: Server,
-    title: "设备和内网都能接入",
-    description: "文件系统、数据库、共享服务和内部 API 都能进入同一套工作链。",
+    title: "Connect devices and intranets",
+    description:
+      "File systems, databases, shared services, and internal APIs all join the same workflow.",
   },
   {
     icon: ShieldCheck,
-    title: "连接之后仍然受控",
-    description: "访问范围、调用动作和执行轨迹都可以继续被治理和审计。",
+    title: "Still governed once connected",
+    description:
+      "Access scope, allowed actions, and execution trails stay governed and auditable.",
   },
 ] as const
 
@@ -64,18 +66,33 @@ const orbitTracks = [
 ] as const
 
 const orbitNodes = [
-  { icon: Mail, label: "邮箱", orbitSize: "size-[92%]", angle: 18 },
+  { icon: Mail, label: "Email", orbitSize: "size-[92%]", angle: 18 },
   { icon: Gitlab, label: "GitLab", orbitSize: "size-[92%]", angle: 138 },
   { icon: Github, label: "GitHub", orbitSize: "size-[92%]", angle: 258 },
-  { icon: Smartphone, label: "手机", orbitSize: "size-[74%]", angle: 62 },
-  { icon: Server, label: "服务器", orbitSize: "size-[74%]", angle: 182 },
-  { icon: HardDrive, label: "共享盘", orbitSize: "size-[74%]", angle: 302 },
-  { icon: LaptopMinimal, label: "电脑", orbitSize: "size-[56%]", angle: 106 },
-  { icon: Database, label: "数据库", orbitSize: "size-[56%]", angle: 226 },
-  { icon: BookText, label: "内网 Wiki", orbitSize: "size-[56%]", angle: 346 },
-  { icon: AppWindow, label: "浏览器", orbitSize: "size-[40%]", angle: 26 },
-  { icon: CalendarDays, label: "日历", orbitSize: "size-[40%]", angle: 146 },
-  { icon: Network, label: "内部 API", orbitSize: "size-[40%]", angle: 266 },
+  { icon: Smartphone, label: "Phone", orbitSize: "size-[74%]", angle: 62 },
+  { icon: Server, label: "Server", orbitSize: "size-[74%]", angle: 182 },
+  {
+    icon: HardDrive,
+    label: "Shared drive",
+    orbitSize: "size-[74%]",
+    angle: 302,
+  },
+  { icon: LaptopMinimal, label: "Laptop", orbitSize: "size-[56%]", angle: 106 },
+  { icon: Database, label: "Database", orbitSize: "size-[56%]", angle: 226 },
+  {
+    icon: BookText,
+    label: "Intranet wiki",
+    orbitSize: "size-[56%]",
+    angle: 346,
+  },
+  { icon: AppWindow, label: "Browser", orbitSize: "size-[40%]", angle: 26 },
+  {
+    icon: CalendarDays,
+    label: "Calendar",
+    orbitSize: "size-[40%]",
+    angle: 146,
+  },
+  { icon: Network, label: "Internal API", orbitSize: "size-[40%]", angle: 266 },
 ] as const
 
 const orbitBaseDelay = {
@@ -102,11 +119,12 @@ export function LandingLocalAccessSection() {
         <div className="grid gap-12 lg:grid-cols-[0.84fr_1.16fr] lg:items-center lg:gap-14">
           <LandingReveal className="max-w-xl" x={-24}>
             <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-              云端协作，执行继续落到设备和内网
+              Collaborate in the cloud, execute on your devices and intranet
             </h2>
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-              团队在 Web
-              里协作，但真正执行不必只停留在云端。浏览器、文件系统、数据库和内网服务都可以在边界清楚的前提下继续接进来
+              The team collaborates on the web, but execution doesn't have to
+              stay in the cloud. Browsers, file systems, databases, and intranet
+              services connect with clear boundaries
             </p>
 
             <LandingStagger className="mt-8 space-y-4" delay={0.08}>

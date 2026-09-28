@@ -71,7 +71,7 @@ export function SidebarWeixinBinding() {
   const { workspaceId, currentWorkspaceMemberId } = useWorkspace()
   const currentUser = useAuthStore((state) => state.user)
   const currentUserId = currentUser?.id || null
-  const currentUserName = currentUser?.name || "自己"
+  const currentUserName = currentUser?.name || "you"
 
   const [loadingBinding, setLoadingBinding] = React.useState(true)
   const [binding, setBinding] =
@@ -216,7 +216,7 @@ export function SidebarWeixinBinding() {
             await api.getCurrentUserWeixinBinding(activeWorkspaceId)
           if (!cancelled) {
             setBinding(bindingResult?.binding || null)
-            toast.success("绑定成功", { position: "top-center" })
+            toast.success("Connected", { position: "top-center" })
           }
           return
         }
@@ -319,7 +319,7 @@ export function SidebarWeixinBinding() {
         selectedUsage === "self" ? currentWorkspaceMemberId || null : null
       )
       setBinding(result?.binding || null)
-      toast.success("已保存", { position: "top-center" })
+      toast.success("Saved", { position: "top-center" })
       closeDialog()
     } catch (saveError) {
       clientLog.error("Failed to save WeChat binding target:", saveError)
@@ -504,9 +504,9 @@ export function SidebarWeixinBinding() {
               <FieldLabel htmlFor="weixin-usage-self">
                 <Field orientation="horizontal">
                   <FieldContent>
-                    <FieldTitle>自己使用</FieldTitle>
+                    <FieldTitle>For myself</FieldTitle>
                     <FieldDescription>
-                      {`首条消息自动绑定到 ${currentUserName}`}
+                      {`First message auto-links to ${currentUserName}`}
                     </FieldDescription>
                   </FieldContent>
                   <RadioGroupItem
@@ -519,8 +519,10 @@ export function SidebarWeixinBinding() {
               <FieldLabel htmlFor="weixin-usage-visitor">
                 <Field orientation="horizontal">
                   <FieldContent>
-                    <FieldTitle>访客使用</FieldTitle>
-                    <FieldDescription>首条消息保持访客身份</FieldDescription>
+                    <FieldTitle>For visitors</FieldTitle>
+                    <FieldDescription>
+                      First message keeps visitor identity
+                    </FieldDescription>
                   </FieldContent>
                   <RadioGroupItem
                     value="visitor"

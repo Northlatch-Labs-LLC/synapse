@@ -17,14 +17,14 @@ import { MobileLandingTalent } from "@/components/mobile-landing/mobile-landing-
 import { MobileSectionRail } from "@/components/mobile-landing/mobile-section-rail"
 
 const railSections = [
-  { id: "hero", title: "首页" },
-  { id: "collab", title: "协作" },
-  { id: "sharing", title: "共享" },
-  { id: "roles", title: "角色" },
-  { id: "plugins", title: "插件" },
-  { id: "reach", title: "执行" },
-  { id: "events", title: "事件" },
-  { id: "trust", title: "治理" },
+  { id: "hero", title: "Home" },
+  { id: "collab", title: "Collaboration" },
+  { id: "sharing", title: "Sharing" },
+  { id: "roles", title: "Roles" },
+  { id: "plugins", title: "Plugins" },
+  { id: "reach", title: "Execution" },
+  { id: "events", title: "Events" },
+  { id: "trust", title: "Governance" },
 ]
 
 export default function MobileHomePage() {

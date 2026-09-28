@@ -93,7 +93,7 @@ export function LandingHeroCarousel({ slides }: { slides: HeroSlide[] }) {
           <button
             key={slide.id}
             type="button"
-            aria-label={`查看第 ${idx + 1} 张卡片`}
+            aria-label={`View card ${idx + 1}`}
             onClick={() => scrollTo(idx)}
             className={cn(
               "h-1.5 rounded-full transition-all",

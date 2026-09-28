@@ -16,27 +16,27 @@ import { cn } from "@/lib/utils"
 import { MobileSection, MobileSectionHeader } from "./mobile-landing-primitives"
 
 const tabs = [
-  { id: "env", icon: UsersRound, label: "环境" },
-  { id: "roles", icon: LockKeyhole, label: "权限" },
-  { id: "audit", icon: ScrollText, label: "审计" },
+  { id: "env", icon: UsersRound, label: "Environments" },
+  { id: "roles", icon: LockKeyhole, label: "Permissions" },
+  { id: "audit", icon: ScrollText, label: "Audit" },
 ] as const
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 const roleRows = [
   {
-    role: "平台管理员",
-    summary: "管理成员、模型组与平台配置",
+    role: "Platform admin",
+    summary: "Manage members, model groups, and platform settings",
     tone: "bg-slate-950 text-white",
   },
   {
-    role: "工作区管理员",
-    summary: "安装插件、分配角色、配置资源",
+    role: "Workspace admin",
+    summary: "Install plugins, assign roles, configure resources",
     tone: "bg-sky-100 text-sky-950",
   },
   {
-    role: "成员",
-    summary: "发起任务、查看结果、使用授权能力",
+    role: "Member",
+    summary: "Start tasks, review results, use granted capabilities",
     tone: "bg-slate-100 text-slate-700",
   },
 ] as const
@@ -44,18 +44,18 @@ const roleRows = [
 const auditItems = [
   {
     time: "09:42",
-    action: "Browser Operator 装入团队环境",
-    detail: "由工作区管理员发起",
+    action: "Browser Operator installed into the team environment",
+    detail: "Initiated by a workspace admin",
   },
   {
     time: "09:45",
-    action: "Risk Analyst 获得 SQL Access",
-    detail: "权限范围限制为只读查询",
+    action: "Risk Analyst granted SQL Access",
+    detail: "Scope limited to read-only queries",
   },
   {
     time: "09:52",
-    action: "凌晨巡检触发并写入共享记忆",
-    detail: "事件链路完整记录",
+    action: "Overnight inspection triggered and written to shared memory",
+    detail: "Full event trail recorded",
   },
 ] as const
 
@@ -68,8 +68,8 @@ export function MobileLandingGovernance() {
       className="bg-[linear-gradient(180deg,rgba(247,250,255,0.55),rgba(255,255,255,0.96))]"
     >
       <MobileSectionHeader
-        title="管理数字团队，像管理真实团队一样清楚"
-        subtitle="个人 / 团队并行 · 权限可见 · 关键动作可追溯"
+        title="Run a digital team with real-team clarity"
+        subtitle="Personal and team side by side · visible permissions · traceable actions"
       />
 
       <div className="mx-auto mt-7 flex max-w-md rounded-full border border-white/72 bg-white/72 p-1 backdrop-blur">
@@ -118,22 +118,24 @@ export function MobileLandingGovernance() {
                   </div>
                   <div>
                     <div className="text-[13px] font-semibold text-slate-950">
-                      个人环境
+                      Personal environment
                     </div>
                     <div className="text-[11px] text-slate-500">
-                      给自己配工具，也可以共享
+                      Tools for yourself, shareable when needed
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["个人工具", "个人记忆", "本地设备"].map((label) => (
-                    <span
-                      key={label}
-                      className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-600"
-                    >
-                      {label}
-                    </span>
-                  ))}
+                  {["Personal tools", "Personal memory", "Local devices"].map(
+                    (label) => (
+                      <span
+                        key={label}
+                        className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-600"
+                      >
+                        {label}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
 
@@ -158,22 +160,24 @@ export function MobileLandingGovernance() {
                   </div>
                   <div>
                     <div className="text-[13px] font-semibold text-slate-950">
-                      团队环境
+                      Team environment
                     </div>
                     <div className="text-[11px] text-slate-500">
-                      统一配置公共能力，供多人复用
+                      Shared capabilities configured once, reused by everyone
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["团队工具", "共享角色", "统一权限"].map((label) => (
-                    <span
-                      key={label}
-                      className="rounded-full border border-sky-200/70 bg-white px-2 py-1 text-[11px] text-slate-600"
-                    >
-                      {label}
-                    </span>
-                  ))}
+                  {["Team tools", "Shared roles", "Unified permissions"].map(
+                    (label) => (
+                      <span
+                        key={label}
+                        className="rounded-full border border-sky-200/70 bg-white px-2 py-1 text-[11px] text-slate-600"
+                      >
+                        {label}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
             </m.div>
@@ -208,7 +212,7 @@ export function MobileLandingGovernance() {
                     <span
                       className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] leading-none ${row.tone}`}
                     >
-                      生效中
+                      Active
                     </span>
                   </div>
                 </m.div>

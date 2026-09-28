@@ -19,48 +19,48 @@ import {
 const highlights = [
   {
     icon: ShieldCheck,
-    title: "官方维护",
-    text: "内置能力可直接使用",
+    title: "Officially maintained",
+    text: "Built-in capabilities, ready to use",
   },
   {
     icon: PlugZap,
-    title: "装到工作区",
-    text: "按角色或会话发放",
+    title: "Install per workspace",
+    text: "Granted per role or session",
   },
   {
     icon: LockKeyhole,
-    title: "统一授权",
-    text: "谁能装谁能用一处管理",
+    title: "Unified grants",
+    text: "Who installs and who uses, managed in one place",
   },
 ] as const
 
 const plugins = [
   {
     name: "Zhipu Toolkit",
-    summary: "网页搜索、文档读取、OCR",
+    summary: "Web search, document reading, OCR",
     accent: "bg-sky-100 text-sky-900",
-    meta: "官方维护",
+    meta: "Officially maintained",
     icon: Search,
   },
   {
     name: "Browser Operator",
-    summary: "让数字员工操作真实浏览器",
+    summary: "Lets digital employees drive a real browser",
     accent: "bg-emerald-100 text-emerald-900",
-    meta: "官方维护",
+    meta: "Officially maintained",
     icon: AppWindow,
   },
   {
     name: "Docs Connector",
-    summary: "文档、知识库、附件接入",
+    summary: "Docs, knowledge bases, and attachments",
     accent: "bg-amber-100 text-amber-900",
-    meta: "工作区常用",
+    meta: "Frequently used",
     icon: FileText,
   },
   {
     name: "SQL Access",
-    summary: "受控读取结构化数据",
+    summary: "Controlled reads of structured data",
     accent: "bg-violet-100 text-violet-900",
-    meta: "受控访问",
+    meta: "Controlled access",
     icon: Database,
   },
 ] as const
@@ -72,8 +72,8 @@ export function MobileLandingPlugins() {
       className="bg-[linear-gradient(180deg,rgba(247,250,255,0.45),rgba(255,255,255,0.96))]"
     >
       <MobileSectionHeader
-        title="插件先进入工作区，再交给角色"
-        subtitle="搜索、安装、分配、授权同一个后台搞定"
+        title="Plugins join the workspace first, then reach roles"
+        subtitle="Search, install, assign, and grant from one console"
       />
 
       <div className="mx-auto mt-7 grid max-w-md grid-cols-3 gap-2">
@@ -101,10 +101,10 @@ export function MobileLandingPlugins() {
         <div className="rounded-[26px] border border-white/72 bg-white/92 p-3.5 shadow-[0_24px_50px_-32px_rgba(15,23,42,0.42)] backdrop-blur">
           <div className="flex items-center justify-between">
             <div className="text-[12.5px] font-semibold text-slate-950">
-              官方插件市场
+              Official plugin marketplace
             </div>
             <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">
-              4 类 · 持续上新
+              4 categories · growing
             </span>
           </div>
 

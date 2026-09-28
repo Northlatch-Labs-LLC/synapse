@@ -653,8 +653,8 @@ function ScopeConversationCard({
     ? currentUserName
     : conversation.users[0]
   const promptText = conversation.includesCurrentUser
-    ? `@${primaryActorName} 帮我同步一下这个群的最新进展`
-    : `@${primaryActorName} 帮我继续处理这个群里的待办`
+    ? `@${primaryActorName} catch me up on the latest in this group`
+    : `@${primaryActorName} keep working through the open to-dos in this group`
 
   return (
     <div className="overflow-hidden rounded-[26px] border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
@@ -701,7 +701,7 @@ function ScopeConversationCard({
               : "border-gray-200 bg-white text-gray-500 dark:border-white/10 dark:bg-white/5 dark:text-gray-400"
           )}
         >
-          {available ? "可用" : "不可用"}
+          {available ? "Available" : "Unavailable"}
         </div>
       </div>
 
@@ -712,19 +712,19 @@ function ScopeConversationCard({
         <div className="text-[10px] font-medium tracking-[0.18em] text-gray-400 uppercase dark:text-gray-500">
           {conversation.includesCurrentUser
             ? conversation.singleRealUser
-              ? `${currentUserName} 是群内唯一真实用户`
-              : `${currentUserName} 在群内，但还有其他真实用户`
-            : `${currentUserName} 不在群内`}
+              ? `${currentUserName} is the only real user in this group`
+              : `${currentUserName} is in the group with other real users`
+            : `${currentUserName} is not in this group`}
         </div>
         <MiniUserBubble text={`${promptSpeaker}: ${promptText}`} />
         <MiniActorBubble
           actorName={primaryActorName}
-          text={`${primaryActorName} 会在这里读取工具、连接或技能。`}
+          text={`${primaryActorName} reads tools, connections, or skills here.`}
           active={available ? primaryActorActive : false}
         />
         <MiniActorBubble
           actorName={secondaryActorName}
-          text={`${secondaryActorName} 代表另一个 Actor，看它是否也能使用。`}
+          text={`${secondaryActorName} stands in for another actor — check whether it can use this too.`}
           active={available ? secondaryActorActive : false}
         />
       </div>
@@ -1324,9 +1324,9 @@ export function AccessReuseScopeStep({
                   >
                     {conversation.includesCurrentUser
                       ? conversation.singleRealUser
-                        ? "你是唯一真实用户"
-                        : "你和其他真实用户都在"
-                      : "只有其他真实用户"}
+                        ? "You are the only real user"
+                        : "You and other real users are present"
+                      : "Only other real users"}
                   </div>
                 </div>
               </div>

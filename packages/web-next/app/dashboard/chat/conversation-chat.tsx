@@ -586,9 +586,9 @@ export default function ConversationChat({
         throw new Error("Workspace context is required to retry a message.")
       }
       await api.retryConversationMessage(workspaceId, conversation.id, itemId)
-      toast.success("已请求重试")
+      toast.success("Retry requested")
     } catch (error) {
-      const message = error instanceof Error ? error.message : "重试失败"
+      const message = error instanceof Error ? error.message : "Retry failed"
       toast.error(message)
       throw error
     } finally {

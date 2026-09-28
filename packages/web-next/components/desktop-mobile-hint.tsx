@@ -51,10 +51,10 @@ export function DesktopMobileHint() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-[12.5px] font-semibold text-slate-950">
-                屏幕较窄？
+                Narrow screen?
               </div>
               <div className="mt-0.5 text-[11px] leading-4 text-slate-500">
-                我们为窄屏专门设计了移动版页面
+                We built a dedicated mobile page for narrow screens
               </div>
             </div>
             <Link
@@ -62,11 +62,11 @@ export function DesktopMobileHint() {
               onClick={dismiss}
               className="rounded-full bg-slate-950 px-3.5 py-2 text-[12px] font-semibold text-white transition-transform active:scale-[0.97]"
             >
-              切换
+              Switch
             </Link>
             <button
               type="button"
-              aria-label="忽略"
+              aria-label="Dismiss"
               onClick={dismiss}
               className="flex size-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors active:bg-slate-100"
             >

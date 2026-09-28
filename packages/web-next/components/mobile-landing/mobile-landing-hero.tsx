@@ -28,61 +28,65 @@ const chatMessages = [
     name: "Celine",
     initials: "CE",
     tone: "bg-slate-950 text-white",
-    text: "把董事会摘要的结论和 blocker 写进共享记忆。",
+    text: "Write the board summary's conclusions and blockers into shared memory.",
   },
   {
     role: "actor",
     name: "Brief Writer",
     initials: "BW",
     tone: "bg-sky-100 text-sky-950",
-    text: "初稿已交付，结论和 blocker 已写回共享记忆。",
-    meta: "已交付 · 共享记忆已更新",
+    text: "First draft delivered. Conclusions and blockers written back to shared memory.",
+    meta: "Delivered · Shared memory updated",
   },
   {
     role: "actor",
     name: "Risk Analyst",
     initials: "RA",
     tone: "bg-amber-100 text-amber-950",
-    text: "读取共享记忆后，建议单列移动端 onboarding 风险。",
+    text: "After reading shared memory, recommends flagging mobile onboarding as a separate risk.",
   },
 ] as const
 
 const memoryItems = [
-  "董事会版本先给结论，再解释风险和下一步",
-  "Q2 叙事已挂进群，后续角色可直接接力",
-  "移动端 onboarding 是本轮重点观察项",
+  "Board version leads with conclusions, then risks and next steps",
+  "Q2 narrative is attached to the group; the next role can pick it up",
+  "Mobile onboarding is the key watch item this round",
 ] as const
 
-const memoryTags = ["Q2 叙事 v4", "发布检查表", "上轮复盘摘要"] as const
+const memoryTags = [
+  "Q2 narrative v4",
+  "Release checklist",
+  "Last retro summary",
+] as const
 
 const toolRows = [
   {
     icon: Globe,
-    name: "联网检索",
-    scope: "工作区",
-    status: "已授权",
+    name: "Web search",
+    scope: "Workspace",
+    status: "Authorized",
     statusTone: "bg-sky-500/12 text-sky-700",
   },
   {
     icon: Database,
-    name: "共享记忆",
-    scope: "当前会话",
-    status: "已挂载",
+    name: "Shared memory",
+    scope: "Current session",
+    status: "Mounted",
     statusTone: "bg-violet-500/12 text-violet-700",
   },
   {
     icon: Wrench,
-    name: "桌面设备",
-    scope: "设备",
-    status: "待批准",
+    name: "Desktop device",
+    scope: "Device",
+    status: "Pending approval",
     statusTone: "bg-amber-500/14 text-amber-700",
   },
 ] as const
 
 const heroSlides = [
-  { id: "chat", title: "群聊", node: <ChatSlide /> },
-  { id: "memory", title: "记忆", node: <MemorySlide /> },
-  { id: "tools", title: "授权", node: <ToolsSlide /> },
+  { id: "chat", title: "Chat", node: <ChatSlide /> },
+  { id: "memory", title: "Memory", node: <MemorySlide /> },
+  { id: "tools", title: "Access", node: <ToolsSlide /> },
 ] as const
 
 export function MobileLandingHero() {
@@ -147,7 +151,7 @@ export function MobileLandingHero() {
           className="inline-flex items-center gap-1.5 rounded-full border border-white/72 bg-white/72 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-[0_8px_18px_-10px_rgba(15,23,42,0.18)] backdrop-blur"
         >
           <Sparkles className="size-3.5 text-primary" />
-          AI 协作运行时
+          AI collaboration runtime
         </m.div>
 
         <div className="mt-4 [&>div]:!mt-0 [&>div]:!text-[clamp(1.25rem,6.8vw,2.4rem)]">
@@ -160,7 +164,8 @@ export function MobileLandingHero() {
           transition={{ duration: 0.55, delay: 0.18, ease }}
           className="mx-auto mt-4 max-w-[22rem] text-[14.5px] leading-7 text-slate-600"
         >
-          不是再多一个聊天框，把角色、群聊、记忆、授权和执行装进同一个组织运行时
+          Not another chat box. Roles, group chats, memory, grants, and
+          execution live in one organizational runtime
         </m.p>
 
         <m.div
@@ -177,21 +182,21 @@ export function MobileLandingHero() {
               className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[0_18px_32px_-16px_rgba(15,23,42,0.55)] transition-transform active:scale-[0.98]"
             >
               <Github className="size-4" />
-              GitHub 开源仓库
+              GitHub open-source repo
             </a>
           ) : (
             <Link
               href="/register"
               className="rounded-full bg-slate-950 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[0_18px_32px_-16px_rgba(15,23,42,0.55)] transition-transform active:scale-[0.98]"
             >
-              创建团队
+              Create a team
             </Link>
           )}
           <Link
             href="#trust"
             className="rounded-full border border-slate-200/90 bg-white/85 px-5 py-3.5 text-[15px] font-semibold text-slate-800 backdrop-blur transition-colors active:bg-white"
           >
-            了解私有部署
+            Learn about self-hosting
           </Link>
         </m.div>
       </div>
@@ -240,7 +245,7 @@ export function MobileLandingHero() {
             <button
               key={slide.id}
               type="button"
-              aria-label={`查看 ${slide.title} 卡片`}
+              aria-label={`View the ${slide.title} card`}
               onClick={() => scrollTo(idx)}
               className="group/dot flex items-center gap-1"
             >
@@ -310,14 +315,14 @@ function ChatSlide() {
           </div>
           <div>
             <div className="text-[12.5px] font-semibold text-slate-950">
-              发布战情群
+              Release war room
             </div>
-            <div className="text-[10px] text-emerald-600">· 3 个角色在线</div>
+            <div className="text-[10px] text-emerald-600">· 3 roles online</div>
           </div>
         </div>
         <div className="flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
           <ShieldCheck className="size-3" />
-          已授权
+          Authorized
         </div>
       </div>
 
@@ -376,7 +381,9 @@ function ChatSlide() {
         className="mt-4 flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2.5 text-[11px] text-slate-500"
       >
         <BookOpenText className="size-3.5 text-slate-500" />
-        <span className="flex-1">共享记忆已更新 · 后续角色可接力</span>
+        <span className="flex-1">
+          Shared memory updated · the next role can continue
+        </span>
         <div className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
       </m.div>
     </div>
@@ -388,15 +395,16 @@ function MemorySlide() {
     <div className="px-4 pt-2 pb-5">
       <div className="flex items-center gap-2 text-[12.5px] font-semibold text-slate-950">
         <BookOpenText className="size-4 text-slate-600" />
-        群聊记忆
+        Group chat memory
       </div>
       <p className="mt-1 text-[11px] leading-5 text-slate-500">
-        上下文沉淀成结构化记忆，而不是散落在历史消息里
+        Context settles into structured memory instead of scattering across
+        message history
       </p>
 
       <div className="mt-4">
         <div className="text-[11px] font-semibold text-slate-950">
-          共享记忆 / 发布摘要
+          Shared memory / Release summary
         </div>
         <div className="mt-2 space-y-1.5">
           {memoryItems.map((item, idx) => (
@@ -419,7 +427,7 @@ function MemorySlide() {
 
       <div className="mt-4">
         <div className="text-[11px] font-semibold text-slate-600">
-          已挂载资料
+          Attached material
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {memoryTags.map((tag, idx) => (
@@ -448,10 +456,11 @@ function ToolsSlide() {
     <div className="px-4 pt-2 pb-5">
       <div className="flex items-center gap-2 text-[12.5px] font-semibold text-slate-950">
         <ShieldCheck className="size-4 text-emerald-600" />
-        资源授权
+        Resource access
       </div>
       <p className="mt-1 text-[11px] leading-5 text-slate-500">
-        资源先进入工作区，再按规则交给合适的角色调用
+        Resources join the workspace first, then reach the right role under
+        rules
       </p>
 
       <div className="mt-3 space-y-2">
@@ -502,10 +511,10 @@ function ToolsSlide() {
         >
           <div>
             <div className="text-[12px] font-semibold text-slate-950">
-              授权链路
+              Authorization chain
             </div>
             <div className="mt-0.5 text-[10.5px] leading-4 text-slate-600">
-              角色请求 · Scope 校验 · 审计执行
+              Role requests · scope checks · audited execution
             </div>
           </div>
           <ChevronRight className="size-4 text-emerald-600" />

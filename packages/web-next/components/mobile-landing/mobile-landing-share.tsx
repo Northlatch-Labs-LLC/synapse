@@ -19,18 +19,18 @@ const ease: [number, number, number, number] = [0.22, 1, 0.36, 1]
 const points = [
   {
     icon: ArrowRightLeft,
-    title: "像联系人一样引入",
-    text: "用户、Actor、Remote Agent 跨工作区互通",
+    title: "Add them like a contact",
+    text: "Users, actors, and remote agents interoperate across workspaces",
   },
   {
     icon: ShieldCheck,
-    title: "共享后继续工作",
-    text: "拿到授权后继续接住文档、数据和流程",
+    title: "Keep working after sharing",
+    text: "Once granted, they pick up documents, data, and processes",
   },
   {
     icon: SquareTerminal,
-    title: "外部运行时保留",
-    text: "Remote Agent 通过桥接进入同一群聊",
+    title: "External runtimes stay put",
+    text: "Remote agents join the same group chat through a bridge",
   },
 ] as const
 
@@ -43,8 +43,8 @@ export function MobileLandingShare() {
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(120%_80%_at_50%_0%,rgba(56,189,248,0.12),transparent_60%)]" />
 
       <MobileSectionHeader
-        title="像加同事一样，把 Agent 接进来"
-        subtitle="共享的 Actor 能在群聊里申请授权"
+        title="Bring agents in like new colleagues"
+        subtitle="Shared actors can request grants inside the group chat"
       />
 
       <div className="mx-auto mt-8 max-w-md space-y-3">
@@ -75,26 +75,29 @@ export function MobileLandingShare() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-[12.5px] font-semibold text-slate-950">
               <LaptopMinimal className="size-3.5 text-emerald-700" />
-              桌面浏览器访问申请
+              Desktop browser access request
             </div>
             <div className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] text-emerald-700">
-              待你授权
+              Awaiting your approval
             </div>
           </div>
           <p className="mt-2 text-[12px] leading-5 text-slate-700">
-            共享 Actor 想继续操作你已接入的桌面浏览器
+            A shared actor wants to keep operating the desktop browser you
+            connected
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {["申请方 · Scout", "范围 · 当前会话", "资源 · 桌面浏览器"].map(
-              (label) => (
-                <span
-                  key={label}
-                  className="rounded-full border border-emerald-200/80 bg-white px-2 py-1 text-[10.5px] leading-none text-slate-600"
-                >
-                  {label}
-                </span>
-              )
-            )}
+            {[
+              "Requester · Scout",
+              "Scope · current session",
+              "Resource · desktop browser",
+            ].map((label) => (
+              <span
+                key={label}
+                className="rounded-full border border-emerald-200/80 bg-white px-2 py-1 text-[10.5px] leading-none text-slate-600"
+              >
+                {label}
+              </span>
+            ))}
           </div>
           <m.div
             initial={{ opacity: 0, y: 8 }}
@@ -104,7 +107,7 @@ export function MobileLandingShare() {
             className="mt-3 flex items-center gap-2 rounded-full bg-emerald-600/95 px-3 py-1.5 text-[11.5px] font-medium text-white shadow-[0_10px_22px_-12px_rgba(16,185,129,0.6)]"
           >
             <ShieldCheck className="size-3.5" />
-            一键授权 · 仅当前会话生效
+            One-tap approval · current session only
           </m.div>
         </div>
       </MobileReveal>
