@@ -53,5 +53,13 @@ jobs:
         # install it; its typecheck (pretypecheck → sync:shared → tsc) needs
         # its own node_modules.
         run: npm --prefix packages/mobile-app ci
+      - name: Build fs-helper (release profile)
+        # The API suites inside verify:boundary resolve the RELEASE fs-helper
+        # profile; build it so helper-backed cases run for real. The step env
+        # neutralizes the job-level ALLOW_MISSING_FS_HELPER=1 (which skips the
+        # script itself); tests still see the job-level opt-out for freshness.
+        env:
+          ALLOW_MISSING_FS_HELPER: ""
+        run: bash scripts/pretest-fs-helper.sh release
       - name: verify:boundary
         run: npm run verify:boundary

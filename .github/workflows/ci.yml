@@ -67,7 +67,11 @@ jobs:
         # The API's materializer resolves the RELEASE profile only, while
         # device-runtime's pretest hook builds debug by default — S12 failed
         # with "binary not found" for exactly that mismatch. Build release
-        # before any test runs.
+        # before any test runs. The step-level env neutralizes the job-level
+        # ALLOW_MISSING_FS_HELPER=1, which otherwise makes the script skip
+        # its own build ("${VAR:-0}" treats empty as unset).
+        env:
+          ALLOW_MISSING_FS_HELPER: ""
         run: bash scripts/pretest-fs-helper.sh release
       - uses: actions/setup-node@v4
         with:
