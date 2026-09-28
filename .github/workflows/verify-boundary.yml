@@ -19,6 +19,21 @@ permissions:
 jobs:
   verify-boundary:
     runs-on: ubuntu-latest
+    services:
+      # verify:boundary runs the FULL api suite (verify-boundary.sh), whose
+      # modules construct real ioredis clients at module scope — without a
+      # reachable Redis they retry forever and the workflow hangs until the
+      # 360-min job timeout (why no verify-boundary run had ever completed;
+      # same service as the ci workflow's gates job).
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     env:
       # The fs-helper is a Rust sidecar not needed for the boundary contract;
       # let pretest skip its rebuild so the gate is deterministic in CI. The
