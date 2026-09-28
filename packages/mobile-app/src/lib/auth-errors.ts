@@ -1,30 +1,30 @@
 import { ApiError } from "@/lib/api"
 
 /**
- * Map an auth failure to one of three user-facing messages (Simplified Chinese,
- * to match the app's hardcoded copy). We deliberately do NOT distinguish
- * "邮箱未注册" from "密码错误" — that leaks which addresses have accounts, and
- * the backend (better-auth) collapses them by design.
+ * Map an auth failure to one of three user-facing messages. We deliberately do
+ * NOT distinguish "email not registered" from "wrong password" (that leaks which
+ * addresses have accounts, and the backend (better-auth) collapses them by
+ * design).
  *
- *   - 429              -> 限流（尝试过多）
- *   - 401 / 凭据错误    -> 邮箱或密码错误
- *   - 其它（网络/5xx/未知）-> 通用兜底（可按场景自定义 fallback）
+ *   - 429                       -> rate limited
+ *   - 401 / bad credentials     -> incorrect email or password
+ *   - other (network/5xx/unknown) -> generic fallback (overridable per screen)
  *
  * `fallback` overrides only the third bucket, so screens with a more specific
  * generic message (e.g. the QR flow) can keep theirs.
  */
 export function getAuthErrorMessage(
   error: unknown,
-  fallback = "网络或服务异常，请稍后再试。"
+  fallback = "Network or service error. Please try again later."
 ): string {
   const status = error instanceof ApiError ? error.status : undefined
   const code = error instanceof ApiError ? error.code : undefined
 
   if (status === 429) {
-    return "尝试过多，请稍后再试。"
+    return "Too many attempts. Please try again later."
   }
   if (status === 401 || code === "INVALID_EMAIL_OR_PASSWORD") {
-    return "邮箱或密码错误。"
+    return "Incorrect email or password."
   }
   return fallback
 }

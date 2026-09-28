@@ -490,7 +490,9 @@ export class ChatRuntime {
             ...getConversationMetaOrDefault(snapshotValue, conversationId),
             loadingLatest: false,
             latestLoadError:
-              error instanceof Error ? error.message : "加载聊天记录失败。",
+              error instanceof Error
+                ? error.message
+                : "Failed to load chat history.",
           },
         },
       }))
@@ -657,8 +659,9 @@ export class ChatRuntime {
     // single owner of read-watermark POSTs (the provider re-broadcasts
     // queue changes to the SW via requestChatServiceWorkerSync). The
     // main thread doing a direct POST here would mean two writes per
-    // mark — see S6 ("主线程与 SW 互斥、一次只 POST 一次"). On native
-    // and on web before the SW activates, the main thread still POSTs
+    // mark — see S6 ("main thread and SW are mutually exclusive; POST happens
+    // exactly once"). On native and on web before the SW activates, the main
+    // thread still POSTs
     // so the user's read state isn't lost.
     if (isChatServiceWorkerActive()) {
       return
@@ -900,7 +903,10 @@ export class ChatRuntime {
 
       this.replaceState({
         ...this.state,
-        error: error instanceof Error ? error.message : "消息同步初始化失败。",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to initialize message sync.",
       })
     }
   }
@@ -1445,7 +1451,7 @@ export class ChatRuntime {
                 // preserves the original failure time across retries (catch path).
                 firstFailedAt: queuedEntry.firstFailedAt ?? nowIsoInstant(),
                 lastErrorMessage:
-                  error instanceof Error ? error.message : "发送失败",
+                  error instanceof Error ? error.message : "Send failed",
               },
             },
           }

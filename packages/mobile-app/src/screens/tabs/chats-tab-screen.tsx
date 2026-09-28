@@ -31,14 +31,12 @@ export default function ChatsTabScreen() {
   const loading = status === "loading"
   const refreshing = false
   const unreadCount = totalUnreadCount
-  const headerTitle = unreadCount > 0 ? `消息(${unreadCount})` : "消息"
+  const headerTitle = unreadCount > 0 ? `Chats (${unreadCount})` : "Chats"
   const emptyDescription = useMemo(() => {
     if (!workspaceId) {
-      return "请先进入一个有效工作区。"
+      return "Open a valid workspace first."
     }
-    return workspaceName
-      ? `${workspaceName} 里还没有任何聊天。`
-      : "还没有任何聊天。"
+    return workspaceName ? `No chats in ${workspaceName} yet.` : "No chats yet."
   }, [workspaceId, workspaceName])
 
   return (
@@ -61,7 +59,7 @@ export default function ChatsTabScreen() {
         {loading ? (
           <View style={styles.stateWrap}>
             <SectionBlock>
-              <LoadingBlock label="正在加载会话..." />
+              <LoadingBlock label="Loading chats..." />
             </SectionBlock>
           </View>
         ) : error ? (
@@ -69,12 +67,12 @@ export default function ChatsTabScreen() {
             <SectionBlock>
               <EmptyState
                 icon="alert-circle"
-                title="会话加载失败"
+                title="Failed to load chats"
                 description={error}
                 action={
                   <View style={styles.retryAction}>
                     <Button
-                      label="重试"
+                      label="Retry"
                       icon="refresh-cw"
                       onPress={() => void refreshInbox()}
                     />
@@ -105,7 +103,7 @@ export default function ChatsTabScreen() {
                 <SectionBlock>
                   <EmptyState
                     icon="message-square"
-                    title="还没有任何聊天"
+                    title="No chats yet"
                     description={emptyDescription}
                   />
                 </SectionBlock>

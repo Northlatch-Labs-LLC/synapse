@@ -27,19 +27,19 @@ export function MobilePlusMenu({
   const actions: MobilePlusMenuAction[] = [
     {
       key: "group",
-      label: "发起群聊",
+      label: "New Group Chat",
       icon: "users",
       onPress: onStartGroup,
     },
     {
       key: "friend",
-      label: "添加好友",
+      label: "Add Contact",
       icon: "user-plus",
       onPress: onAddFriend,
     },
     {
       key: "scan",
-      label: "扫一扫",
+      label: "Scan",
       icon: "camera",
       onPress: onScan,
     },
@@ -54,7 +54,7 @@ export function MobilePlusMenu({
     <>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="打开快捷操作"
+        accessibilityLabel="Open quick actions"
         onPress={() => setOpen(true)}
         style={({ pressed }) => [
           styles.trigger,

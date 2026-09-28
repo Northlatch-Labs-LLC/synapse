@@ -38,9 +38,10 @@ export function ScanCameraPermissionSheet({
           ]}
         >
           <View style={styles.handle} />
-          <Text style={styles.title}>允许使用相机</Text>
+          <Text style={styles.title}>Allow Camera Access</Text>
           <Text style={styles.description}>
-            需要访问你的相机，才能扫描登录二维码和联系人二维码。我们只会在你主动点击扫一扫时使用相机。
+            Camera access is needed to scan sign-in and contact QR codes. The
+            camera is only used when you tap Scan.
           </Text>
           {errorMessage ? (
             <Text style={styles.errorText}>{errorMessage}</Text>
@@ -48,13 +49,13 @@ export function ScanCameraPermissionSheet({
 
           <View style={styles.actions}>
             <Button
-              label="拒绝"
+              label="Deny"
               variant="secondary"
               onPress={onClose}
               style={styles.actionButton}
             />
             <Button
-              label={requesting ? "授权中..." : "授权"}
+              label={requesting ? "Authorizing..." : "Authorize"}
               onPress={onAuthorize}
               disabled={requesting}
               style={styles.actionButton}

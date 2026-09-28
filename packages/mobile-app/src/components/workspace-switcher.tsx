@@ -52,7 +52,7 @@ export function WorkspaceSwitcher({
     <>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="切换工作区"
+        accessibilityLabel="Switch workspace"
         onPress={() => setOpen(true)}
         style={({ pressed }) => [
           styles.trigger,
@@ -60,7 +60,7 @@ export function WorkspaceSwitcher({
         ]}
       >
         <Text numberOfLines={1} style={styles.triggerLabel}>
-          {workspaceName || "选择工作区"}
+          {workspaceName || "Select workspace"}
         </Text>
         <Feather
           name={open ? "chevron-up" : "chevron-down"}
@@ -103,7 +103,7 @@ export function WorkspaceSwitcher({
                   >
                     <Text style={styles.menuItemTitle}>{workspace.name}</Text>
                     {switching ? (
-                      <Text style={styles.switchingText}>切换中</Text>
+                      <Text style={styles.switchingText}>Switching</Text>
                     ) : null}
                   </Pressable>
                 )
@@ -118,7 +118,7 @@ export function WorkspaceSwitcher({
               ]}
             >
               <Feather name="plus" size={16} color={theme.colors.primary} />
-              <Text style={styles.createActionText}>新建工作区</Text>
+              <Text style={styles.createActionText}>New Workspace</Text>
             </Pressable>
           </View>
         </View>

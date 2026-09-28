@@ -30,10 +30,10 @@ function buildParticipantSubtitle(participant: {
   const fallback =
     participant.participantType === CONVERSATION_PARTICIPANT_TYPE.ACTOR ||
     participant.participantType === CONVERSATION_PARTICIPANT_TYPE.REMOTE_AGENT
-      ? "工作区 Actor"
+      ? "Workspace Actor"
       : participant.participantType === CONVERSATION_PARTICIPANT_TYPE.EXTERNAL
-        ? "外部联系人"
-        : "工作区成员"
+        ? "External contact"
+        : "Workspace member"
 
   return participant.title?.trim() || participant.role?.trim() || fallback
 }
@@ -103,7 +103,7 @@ export function ChatMentionPickerScreen() {
         <View style={styles.header}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="返回"
+            accessibilityLabel="Back"
             hitSlop={8}
             onPress={() => router.back()}
             style={({ pressed }) => [
@@ -115,7 +115,7 @@ export function ChatMentionPickerScreen() {
           </Pressable>
 
           <Text numberOfLines={1} style={styles.headerTitle}>
-            选择提醒对象
+            Choose Who to Mention
           </Text>
 
           <View style={styles.headerSpacer} />
@@ -126,7 +126,7 @@ export function ChatMentionPickerScreen() {
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="搜索名称"
+            placeholder="Search names"
             placeholderTextColor={theme.colors.textSoft}
             style={styles.searchInput}
           />
@@ -136,8 +136,8 @@ export function ChatMentionPickerScreen() {
           <View style={styles.stateWrap}>
             <EmptyState
               icon="at-sign"
-              title="当前无法选择提醒对象"
-              description="会话还没同步下来，返回后重试一次。"
+              title="Can't choose who to mention right now"
+              description="The chat hasn't synced yet. Go back and try again."
             />
           </View>
         ) : (
@@ -148,11 +148,11 @@ export function ChatMentionPickerScreen() {
               <View style={styles.stateWrap}>
                 <EmptyState
                   icon="at-sign"
-                  title="当前没有可提醒的对象"
+                  title="No one to mention yet"
                   description={
                     query.trim()
-                      ? "换个关键词试试。"
-                      : "当前会话里还没有其他可选成员。"
+                      ? "Try a different keyword."
+                      : "There are no other members to select in this chat yet."
                   }
                 />
               </View>

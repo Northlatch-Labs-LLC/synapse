@@ -1,8 +1,8 @@
 const MOCK_TRANSCRIPTION_CHUNKS = [
-  "帮我整理一下今天的重点任务",
-  "先按照优先级",
-  "再补充需要我跟进的人",
-  "最后输出一个简短执行建议",
+  "Help me organize today's key tasks",
+  "by priority first",
+  "then add the people I need to follow up with",
+  "and finish with a short action plan",
 ] as const
 
 export function startMockRealtimeTranscriptionSession({

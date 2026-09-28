@@ -18,25 +18,25 @@ export const ROOT_TAB_ORDER: RootTabKey[] = ["home", "chats", "contacts", "me"]
 export const ROOT_TAB_CONFIG: Record<RootTabKey, RootTabDefinition> = {
   home: {
     href: "/",
-    label: "首页",
+    label: "Home",
     activeIcon: "home",
     inactiveIcon: "home-outline",
   },
   chats: {
     href: "/chats",
-    label: "聊天",
+    label: "Chats",
     activeIcon: "chatbubble",
     inactiveIcon: "chatbubble-outline",
   },
   contacts: {
     href: "/contacts",
-    label: "联系人",
+    label: "Contacts",
     activeIcon: "people",
     inactiveIcon: "people-outline",
   },
   me: {
     href: "/me",
-    label: "我的",
+    label: "Me",
     activeIcon: "person",
     inactiveIcon: "person-outline",
   },

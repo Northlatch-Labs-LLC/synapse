@@ -172,7 +172,7 @@ export function hasValidAuthNetworkConfig(): boolean {
 
 /** Display-only API base for debug surfaces; never throws. */
 export function getApiBaseForDisplay(): string {
-  return tryNormalizeApiBase(getRawApiUrl()) ?? "(未配置)"
+  return tryNormalizeApiBase(getRawApiUrl()) ?? "(not configured)"
 }
 
 /**

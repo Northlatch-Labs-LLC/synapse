@@ -472,9 +472,9 @@ export function getParticipantDisplayName(
     case CONVERSATION_PARTICIPANT_TYPE.EXTERNAL:
       return "External"
     case CONVERSATION_PARTICIPANT_TYPE.WORKSPACE_MEMBER:
-      return "成员"
+      return "Member"
     default:
-      return "系统"
+      return "System"
   }
 }
 
@@ -501,7 +501,9 @@ export function getConversationDisplayName(
 ) {
   if (conversation.kind === CONVERSATION_KIND.DIRECT) {
     const peer = getConversationPeerParticipant(conversation, workspaceMemberId)
-    return getParticipantDisplayName(peer) || conversation.title || "聊天"
+    return (
+      getParticipantDisplayName(peer) || conversation.title || "Direct chat"
+    )
   }
 
   const title = conversation.title?.trim()
@@ -509,7 +511,7 @@ export function getConversationDisplayName(
     return title
   }
 
-  return "群聊"
+  return "Group chat"
 }
 
 export function getConversationAvatarSpec(
@@ -777,17 +779,17 @@ function summarizeFileCategories(blocks: CanonicalContentBlock[]) {
   if (files.length === 1) {
     switch (files[0]!.category) {
       case "image":
-        return "图片"
+        return "Image"
       case "video":
-        return "视频"
+        return "Video"
       case "audio":
-        return "语音"
+        return "Audio"
       default:
-        return files[0]!.name || "文件"
+        return files[0]!.name || "Attachment"
     }
   }
 
-  return `${files.length} 个附件`
+  return `${files.length} attachments`
 }
 
 export function buildContentBlocksPreviewText(blocks: CanonicalContentBlock[]) {
@@ -813,7 +815,7 @@ export function buildReplyPreviewText(
   }
 
   if (reply.isUnavailable) {
-    return "原消息不可用"
+    return "Original message unavailable"
   }
 
   const previewText = reply.previewText.trim()
@@ -826,7 +828,7 @@ export function buildReplyPreviewText(
     return fallback
   }
 
-  return reply.subtype ? `[${reply.subtype}]` : "消息"
+  return reply.subtype ? `[${reply.subtype}]` : "Message"
 }
 
 export function participantToConversationEntityRef(
@@ -943,9 +945,9 @@ export function getEntityDisplayName(
     case CONVERSATION_PARTICIPANT_TYPE.EXTERNAL:
       return "External"
     case CONVERSATION_PARTICIPANT_TYPE.WORKSPACE_MEMBER:
-      return "成员"
+      return "Member"
     default:
-      return "系统"
+      return "System"
   }
 }
 

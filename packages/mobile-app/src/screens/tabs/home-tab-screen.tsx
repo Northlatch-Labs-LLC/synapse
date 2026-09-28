@@ -94,7 +94,7 @@ export default function HomeTabScreen() {
       setError(null)
     } catch (nextError) {
       setError(
-        nextError instanceof Error ? nextError.message : "加载首页失败。"
+        nextError instanceof Error ? nextError.message : "Failed to load Home."
       )
     } finally {
       setLoading(false)
@@ -116,7 +116,7 @@ export default function HomeTabScreen() {
     const trimmed = content.trim()
     if (!workspaceId || !selectedActor || !trimmed) return
     if (status !== "ready" || !clientInstanceId) {
-      setError("聊天连接尚未完成，请稍后再试。")
+      setError("Chat connection is not ready yet. Please try again shortly.")
       return
     }
 
@@ -141,7 +141,9 @@ export default function HomeTabScreen() {
       }
     } catch (nextError) {
       setError(
-        nextError instanceof Error ? nextError.message : "创建会话失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to create chat."
       )
     } finally {
       setSubmitting(false)
@@ -152,7 +154,7 @@ export default function HomeTabScreen() {
     return (
       <ScreenView>
         <View style={styles.stateWrap}>
-          <LoadingBlock label="正在进入工作区创建流程..." />
+          <LoadingBlock label="Entering workspace setup..." />
         </View>
       </ScreenView>
     )
@@ -200,12 +202,12 @@ export default function HomeTabScreen() {
         >
           {loading ? (
             <SectionBlock>
-              <LoadingBlock label="正在加载首页..." />
+              <LoadingBlock label="Loading Home..." />
             </SectionBlock>
           ) : (
             <>
               <SectionBlock style={styles.quickComposerBlock}>
-                <SectionTitleRow title="快捷发起" />
+                <SectionTitleRow title="Quick Start" />
                 <HomeQuickComposer
                   actor={selectedActor}
                   sending={submitting}
@@ -219,7 +221,7 @@ export default function HomeTabScreen() {
                 />
                 {actors.length === 0 ? (
                   <Text style={styles.emptyHint}>
-                    当前工作区还没有可用角色。
+                    No actors available in this workspace yet.
                   </Text>
                 ) : null}
                 {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -227,10 +229,10 @@ export default function HomeTabScreen() {
 
               <SectionBlock>
                 <SectionTitleRow
-                  title="最近会话"
+                  title="Recent Chats"
                   action={
                     <Pressable onPress={() => router.replace("/chats")}>
-                      <Text style={styles.linkText}>查看全部</Text>
+                      <Text style={styles.linkText}>View all</Text>
                     </Pressable>
                   }
                 />
@@ -247,8 +249,8 @@ export default function HomeTabScreen() {
                 ) : (
                   <EmptyState
                     icon="message-square"
-                    title="还没有会话"
-                    description="先通过上面的输入框发起第一条消息。"
+                    title="No chats yet"
+                    description="Send your first message using the composer above."
                   />
                 )}
               </SectionBlock>
