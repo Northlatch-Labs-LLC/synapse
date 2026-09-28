@@ -911,6 +911,12 @@ export async function fatalExit(
 // OnUncaughtException/OnUnhandledRejection defaults are filtered out above —
 // Sentry-on used to silently flip unhandledRejection to warn-and-continue):
 // capture, flush (bounded), exit 1.
+//
+// Error-policy tiers (issue #4): RECOVERABLE failures — postgres idle-client
+// drops (pool-error-handler.ts) and redis outage retries (error-listener.ts)
+// — are contained at their source with a listener and NEVER reach these
+// handlers. These handlers are the backstop for the genuinely unknown; a
+// trip here means an uncontained bug, and exiting loudly is correct.
 process.on("uncaughtException", (err) => {
   void fatalExit(err, "uncaughtException")
 })

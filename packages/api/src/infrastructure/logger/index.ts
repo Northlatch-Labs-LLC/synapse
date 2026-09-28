@@ -155,6 +155,7 @@ const SCOPE_TO_DOMAIN: Readonly<Record<string, DomainScope>> = {
   "ocr.registry": { domain: "ocr", component: "registry" },
   "ocr.tesseract": { domain: "ocr", component: "tesseract" },
   "outbox-sweeper": { domain: "infra", component: "outbox-sweeper" },
+  redis: { domain: "infra", component: "redis" },
   "remote-agent-delivery-retry": {
     domain: "remote-agent",
     component: "delivery-retry",

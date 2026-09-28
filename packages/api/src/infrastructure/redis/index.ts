@@ -1,16 +1,25 @@
 import Redis from "ioredis"
 import { config } from "../../config/index.js"
+import { createLogger } from "../logger/index.js"
+import { attachRedisErrorListener } from "./error-listener.js"
+
+const log = createLogger("redis")
 
 // Use any for the client type — ioredis's default export is a class but
 // TypeScript only sees it as a namespace via this CJS interop; the
 // runtime constructor is what we actually need.
 type RedisClient = any
 
-function createRedisClient(): RedisClient {
-  return new (Redis as any)(config.redis.url, {
+function createRedisClient(label: string): RedisClient {
+  const client = new (Redis as any)(config.redis.url, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
   })
+  // Attached at construction (issue #4): without an `error` listener a redis
+  // outage floods "[ioredis] Unhandled error event" on every retry; with it,
+  // domain-tagged warns, throttled per client.
+  attachRedisErrorListener(client, { label, log })
+  return client
 }
 
 // Lazy clients: the underlying ioredis instance is created on first
@@ -25,10 +34,10 @@ type LazyHandle = {
   isMaterialized: () => boolean
 }
 
-function lazyRedisClient(): LazyHandle {
+function lazyRedisClient(label: string): LazyHandle {
   let materialized: RedisClient | null = null
   function ensure(): RedisClient {
-    if (!materialized) materialized = createRedisClient()
+    if (!materialized) materialized = createRedisClient(label)
     return materialized
   }
   const proxy = new Proxy({} as RedisClient, {
@@ -48,9 +57,9 @@ function lazyRedisClient(): LazyHandle {
   }
 }
 
-const lazyRedis = lazyRedisClient()
-const lazyRedisSub = lazyRedisClient()
-const lazyRedisPub = lazyRedisClient()
+const lazyRedis = lazyRedisClient("redis")
+const lazyRedisSub = lazyRedisClient("redis:sub")
+const lazyRedisPub = lazyRedisClient("redis:pub")
 
 export const redis = lazyRedis.client
 export const redisSub = lazyRedisSub.client
