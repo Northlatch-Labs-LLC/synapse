@@ -110,7 +110,7 @@ jobs:
       - name: Build api image
         run: docker build -f infrastructure/Dockerfile.api -t synapse-api:ci .
       - name: Trivy scan (CRITICAL/HIGH block, INV-S7/S8)
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: synapse-api:ci
           severity: CRITICAL,HIGH
@@ -120,7 +120,7 @@ jobs:
       - name: Build web image
         run: docker build -f infrastructure/Dockerfile.web -t synapse-web:ci .
       - name: Trivy scan web image
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: synapse-web:ci
           severity: CRITICAL,HIGH
