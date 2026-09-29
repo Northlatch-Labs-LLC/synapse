@@ -113,13 +113,13 @@ export default function BillingSettingsPage() {
         </p>
       </div>
 
-      {error && (
+      {error ? (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
-      )}
+      ) : null}
 
-      {subscription && (
+      {subscription ? (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Current subscription</CardTitle>
@@ -166,7 +166,7 @@ export default function BillingSettingsPage() {
             )}
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       <div className="grid gap-4 md:grid-cols-3">
         {plans?.plans.map((plan) => {
@@ -198,7 +198,7 @@ export default function BillingSettingsPage() {
                       : "Auto gateway models"}
                   </li>
                 </ul>
-                {plan.plan !== "free" && !isCurrent && (
+                {plan.plan !== "free" && !isCurrent ? (
                   <div className="space-y-2 pt-1">
                     {plan.plan === "team" && (
                       <Input
@@ -222,12 +222,12 @@ export default function BillingSettingsPage() {
                           : "Billing not configured"}
                     </Button>
                   </div>
-                )}
-                {isCurrent && (
+                ) : null}
+                {isCurrent ? (
                   <div className="pt-1 text-xs text-muted-foreground">
                     Your current plan
                   </div>
-                )}
+                ) : null}
               </CardContent>
             </Card>
           )
