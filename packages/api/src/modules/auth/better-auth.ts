@@ -385,6 +385,9 @@ export const auth = betterAuth({
     modelName: "users",
     fields: {
       emailVerified: "email_verified",
+      // phoneNumber plugin fields (west-first WhatsApp OTP sign-in)
+      phoneNumber: "phone_number",
+      phoneNumberVerified: "phone_number_verified",
       createdAt: "created_at",
       updatedAt: "updated_at",
     },
