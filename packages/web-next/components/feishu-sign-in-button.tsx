@@ -21,7 +21,7 @@ export function FeishuSignInButton({
   disabled,
   onError,
 }: {
-  actionLabel: "登录" | "注册"
+  actionLabel: "Sign in" | "Sign up"
   redirect: string | null
   disabled?: boolean
   onError: (message: string) => void
@@ -68,7 +68,7 @@ export function FeishuSignInButton({
       ) : (
         <FeishuIcon className="size-4" />
       )}
-      {`使用飞书${actionLabel}`}
+      {`${actionLabel} with Feishu`}
     </Button>
   )
 }

@@ -1,6 +1,7 @@
 import pg from "pg"
 import { config } from "../../config/index.js"
 import { createLogger } from "../logger/index.js"
+import { attachPoolErrorHandler } from "./pool-error-handler.js"
 import type { DatabaseTable } from "./db-types.js"
 
 const { Pool } = pg
@@ -18,6 +19,10 @@ export const pool = new Pool({
   connectionString: config.database.url,
   max: 20,
 })
+// Attached at construction so no emitter timing window exists between pool
+// creation and protection (issue #4: an idle-client disconnect used to become
+// an uncaughtException and kill the process).
+attachPoolErrorHandler(pool, log)
 
 type RequiredSchemaSpec = {
   table: DatabaseTable

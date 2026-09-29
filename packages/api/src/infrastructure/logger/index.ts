@@ -93,6 +93,7 @@ const SCOPE_TO_DOMAIN: Readonly<Record<string, DomainScope>> = {
   "asr.registry": { domain: "asr", component: "registry" },
   audit: { domain: "audit" },
   "auth.better-auth": { domain: "auth", component: "better-auth" },
+  "auth.sso": { domain: "auth", component: "sso" },
   "auth-session-registry": { domain: "auth", component: "session-registry" },
   automation: { domain: "automation" },
   "automation.integrations": {
@@ -154,6 +155,7 @@ const SCOPE_TO_DOMAIN: Readonly<Record<string, DomainScope>> = {
   "ocr.registry": { domain: "ocr", component: "registry" },
   "ocr.tesseract": { domain: "ocr", component: "tesseract" },
   "outbox-sweeper": { domain: "infra", component: "outbox-sweeper" },
+  redis: { domain: "infra", component: "redis" },
   "remote-agent-delivery-retry": {
     domain: "remote-agent",
     component: "delivery-retry",

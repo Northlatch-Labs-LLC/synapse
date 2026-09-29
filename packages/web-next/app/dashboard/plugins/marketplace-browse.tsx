@@ -69,7 +69,7 @@ export default function MarketplaceBrowse({
                     : "text-gray-500 hover:text-gray-900"
                 }`}
               >
-                全部插件
+                All plugins
                 {!selectedCategorySlug ? (
                   <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-blue-600" />
                 ) : null}
@@ -110,10 +110,10 @@ export default function MarketplaceBrowse({
               onClick={handleSearch}
               className="absolute top-1/2 right-3 -translate-y-1/2 text-xs font-medium text-blue-600 transition-colors hover:text-blue-700"
             >
-              搜索
+              Search
             </button>
             <Input
-              placeholder="搜索插件"
+              placeholder="Search plugins"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               onKeyDown={(event) => event.key === "Enter" && handleSearch()}
@@ -156,7 +156,7 @@ export default function MarketplaceBrowse({
                   locale,
                   primaryCategory.defaultLocale || "en"
                 ) || primaryCategory.displayName
-              : "插件"
+              : "Plugin"
 
             return (
               <div
@@ -227,7 +227,7 @@ export default function MarketplaceBrowse({
                         openPlugin(plugin.id)
                       }}
                     >
-                      配置
+                      Configure
                     </Button>
                   ) : (
                     <Button
@@ -238,7 +238,7 @@ export default function MarketplaceBrowse({
                         openPlugin(plugin.id)
                       }}
                     >
-                      安装
+                      Install
                     </Button>
                   )}
                 </div>

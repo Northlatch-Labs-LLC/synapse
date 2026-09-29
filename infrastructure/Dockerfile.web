@@ -74,6 +74,13 @@ WORKDIR /app/packages/web-next
 RUN npm run build
 
 FROM node:20-alpine
+# Image-scan hygiene (INV-S7/S8): node:20-alpine ships alpine packages with
+# known HIGHs (libcrypto3 3.5.6-r0 → fixed 3.5.8-r0) and npm 10's bundled
+# toolchain pins tar@6.2.1 (CVE-2026-59873, fixed only on the 7.x line npm
+# here will never take) + brace-expansion@2.0.1. This stage never invokes
+# npm — CMD runs next via node directly — so upgrade the OS packages and drop
+# the npm tree wholesale instead of carrying its unfixed deps into the scan.
+RUN apk upgrade --no-cache && rm -rf /usr/local/lib/node_modules/npm
 WORKDIR /app/packages/web-next
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/packages/shared /app/packages/shared

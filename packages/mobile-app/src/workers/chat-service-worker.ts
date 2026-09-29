@@ -207,7 +207,7 @@ async function flushOutbox(
 ) {
   return flushOutboxQueue(queueState, {
     now: () => nowIsoInstant(),
-    failureMessage: "发送失败",
+    failureMessage: "Send failed",
     send: async (entry) => {
       await fetchJson(
         auth,

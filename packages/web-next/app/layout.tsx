@@ -53,14 +53,15 @@ export const metadata: Metadata = {
     default: "Synapse",
     template: "%s | Synapse",
   },
-  description: "让 AI 成为拥有岗位、记忆、权限与协作关系的数字员工组织。",
+  description:
+    "Turn AI into an organization of digital employees with roles, memory, permissions, and collaboration.",
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "Synapse",
-    description: "云端数字员工组织运行时。",
+    description: "The cloud runtime for your AI digital workforce.",
     images: ["/synapse.png"],
   },
 }
@@ -72,7 +73,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="zh-CN"
+      lang="en"
       suppressHydrationWarning
       className={`${sans.variable} ${display.variable} font-sans antialiased`}
     >

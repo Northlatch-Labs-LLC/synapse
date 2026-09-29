@@ -43,8 +43,8 @@ const orbits: Orbit[] = [
     speed: 38,
     direction: "cw",
     items: [
-      { icon: Mail, label: "邮箱", angle: 0 },
-      { icon: Smartphone, label: "手机", angle: 120 },
+      { icon: Mail, label: "Email", angle: 0 },
+      { icon: Smartphone, label: "Phone", angle: 120 },
       { icon: Github, label: "GitHub", angle: 240 },
     ],
   },
@@ -53,9 +53,9 @@ const orbits: Orbit[] = [
     speed: 30,
     direction: "ccw",
     items: [
-      { icon: Server, label: "服务器", angle: 60 },
-      { icon: HardDrive, label: "共享盘", angle: 180 },
-      { icon: AppWindow, label: "浏览器", angle: 300 },
+      { icon: Server, label: "Servers", angle: 60 },
+      { icon: HardDrive, label: "Shared drives", angle: 180 },
+      { icon: AppWindow, label: "Browser", angle: 300 },
     ],
   },
   {
@@ -63,9 +63,9 @@ const orbits: Orbit[] = [
     speed: 24,
     direction: "cw",
     items: [
-      { icon: Database, label: "数据库", angle: 30 },
-      { icon: LaptopMinimal, label: "电脑", angle: 150 },
-      { icon: Network, label: "内部 API", angle: 270 },
+      { icon: Database, label: "Databases", angle: 30 },
+      { icon: LaptopMinimal, label: "Desktop", angle: 150 },
+      { icon: Network, label: "Internal APIs", angle: 270 },
     ],
   },
 ]
@@ -73,18 +73,18 @@ const orbits: Orbit[] = [
 const benefits = [
   {
     icon: LaptopMinimal,
-    title: "云上协作，本地执行",
-    text: "任务在云端被分工讨论，执行落回设备与浏览器",
+    title: "Collaborate in the cloud, execute locally",
+    text: "Tasks get divided and discussed in the cloud; execution lands back on devices and browsers",
   },
   {
     icon: Server,
-    title: "设备和内网都能接入",
-    text: "文件系统、数据库、内网 API 进入同一工作链",
+    title: "Devices and intranets connect too",
+    text: "File systems, databases, and intranet APIs join one work chain",
   },
   {
     icon: ShieldCheck,
-    title: "连接之后仍然受控",
-    text: "访问范围、调用动作、轨迹持续被治理审计",
+    title: "Connected, still governed",
+    text: "Access scope, actions, and trails stay under continuous audit",
   },
 ] as const
 
@@ -95,8 +95,8 @@ export function MobileLandingReach() {
       className="bg-[linear-gradient(180deg,rgba(246,250,255,0.6),rgba(255,255,255,0.96))]"
     >
       <MobileSectionHeader
-        title="云端协作，执行继续落到设备"
-        subtitle="浏览器、文件、数据库都可以在边界清楚下继续接进来"
+        title="Collaborate in the cloud, execute on your devices"
+        subtitle="Browsers, files, and databases connect with clear boundaries"
       />
 
       <MobileReveal

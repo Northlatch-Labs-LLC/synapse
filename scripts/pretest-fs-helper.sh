@@ -97,7 +97,7 @@ cd "$SIDECAR_DIR"
 # Pin the output dir to where the resolver looks, so a stray CARGO_TARGET_DIR
 # can't send the fresh binary somewhere the suite will never resolve. --target-dir
 # overrides both the CARGO_TARGET_DIR env var and any [build] target-dir config.
-if ! cargo build "${cargo_args[@]}" --target-dir "$SIDECAR_DIR/target" 2>&1; then
+if ! cargo build ${cargo_args[@]+"${cargo_args[@]}"} --target-dir "$SIDECAR_DIR/target" 2>&1; then
   echo "[pretest-fs-helper.sh] ERROR: fs-helper build failed. Fix the Rust source above, or set ALLOW_MISSING_FS_HELPER=1 to run tests against the existing/absent binary." >&2
   exit 1
 fi

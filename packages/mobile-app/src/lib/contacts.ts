@@ -21,7 +21,7 @@ export function actorSummary(actor: Actor) {
 }
 
 export function scopedContactName(contact: ContactHubEntryView) {
-  return contact.title || "未命名联系人"
+  return contact.title || "Unnamed contact"
 }
 
 export function scopedContactSubtitle(contact: ContactHubEntryView) {
@@ -32,7 +32,7 @@ export function scopedContactSubtitle(contact: ContactHubEntryView) {
 
 export function scopedContactSummary(contact: ContactHubEntryView) {
   if (contact.kind.startsWith("friend-")) {
-    return `来自 ${contact.workspace.name} 的好友联系人`
+    return `Friend contact from ${contact.workspace.name}`
   }
-  return `来自 ${contact.workspace.name} 的工作区联系人`
+  return `Workspace contact from ${contact.workspace.name}`
 }

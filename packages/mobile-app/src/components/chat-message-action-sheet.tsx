@@ -98,12 +98,12 @@ export function ChatMessageActionSheet({
               size={16}
               color={theme.colors.text}
             />
-            <Text style={styles.menuLabel}>引用</Text>
+            <Text style={styles.menuLabel}>Quote</Text>
           </Pressable>
           <View style={styles.separator} />
           <Pressable onPress={onCopy} style={styles.menuItem}>
             <Feather name="copy" size={16} color={theme.colors.text} />
-            <Text style={styles.menuLabel}>复制</Text>
+            <Text style={styles.menuLabel}>Copy</Text>
           </Pressable>
         </View>
       </View>

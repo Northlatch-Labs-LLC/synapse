@@ -21,9 +21,9 @@ export default function GlobalError({
     <html>
       <body>
         <div style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
-          <h2>出错了 / Something went wrong</h2>
-          <p>请重试，或刷新页面。/ Please try again or reload.</p>
-          <button onClick={() => reset()}>重试 / Try again</button>
+          <h2>Something went wrong</h2>
+          <p>Please try again, or reload the page.</p>
+          <button onClick={() => reset()}>Try again</button>
         </div>
       </body>
     </html>

@@ -77,7 +77,10 @@ export function HomeQuickComposer({
 
     const permission = await requestRecordingPermissionsAsync()
     if (!permission.granted) {
-      Alert.alert("无法录音", "请先授权麦克风权限。")
+      Alert.alert(
+        "Unable to record",
+        "Please grant microphone permission first."
+      )
       return
     }
 
@@ -147,8 +150,8 @@ export function HomeQuickComposer({
             onChangeText={setDraft}
             placeholder={
               actor
-                ? `给 ${actor.definition.displayName} 发消息`
-                : "先选择一个角色"
+                ? `Message ${actor.definition.displayName}`
+                : "Select an Actor first"
             }
             placeholderTextColor={theme.colors.textSoft}
             multiline
@@ -202,7 +205,7 @@ export function HomeQuickComposer({
               ) : (
                 <>
                   <Feather name="send" size={16} color={theme.colors.white} />
-                  <Text style={styles.sendButtonText}>发送</Text>
+                  <Text style={styles.sendButtonText}>Send</Text>
                 </>
               )}
             </Pressable>
@@ -236,7 +239,7 @@ export function HomeQuickComposer({
                 recorderState.isRecording && styles.voiceButtonTextActive,
               ]}
             >
-              {recorderState.isRecording ? "松开结束语音输入" : "长按语音输入"}
+              {recorderState.isRecording ? "Release to stop" : "Hold to talk"}
             </Text>
           </Pressable>
         )}

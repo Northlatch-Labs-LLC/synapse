@@ -21,7 +21,7 @@ export function MobileHeaderActions({
     <View style={styles.row}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="搜索"
+        accessibilityLabel="Search"
         onPress={onSearch}
         style={({ pressed }) => [
           styles.searchTrigger,

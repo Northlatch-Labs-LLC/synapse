@@ -27,9 +27,13 @@ export type ResolvedTaskPayload = {
   readonly userInput?: ResolvedTaskUserInput
 }
 
+// zod 4: a transform that RETURNS undefined for an absent key fails the
+// object's non-optional output validation; .optional() restores the v3
+// behavior (absent or non-string ⇒ undefined, parse still succeeds).
 const stringField = z
   .unknown()
   .transform((value) => (typeof value === "string" ? value : undefined))
+  .optional()
 
 const answerSchema = z
   .object({
@@ -44,10 +48,13 @@ const questionSchema = z
     id: stringField,
     title: stringField,
     prompt: stringField,
-    answer: z.unknown().transform((value) => {
-      const parsed = answerSchema.safeParse(value)
-      return parsed.success ? parsed.data : undefined
-    }),
+    answer: z
+      .unknown()
+      .transform((value) => {
+        const parsed = answerSchema.safeParse(value)
+        return parsed.success ? parsed.data : undefined
+      })
+      .optional(),
   })
   .passthrough()
 
@@ -71,10 +78,13 @@ const resolvedTaskPayloadSchema: z.ZodType<ResolvedTaskPayload> = z
     lifecycleStatus: stringField,
     outcome: stringField,
     resolutionNote: stringField,
-    userInput: z.unknown().transform((value) => {
-      const parsed = userInputSchema.safeParse(value)
-      return parsed.success ? parsed.data : undefined
-    }),
+    userInput: z
+      .unknown()
+      .transform((value) => {
+        const parsed = userInputSchema.safeParse(value)
+        return parsed.success ? parsed.data : undefined
+      })
+      .optional(),
   })
   .passthrough()
 

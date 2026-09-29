@@ -370,7 +370,7 @@ export function MessageItem({
             <Text
               style={[styles.deliveryStatus, mine && styles.deliveryStatusMine]}
             >
-              {localDeliveryStatus === "retrying" ? "待重试" : "发送中"}
+              {localDeliveryStatus === "retrying" ? "Retrying" : "Sending"}
             </Text>
           ) : null}
           {localDeliveryStatus === "retrying" &&
@@ -388,7 +388,7 @@ export function MessageItem({
                   styles.retryButton,
                 ]}
               >
-                重试
+                Retry
               </Text>
             </Pressable>
           ) : null}

@@ -1,0 +1,12 @@
+apiVersion: v2
+name: synapse
+description: |
+  Synapse — self-hosted AI team workspace (Northlatch fork, G-S1 enterprise
+  spine deployment). Owns the api + web workloads and their ingress; HA
+  Postgres/Redis are pointed at, not owned (see values.yaml + README).
+type: application
+version: 0.1.0
+appVersion: "0.28.0"
+maintainers:
+  - name: Northlatch Labs LLC
+    email: ops@northlatch.com

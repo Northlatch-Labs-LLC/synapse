@@ -26,7 +26,7 @@ export function ConversationItem({
   const title = conversation.title
   const avatar = getConversationAvatarSpec(conversation, workspaceMemberId)
   const preview =
-    conversation.lastItem?.previewText?.trim() || "打开会话继续沟通"
+    conversation.lastItem?.previewText?.trim() || "Open the chat to continue"
   const messageAt = conversation.lastItem?.createdAt || conversation.createdAt
   const latestSequence = conversation.lastItem?.sequence ?? 0
   const unreadCount =

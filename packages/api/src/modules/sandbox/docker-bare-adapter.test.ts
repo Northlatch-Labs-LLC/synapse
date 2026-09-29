@@ -52,9 +52,18 @@ function fakeDocker(
     child.stdout = new EventEmitter()
     child.stderr = new EventEmitter()
     let exited = false
+    // A hung child must hold an event-loop handle exactly like a REAL spawned
+    // child does: the backstop timer is .unref()'d (production-correct), so a
+    // bare-EventEmitter fake that hangs holds nothing — under concurrency the
+    // loop can drain mid-hang and the runner cancels the test as a pending
+    // promise ("event loop has already resolved"). The keepalive interval
+    // restores real spawn semantics and is cleared on exit/kill.
+    let keepalive: ReturnType<typeof setInterval> | undefined
+    if (res.hang) keepalive = setInterval(() => {}, 1 << 30)
     const emitExit = (code: number) => {
       if (exited) return
       exited = true
+      if (keepalive) clearInterval(keepalive)
       if (res.stdout) child.stdout.emit("data", Buffer.from(res.stdout))
       if (res.stderr) child.stderr.emit("data", Buffer.from(res.stderr))
       child.emit("exit", code)

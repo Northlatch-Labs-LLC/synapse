@@ -179,7 +179,7 @@ export function MobileSectionRail({ sections }: { sections: RailSection[] }) {
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       role="navigation"
-      aria-label="章节导航"
+      aria-label="Section navigation"
     >
       <div
         className={cn(

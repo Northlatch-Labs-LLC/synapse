@@ -284,6 +284,20 @@ const envObjectSchema = z.object({
   // "true" => Lark international (open.larksuite.com); else Feishu (open.feishu.cn).
   FEISHU_INTL: z.string().optional(),
 
+  // ===== Signed audit export (G-S1) =====
+  // base64-encoded PKCS8 ed25519 PEM. Generate:
+  //   node scripts/verify-audit-export.mjs --generate
+  AUDIT_EXPORT_SIGNING_KEY: withDefault(z.string(), ""),
+
+  // ===== Enterprise SSO (G-S1): OIDC providers via better-auth genericOAuth =====
+  // JSON array: [{"id":"okta","name":"Okta","clientId":"...","clientSecret":"...",
+  //   "authorizationUrl":"https://.../authorize","tokenUrl":"https://.../token",
+  //   "userInfoUrl":"https://.../userinfo","scopes":["openid","email","profile"]}]
+  // Empty/unset ⇒ no SSO providers (password + Feishu flows unchanged).
+  // Malformed JSON fails startup LOUDLY — a silently-disabled SSO provider is
+  // an outage wearing a green healthcheck.
+  SSO_OIDC_PROVIDERS: withDefault(z.string(), ""),
+
   LOG_LEVEL: z.string().optional(),
 
   // Secret-at-rest master passphrase (crypto/index.ts). Required in production
@@ -1020,6 +1034,16 @@ export const config = {
     appId: env.FEISHU_APP_ID,
     appSecret: env.FEISHU_APP_SECRET,
     intl: env.FEISHU_INTL === "true",
+  },
+  auditExport: {
+    // G-S1 signed audit export: base64(PKCS8 ed25519 PEM). Empty disables the
+    // export endpoint (503) — never silently emits an unsigned audit file.
+    signingKey: env.AUDIT_EXPORT_SIGNING_KEY ?? "",
+  },
+  sso: {
+    // G-S1 enterprise SSO: raw JSON, parsed+validated in
+    // modules/auth/sso-providers.ts (fail-loud on malformed config).
+    oidcProvidersRaw: env.SSO_OIDC_PROVIDERS ?? "",
   },
 } as const
 

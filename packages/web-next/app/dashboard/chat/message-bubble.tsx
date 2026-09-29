@@ -2427,8 +2427,8 @@ function ServerToolCallDisplay({ calls }: { calls: ServerToolCall[] }) {
     0
   )
   const summary =
-    `${calls.length} 个工具调用` +
-    (totalResults > 0 ? ` · ${totalResults} 个结果` : "")
+    `Tool calls: ${calls.length}` +
+    (totalResults > 0 ? ` · Results: ${totalResults}` : "")
 
   return (
     <div className="mt-2 border-t border-gray-200 pt-2 dark:border-white/5">
@@ -2489,7 +2489,7 @@ function ServerToolCallDisplay({ calls }: { calls: ServerToolCall[] }) {
                     ))}
                     {links.length > 5 ? (
                       <span className="ml-4 text-[10px] text-muted-foreground/40">
-                        +{links.length - 5} 更多结果
+                        +{links.length - 5} more results
                       </span>
                     ) : null}
                   </div>
@@ -3263,7 +3263,7 @@ export default function MessageBubble({
                     onClick={async () => {
                       await onRetryModelError?.(messageId)
                     }}
-                    aria-label="重试"
+                    aria-label="Retry"
                   >
                     {retryPending ? (
                       <Loader2 className="h-3 w-3 animate-spin" />
@@ -3273,7 +3273,7 @@ export default function MessageBubble({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{retryPending ? "正在重试" : "重试"}</p>
+                  <p>{retryPending ? "Retrying" : "Retry"}</p>
                 </TooltipContent>
               </Tooltip>
             ) : null}

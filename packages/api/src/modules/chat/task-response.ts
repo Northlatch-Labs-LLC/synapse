@@ -4,6 +4,7 @@ import {
   enrichTaskForUser,
   getTaskSummary,
   resolveTaskRequest,
+  TaskResolverTrustLevelError,
   type ResolveTaskRequestParams,
   type ResolveTaskRequestResult,
 } from "../tasks/service.js"
@@ -27,6 +28,7 @@ type TaskResponseErrorBody =
       task: TaskSummary
     }
   | { error: string; code: "task_resolution_failed" }
+  | { error: string; code: "task_resolver_forbidden_trust_level" }
 
 export type ChatTaskResponseResult =
   | { statusCode: 200; body: TaskResponseSuccessBody }
@@ -150,6 +152,17 @@ export async function respondToChatTaskUseCase(
       },
     }
   } catch (error) {
+    if (error instanceof TaskResolverTrustLevelError) {
+      // G-S1 ledger RBAC: trust-level denials are authorization decisions,
+      // not malformed input — surface as 403 so clients can react properly.
+      return {
+        statusCode: 403,
+        body: {
+          error: error.message,
+          code: "task_resolver_forbidden_trust_level",
+        },
+      }
+    }
     return {
       statusCode: 400,
       body: {

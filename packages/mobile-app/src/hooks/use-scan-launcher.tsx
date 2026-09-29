@@ -46,8 +46,8 @@ export function useScanLauncher(
 
       setErrorMessage(
         Platform.OS === "web"
-          ? "浏览器没有授予相机权限。请检查地址栏里的相机权限设置后重试。"
-          : "系统没有授予相机权限，请允许后再试一次。"
+          ? "Camera access was not granted by the browser. Check the camera permission settings in the address bar and try again."
+          : "Camera access was not granted. Please allow it and try again."
       )
     } finally {
       setRequesting(false)

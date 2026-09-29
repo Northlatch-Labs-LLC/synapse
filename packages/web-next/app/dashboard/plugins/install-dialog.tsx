@@ -714,11 +714,12 @@ export default function InstallDialog({
         kind: PLUGIN_INSTALL_STEP_KIND.INTEGRATION_EVENTS,
         titleI18n: {
           en: `Create ${integrationProvider === "github" ? "GitHub" : "GitLab"} Event Sources`,
-          "zh-CN": `创建 ${integrationProvider === "github" ? "GitHub" : "GitLab"} 事件源`,
+          "zh-CN": `Create ${integrationProvider === "github" ? "GitHub" : "GitLab"} Event Sources`,
         },
         descriptionI18n: {
           en: "Optionally create durable automation event sources backed by the platform webhook API.",
-          "zh-CN": "按需创建通过平台官方 webhook API 接入的自动化事件源。",
+          "zh-CN":
+            "Optionally create durable automation event sources backed by the platform webhook API.",
         },
         scope: PLUGIN_INSTALL_STEP_SCOPE.PLUGIN,
         fields: [],
