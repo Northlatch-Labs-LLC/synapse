@@ -100,7 +100,7 @@ export const BillingWebhookResultSchema = z.object({
 export const BillingLimitErrorSchema = z.object({
   error: z.string(),
   code: z.literal("plan_limit_reached"),
-  limit: z.enum(["actors", "members"]),
+  limit: z.enum(BILLING_LIMIT_KIND_VALUES),
   currentPlan: BILLING_PLAN_IDS,
 })
 export type BillingLimitError = z.infer<typeof BillingLimitErrorSchema>
