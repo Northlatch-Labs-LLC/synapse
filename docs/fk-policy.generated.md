@@ -9,11 +9,11 @@
 |---|---|
 | root | 20 |
 | junction | 8 |
-| child | 33 |
+| child | 34 |
 | append-only | 37 |
 | ephemeral | 40 |
 | reference | 13 |
-| **total** | **151** |
+| **total** | **152** |
 
 ## Soft-delete roots (deleted_at) — 20
 
@@ -34,11 +34,11 @@
 
 | target action | count |
 |---|---|
-| RESTRICT | 297 |
+| RESTRICT | 298 |
 | NO ACTION | 0 |
 | SET NULL | 151 |
 | CASCADE | 0 |
-| **total** | **448** |
+| **total** | **449** |
 
 ## FK live integrity distribution
 
@@ -46,9 +46,9 @@
 |---|---|
 | enforce | 130 |
 | historical | 71 |
-| none | 19 |
+| none | 20 |
 | — | 228 |
-| **total** | **448** |
+| **total** | **449** |
 
 ## SET NULL whitelist — 151
 
@@ -657,4 +657,5 @@
 | workspace_resources(created_by_subject_id) | access_subjects(id) | NO ACTION | RESTRICT | — | alter | constraint:fk_workspace_resources_created_by_subject |
 | workspace_resources(owner_subject_id) | access_subjects(id) | NO ACTION | RESTRICT | — | alter | constraint:fk_workspace_resources_owner_subject |
 | workspace_resources(workspace_id) | workspaces(id) | RESTRICT | RESTRICT | enforce | inline | digest:2e0dc0754294bfe5 |
+| workspace_subscriptions(workspace_id) | workspaces(id) | RESTRICT | RESTRICT | none | inline | digest:1467164d10412138 |
 | workspaces(owner_id) | users(id) | RESTRICT | RESTRICT | enforce | inline | digest:98ec713652d94f52 |

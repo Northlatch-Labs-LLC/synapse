@@ -6073,7 +6073,7 @@ CREATE INDEX idx_tool_calls_runtime_tool ON tool_calls(runtime_tool_id);
 -- created lazily by the billing module (absent row = free plan). Stripe ids
 -- are nullable because a workspace can exist before any billing contact.
 CREATE TABLE workspace_subscriptions (
-  workspace_id UUID PRIMARY KEY REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id UUID PRIMARY KEY REFERENCES workspaces(id) ON DELETE RESTRICT,
   plan VARCHAR(16) NOT NULL DEFAULT 'free',
   status VARCHAR(24) NOT NULL DEFAULT 'active',
   stripe_customer_id VARCHAR(64),

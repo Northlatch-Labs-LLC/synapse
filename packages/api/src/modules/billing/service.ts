@@ -21,10 +21,7 @@ import {
   upsertSubscription,
 } from "./repo.js"
 import { createLogger } from "../../infrastructure/logger/index.js"
-import {
-  serializeInstant,
-  serializeOptionalInstant,
-} from "../../infrastructure/datetime.js"
+import { presentSubscription } from "./presenter.js"
 import type {
   BillingPlanId,
   BillingPlansView,
@@ -74,14 +71,6 @@ function env(): BillingEnv {
 
 /** A subscription only grants its plan while active/trialing; anything else
  * (canceled, unpaid, past_due beyond grace) reads as free to the product. */
-function effectivePlan(
-  plan: BillingPlanId,
-  status: BillingSubscriptionStatus
-): BillingPlanId {
-  if (plan === "free") return "free"
-  return status === "active" || status === "trialing" ? plan : "free"
-}
-
 export async function getPlans(workspaceId: string): Promise<BillingPlansView> {
   const row = await getSubscription(workspaceId)
   return {
@@ -103,20 +92,8 @@ export async function getSubscription(
     selectSubscription(workspaceId),
     selectWorkspaceUsage(workspaceId),
   ])
-  const plan = row?.plan ?? "free"
-  const status = row?.status ?? "active"
-  return {
-    workspaceId,
-    plan: effectivePlan(plan, status),
-    status,
-    seatQuantity: row?.seatQuantity ?? 1,
-    currentPeriodStart:
-      serializeOptionalInstant(row?.currentPeriodStart ?? null) ?? null,
-    currentPeriodEnd:
-      serializeOptionalInstant(row?.currentPeriodEnd ?? null) ?? null,
-    cancelAtPeriodEnd: row?.cancelAtPeriodEnd ?? false,
-    usage,
-  }
+  const presented = presentSubscription(row, usage)
+  return { ...presented, workspaceId }
 }
 
 async function requireOwner(workspaceId: string, userId: string) {
@@ -296,7 +273,10 @@ export async function handleWebhook(input: {
       : (planForPriceId(cfg, item.price?.id) ?? existing?.plan ?? "free")
     await upsertSubscription({
       workspaceId,
-      plan: effectivePlan(plan, status),
+      plan:
+        status === "active" || status === "trialing" || plan === "free"
+          ? plan
+          : "free",
       status,
       stripeCustomerId:
         (object.customer as string | undefined) ??
@@ -306,10 +286,10 @@ export async function handleWebhook(input: {
       stripePriceId: deleted ? null : (item.price?.id ?? null),
       seatQuantity: Number(item.quantity ?? 1) || 1,
       currentPeriodStart: item.current_period_start
-        ? serializeInstant(new Date(item.current_period_start * 1000))
+        ? new Date(item.current_period_start * 1000)
         : null,
       currentPeriodEnd: item.current_period_end
-        ? serializeInstant(new Date(item.current_period_end * 1000))
+        ? new Date(item.current_period_end * 1000)
         : null,
       cancelAtPeriodEnd: Boolean(object.cancel_at_period_end),
     })

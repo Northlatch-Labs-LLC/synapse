@@ -4,7 +4,6 @@ import type {
   BillingPlanId,
   BillingSubscriptionStatus,
 } from "@synapse/shared/schemas"
-import type { IsoInstantString } from "@synapse/shared/datetime"
 
 /**
  * Billing persistence. House rule: SQL lives only in repo*.ts files.
@@ -40,8 +39,8 @@ export async function upsertSubscription(
     WorkspaceSubscriptionRow,
     "currentPeriodStart" | "currentPeriodEnd"
   > & {
-    currentPeriodStart: IsoInstantString | null
-    currentPeriodEnd: IsoInstantString | null
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
   }
 ): Promise<void> {
   await db
@@ -54,12 +53,8 @@ export async function upsertSubscription(
       stripeSubscriptionId: input.stripeSubscriptionId,
       stripePriceId: input.stripePriceId,
       seatQuantity: input.seatQuantity,
-      currentPeriodStart: input.currentPeriodStart
-        ? new Date(input.currentPeriodStart)
-        : null,
-      currentPeriodEnd: input.currentPeriodEnd
-        ? new Date(input.currentPeriodEnd)
-        : null,
+      currentPeriodStart: input.currentPeriodStart,
+      currentPeriodEnd: input.currentPeriodEnd,
       cancelAtPeriodEnd: input.cancelAtPeriodEnd,
     })
     .onConflict((oc) =>
@@ -70,12 +65,8 @@ export async function upsertSubscription(
         stripeSubscriptionId: input.stripeSubscriptionId,
         stripePriceId: input.stripePriceId,
         seatQuantity: input.seatQuantity,
-        currentPeriodStart: input.currentPeriodStart
-          ? new Date(input.currentPeriodStart)
-          : null,
-        currentPeriodEnd: input.currentPeriodEnd
-          ? new Date(input.currentPeriodEnd)
-          : null,
+        currentPeriodStart: input.currentPeriodStart,
+        currentPeriodEnd: input.currentPeriodEnd,
         cancelAtPeriodEnd: input.cancelAtPeriodEnd,
       })
     )
@@ -98,7 +89,7 @@ export async function selectWorkspaceOwner(
   { ownerId: string; name: string; ownerEmail: string | null } | undefined
 > {
   const row = await db
-    .selectFrom("workspaces as w")
+    .selectFrom("workspacesLive as w")
     .innerJoin("users as owner", "owner.id", "w.ownerId")
     .select([
       "w.ownerId as ownerId",
@@ -127,7 +118,7 @@ export async function selectWorkspaceUsage(
         WHERE workspace_id = ${workspaceId}
           AND status = 'active'
           AND deleted_at IS NULL)::text AS members,
-      (SELECT COUNT(*) FROM workspace_resources
+      (SELECT COUNT(*) FROM workspace_resources_live
         WHERE workspace_id = ${workspaceId}
           AND kind = 'actor'
           AND status = 'active'

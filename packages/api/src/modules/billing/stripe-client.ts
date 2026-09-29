@@ -133,6 +133,8 @@ export function verifyStripeSignature(input: {
     else if (key === "v1" && value) signatures.push(value)
   }
   if (!timestamp || signatures.length === 0) return false
+  // datetime-ok: injectable verification clock — the default is the webhook's
+  // server receive time, a deliberate "now", not a masked value.
   const age = (input.nowMs ?? Date.now()) - Number(timestamp) * 1000
   if (!Number.isFinite(age) || age < -tolerance || age > tolerance) {
     return false
