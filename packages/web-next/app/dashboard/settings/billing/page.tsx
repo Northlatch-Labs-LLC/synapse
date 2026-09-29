@@ -52,17 +52,17 @@ export default function BillingSettingsPage() {
     } finally {
       setLoading(false)
     }
-  }, [workspaceId])
-
-  useEffect(() => {
-    load()
-    // Re-sync after returning from Stripe checkout/portal redirects.
+    // Clean the Stripe return query param (?checkout=success|cancelled).
     if (
       typeof window !== "undefined" &&
       window.location.search.includes("checkout=")
     ) {
       window.history.replaceState({}, "", window.location.pathname)
     }
+  }, [workspaceId])
+
+  useEffect(() => {
+    void load()
   }, [load])
 
   const startCheckout = async (plan: "pro" | "team") => {
@@ -70,8 +70,10 @@ export default function BillingSettingsPage() {
     setBusy(plan)
     setError(null)
     try {
-      const body: { plan: "pro" | "team"; seats?: number } = { plan }
-      if (plan === "team") body.seats = Math.max(3, parseInt(seats, 10) || 3)
+      const body: { plan: "pro" | "team"; seats?: number } =
+        plan === "team"
+          ? { plan, seats: Math.max(3, parseInt(seats, 10) || 3) }
+          : { plan }
       const { url } = await api.createBillingCheckout(workspaceId, body)
       window.location.href = url
     } catch (err) {
@@ -142,15 +144,15 @@ export default function BillingSettingsPage() {
                 {subscription.usage.actors} agents
               </span>
             </div>
-            {subscription.currentPeriodEnd && (
+            {subscription.currentPeriodEnd ? (
               <div className="flex gap-2">
                 <span className="text-muted-foreground">Renews:</span>
                 <span>
                   {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
                 </span>
               </div>
-            )}
-            {currentPlan !== "free" && (
+            ) : null}
+            {currentPlan !== "free" ? (
               <div className="pt-2">
                 <Button
                   variant="outline"
@@ -163,7 +165,7 @@ export default function BillingSettingsPage() {
                     : "Manage billing (card, invoices, cancel)"}
                 </Button>
               </div>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       ) : null}
@@ -178,7 +180,7 @@ export default function BillingSettingsPage() {
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-base">{plan.displayName}</CardTitle>
-                {isCurrent && <Crown className="h-4 w-4 text-primary" />}
+                {isCurrent ? <Crown className="h-4 w-4 text-primary" /> : null}
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div className="text-2xl font-semibold">{priceLabel(plan)}</div>
