@@ -6,6 +6,7 @@ import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import {
+  CreditCard,
   Bell,
   Bot,
   Brain,
@@ -92,6 +93,11 @@ const modelItems = [
 
 const accessItems = [
   { href: "/dashboard/access", label: "Access", icon: ShieldCheck },
+  {
+    href: "/dashboard/settings/billing",
+    label: "Billing",
+    icon: CreditCard,
+  },
 ]
 
 const emptyWorkspaceNavigation = {
