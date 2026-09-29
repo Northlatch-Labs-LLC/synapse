@@ -7,20 +7,28 @@ import { z } from "zod"
  * "unlimited" so every consumer shares one integer comparison rule.
  */
 
-export const BILLING_PLAN_IDS = z.enum(["free", "pro", "team"])
+export const BILLING_PLANS = ["free", "pro", "team"] as const
+export const BILLING_PLAN_IDS = z.enum(BILLING_PLANS)
 export type BillingPlanId = z.infer<typeof BILLING_PLAN_IDS>
 
-export const BILLING_SUBSCRIPTION_STATUSES = z.enum([
+export const BILLING_SUBSCRIPTION_STATUS_VALUES = [
   "active",
   "trialing",
   "past_due",
   "canceled",
   "incomplete",
   "unpaid",
-])
+] as const
+export const BILLING_SUBSCRIPTION_STATUSES = z.enum(
+  BILLING_SUBSCRIPTION_STATUS_VALUES
+)
 export type BillingSubscriptionStatus = z.infer<
   typeof BILLING_SUBSCRIPTION_STATUSES
 >
+
+export const BILLING_PAID_PLAN_VALUES = ["pro", "team"] as const
+export const BILLING_MODELS_TIER_VALUES = ["auto", "all"] as const
+export const BILLING_LIMIT_KIND_VALUES = ["members", "actors"] as const
 
 export const BillingPlanViewSchema = z.object({
   plan: BILLING_PLAN_IDS,
@@ -32,7 +40,7 @@ export const BillingPlanViewSchema = z.object({
   /** -1 means unlimited. */
   maxActors: z.number().int().min(-1),
   maxMembers: z.number().int().min(-1),
-  modelsTier: z.enum(["auto", "all"]),
+  modelsTier: z.enum(BILLING_MODELS_TIER_VALUES),
 })
 export type BillingPlanView = z.infer<typeof BillingPlanViewSchema>
 
@@ -67,7 +75,7 @@ export type BillingSubscriptionView = z.infer<
 
 /** POST /workspaces/:id/billing/checkout */
 export const BillingCheckoutInputSchema = z.strictObject({
-  plan: z.enum(["pro", "team"]),
+  plan: z.enum(BILLING_PAID_PLAN_VALUES),
   /** Seat count for team (min 3). Ignored for pro. */
   seats: z.number().int().min(3).max(500).optional(),
 })
