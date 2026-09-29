@@ -116,8 +116,7 @@ export async function selectWorkspaceUsage(
     SELECT
       (SELECT COUNT(*) FROM workspace_members
         WHERE workspace_id = ${workspaceId}
-          AND status = 'active'
-          AND deleted_at IS NULL)::text AS members,
+          AND status = 'active')::text AS members,
       (SELECT COUNT(*) FROM workspace_resources_live
         WHERE workspace_id = ${workspaceId}
           AND kind = 'actor'
