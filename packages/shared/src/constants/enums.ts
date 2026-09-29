@@ -967,6 +967,22 @@ export const TRANSPORT_KINDS = [
   "whatsapp",
   "whatsapp_unofficial",
 ] as const
+
+/**
+ * West-first product surface (founder order 2026-09-29): only western-facing
+ * transports are offered on the product surface. Chinese-market kinds remain
+ * in TRANSPORT_KINDS for wire compatibility with legacy rows, but are not
+ * selectable/connectable while the west-first gate is on.
+ */
+export const WESTERN_TRANSPORT_KINDS = [
+  "telegram",
+  "whatsapp",
+  "whatsapp_unofficial",
+] as const
+export type WesternTransportKind = (typeof WESTERN_TRANSPORT_KINDS)[number]
+
+/** The kinds the product currently offers (west-first default). */
+export const PRODUCT_TRANSPORT_KINDS = WESTERN_TRANSPORT_KINDS
 export const TRANSPORT_CONNECTION_MODES = [
   "webhook",
   "long_connection",

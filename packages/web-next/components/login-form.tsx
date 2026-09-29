@@ -13,7 +13,7 @@ import { normalizeRedirectTarget } from "@/lib/auth"
 import { resolveDestination } from "@/lib/post-login"
 import { useAuthStore } from "@/stores/auth-store"
 import { AuthShell } from "@/components/auth-shell"
-import { FeishuSignInButton } from "@/components/feishu-sign-in-button"
+import { WhatsAppSignInPanel } from "@/components/whatsapp-sign-in-panel"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -132,7 +132,7 @@ export function LoginForm() {
             <form method="post" onSubmit={onSubmit} noValidate>
               <FieldGroup>
                 <Field>
-                  <FeishuSignInButton
+                  <WhatsAppSignInPanel
                     actionLabel="Sign in"
                     redirect={redirect}
                     disabled={isSubmitting}

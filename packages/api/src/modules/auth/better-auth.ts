@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth"
-import { bearer, genericOAuth } from "better-auth/plugins"
+import { bearer, genericOAuth, phoneNumber } from "better-auth/plugins"
 import { deviceAuthorization } from "better-auth/plugins"
+import { randomBytes } from "node:crypto"
 import { getOAuth2Tokens } from "better-auth/oauth2"
 import { expo } from "@better-auth/expo"
 import { config } from "../../config/index.js"
@@ -554,6 +555,65 @@ export const auth = betterAuth({
           }),
         ]
       : []),
+
+    // West-first default sign-in (founder order 2026-09-29): WhatsApp OTP.
+    // Delivery via the WhatsApp Cloud API; the Meta business token + phone
+    // number id arrive as env. Fail loud when unconfigured — never fall back
+    // to a silent channel.
+    phoneNumber({
+      otpLength: 6,
+      sendOTP: async ({ phoneNumber: dest, code }) => {
+        const token = config.whatsapp.cloudToken
+        const phoneId = config.whatsapp.cloudPhoneNumberId
+        if (!token || !phoneId) {
+          throw new Error(
+            "WhatsApp sign-in is not configured on this deployment (WHATSAPP_CLOUD_TOKEN / WHATSAPP_CLOUD_PHONE_NUMBER_ID missing)"
+          )
+        }
+        const to = dest.replace(/[^0-9]/g, "")
+        const template = config.whatsapp.otpTemplate
+        const message = template
+          ? {
+              messaging_product: "whatsapp",
+              to,
+              type: "template",
+              template: {
+                name: template,
+                language: { code: "en" },
+                components: [
+                  { type: "body", parameters: [{ type: "text", text: code }] },
+                ],
+              },
+            }
+          : {
+              messaging_product: "whatsapp",
+              to,
+              type: "text",
+              text: { body: `Your Synapse verification code is ${code}` },
+            }
+        const res = await fetch(
+          `https://graph.facebook.com/v21.0/${phoneId}/messages`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+          }
+        )
+        if (!res.ok) {
+          log.error({ status: res.status }, "whatsapp otp delivery failed")
+          throw new Error("WhatsApp OTP delivery failed")
+        }
+        log.info({ to: dest }, "whatsapp otp sent")
+      },
+      signUpOnVerification: {
+        getTempEmail: (dest: string) =>
+          `${dest.replace(/[^0-9]/g, "")}@whatsapp.local`,
+        getTempName: (dest: string) => `WhatsApp user ${dest.slice(-4)}`,
+      },
+    }),
   ],
 })
 

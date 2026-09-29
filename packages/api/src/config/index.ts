@@ -280,6 +280,10 @@ const envObjectSchema = z.object({
 
   // ===== Feishu / Lark OAuth (genericOAuth provider) =====
   FEISHU_APP_ID: withDefault(z.string(), ""),
+  WHATSAPP_CLOUD_TOKEN: withDefault(z.string(), ""),
+  WHATSAPP_CLOUD_PHONE_NUMBER_ID: withDefault(z.string(), ""),
+  WHATSAPP_OTP_TEMPLATE: withDefault(z.string(), "synapse_otp"),
+  IM_WESTERN_ONLY: withDefault(z.string(), "true"),
   FEISHU_APP_SECRET: withDefault(z.string(), ""),
   // "true" => Lark international (open.larksuite.com); else Feishu (open.feishu.cn).
   FEISHU_INTL: z.string().optional(),
@@ -888,6 +892,7 @@ export const config = {
   },
   im: {
     runtimeManagerEnabled: env.IM_RUNTIME_MANAGER_ENABLED !== "false",
+    westernOnly: env.IM_WESTERN_ONLY !== "false",
   },
   skills: {
     import: {
@@ -1034,6 +1039,11 @@ export const config = {
     appId: env.FEISHU_APP_ID,
     appSecret: env.FEISHU_APP_SECRET,
     intl: env.FEISHU_INTL === "true",
+  },
+  whatsapp: {
+    cloudToken: env.WHATSAPP_CLOUD_TOKEN,
+    cloudPhoneNumberId: env.WHATSAPP_CLOUD_PHONE_NUMBER_ID,
+    otpTemplate: env.WHATSAPP_OTP_TEMPLATE,
   },
   auditExport: {
     // G-S1 signed audit export: base64(PKCS8 ed25519 PEM). Empty disables the

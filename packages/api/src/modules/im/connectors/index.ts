@@ -19,9 +19,20 @@ import type {
   TransportKind,
 } from "@synapse/shared/types"
 import { listConnectors, tryGetConnector } from "./registry.js"
+import { config } from "../../../config/index.js"
+import { WESTERN_TRANSPORT_KINDS } from "@synapse/shared"
+
+function applyWestFirstGate(
+  capabilities: TransportConnectorCapability[]
+): TransportConnectorCapability[] {
+  if (!config.im.westernOnly) return capabilities
+  return capabilities.filter((c) =>
+    (WESTERN_TRANSPORT_KINDS as readonly string[]).includes(c.transportKind)
+  )
+}
 
 export function listTransportConnectorCapabilities(): TransportConnectorCapability[] {
-  return listConnectors().map((c) => c.capability)
+  return applyWestFirstGate(listConnectors().map((c) => c.capability))
 }
 
 export function getTransportConnectorCapability(

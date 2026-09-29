@@ -1,5 +1,6 @@
 import { z } from "zod"
 import {
+  PRODUCT_TRANSPORT_KINDS,
   TRANSPORT_KINDS,
   TRANSPORT_CONNECTION_MODES,
   TRANSPORT_ENDPOINT_TYPES,
@@ -38,6 +39,10 @@ import { WorkspaceMemberViewSchema } from "./workspace.js"
 // ─────────────────────────── interior summary shapes ─────────────────────────
 
 const transportKindSchema = z.enum(TRANSPORT_KINDS)
+// West-first gate (founder order 2026-09-29): NEW accounts can only bind
+// western-facing transports. Summary/view schemas keep the full TRANSPORT_KINDS
+// enum so legacy rows still parse.
+const transportKindInputSchema = z.enum(PRODUCT_TRANSPORT_KINDS)
 const jsonRecordSchema = z.record(z.string(), z.unknown())
 
 /** Connector capability descriptor (connectors registry → metadata API). */
@@ -533,7 +538,9 @@ export function validateTransportConversationInboundActorUpdateInput(
 
 export const TransportAccountCreateInputSchema = z
   .strictObject({
-    transportKind: z.enum(TRANSPORT_KINDS),
+    // West-first gate: new accounts bind western transports only (founder
+    // order 2026-09-29). Legacy rows still read via the summary schemas.
+    transportKind: z.enum(PRODUCT_TRANSPORT_KINDS),
     accountKey: z.string().trim().min(1).max(120),
     displayName: z.string().trim().min(1).max(255),
     connectionMode: z.enum(TRANSPORT_CONNECTION_MODES),
