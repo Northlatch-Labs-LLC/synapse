@@ -37,6 +37,7 @@ import {
   presentGrantRequest,
   presentWorkspaceResource,
 } from "./presenter.js"
+import { PlanLimitReachedError, enforcePlanLimit } from "../billing/service.js"
 import { appRoute } from "../../infrastructure/http/route.js"
 import {
   WorkspaceResourceGrantTargetSchema,
@@ -140,6 +141,9 @@ export function registerWorkspaceResourceRoutes(app: FastifyInstance) {
       const { workspaceId } = request.params as { workspaceId: string }
       try {
         const body = createWorkspaceResourceSchema.parse(request.body)
+        if (body.kind === WORKSPACE_RESOURCE_KIND.ACTOR) {
+          await enforcePlanLimit(workspaceId, "actors")
+        }
         const createAction = (() => {
           switch (body.kind) {
             case WORKSPACE_RESOURCE_KIND.ACTOR:
@@ -178,6 +182,15 @@ export function registerWorkspaceResourceRoutes(app: FastifyInstance) {
         reply.status(201)
         return { resource: presentWorkspaceResource(resource) }
       } catch (error) {
+        if (error instanceof PlanLimitReachedError) {
+          reply.status(402).send({
+            error: error.message,
+            code: "plan_limit_reached",
+            limit: "actors",
+            currentPlan: error.currentPlan,
+          })
+          return
+        }
         handleError(reply, error)
       }
     }

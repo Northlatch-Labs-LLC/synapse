@@ -2410,12 +2410,6 @@ export interface SandboxesLive {
   workspaceId: string | null;
 }
 
-export interface SchemaMigrations {
-  appliedAt: Generated<Date>;
-  description: Generated<string>;
-  version: string;
-}
-
 export interface Session {
   createdAt: Generated<Date>;
   expiresAt: Date;
@@ -3127,6 +3121,21 @@ export interface WorkspacesLive {
   updatedAt: Date | null;
 }
 
+export interface WorkspaceSubscriptions {
+  cancelAtPeriodEnd: Generated<boolean>;
+  createdAt: Generated<Date>;
+  currentPeriodEnd: Date | null;
+  currentPeriodStart: Date | null;
+  plan: Generated<string>;
+  seatQuantity: Generated<number>;
+  status: Generated<string>;
+  stripeCustomerId: string | null;
+  stripePriceId: string | null;
+  stripeSubscriptionId: string | null;
+  updatedAt: Generated<Date>;
+  workspaceId: string;
+}
+
 export interface DB {
   accessSubjects: AccessSubjects;
   account: Account;
@@ -3268,7 +3277,6 @@ export interface DB {
   runtimeToolsLive: RuntimeToolsLive;
   sandboxes: Sandboxes;
   sandboxesLive: SandboxesLive;
-  schemaMigrations: SchemaMigrations;
   session: Session;
   sessionContextStates: SessionContextStates;
   sessionInterrupts: SessionInterrupts;
@@ -3320,4 +3328,5 @@ export interface DB {
   workspaceResourcesLive: WorkspaceResourcesLive;
   workspaces: Workspaces;
   workspacesLive: WorkspacesLive;
+  workspaceSubscriptions: WorkspaceSubscriptions;
 }
