@@ -260,6 +260,9 @@ CREATE TABLE users (
   email VARCHAR(255) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
   email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  -- better-auth phoneNumber plugin (west-first WhatsApp OTP sign-in)
+  phone_number VARCHAR(64) UNIQUE,
+  phone_number_verified BOOLEAN NOT NULL DEFAULT FALSE,
   -- BA core `image` (avatar URL from OAuth providers). Kept separate from
   -- avatar_file_id (Synapse's generated-avatar file id) on purpose: URL vs UUID.
   image TEXT,
