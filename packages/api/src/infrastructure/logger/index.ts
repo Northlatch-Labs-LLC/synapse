@@ -40,6 +40,7 @@ export const LOG_DOMAINS = [
   "automation",
   "avatar",
   "capabilities",
+  "billing",
   "chat",
   "context",
   "devices",
@@ -195,6 +196,7 @@ const SCOPE_TO_DOMAIN: Readonly<Record<string, DomainScope>> = {
   "transcription.whisper": { domain: "transcription", component: "whisper" },
   "worker.job-tracing": { domain: "infra", component: "worker.job-tracing" },
   workspace: { domain: "workspace" },
+  billing: { domain: "billing" },
 }
 
 /**

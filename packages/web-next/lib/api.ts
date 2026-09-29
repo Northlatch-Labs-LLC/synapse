@@ -4,6 +4,10 @@ import {
   WORKSPACE_RESOURCE_KIND,
 } from "@synapse/shared"
 import type {
+  BillingPlansView,
+  BillingSubscriptionView,
+} from "@synapse/shared/schemas"
+import type {
   DeviceListView,
   DeviceDetailView,
   RuntimeServiceView,
@@ -969,6 +973,30 @@ class ApiClient {
     const res = await this.fetch(`/workspaces/${wsId}/invites`, {
       method: "POST",
       body: JSON.stringify(data),
+    })
+    return res.data
+  }
+  async getBillingPlans(wsId: string): Promise<BillingPlansView> {
+    const res = await this.fetch(`/workspaces/${wsId}/billing/plans`)
+    return res.data
+  }
+  async getBillingSubscription(wsId: string): Promise<BillingSubscriptionView> {
+    const res = await this.fetch(`/workspaces/${wsId}/billing/subscription`)
+    return res.data
+  }
+  async createBillingCheckout(
+    wsId: string,
+    body: { plan: "pro" | "team"; seats?: number }
+  ): Promise<{ url: string }> {
+    const res = await this.fetch(`/workspaces/${wsId}/billing/checkout`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    })
+    return res.data
+  }
+  async createBillingPortal(wsId: string): Promise<{ url: string }> {
+    const res = await this.fetch(`/workspaces/${wsId}/billing/portal`, {
+      method: "POST",
     })
     return res.data
   }

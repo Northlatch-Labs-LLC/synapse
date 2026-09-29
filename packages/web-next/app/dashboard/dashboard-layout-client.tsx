@@ -13,6 +13,7 @@ import { SiteHeader } from "@/components/site-header"
 import {
   Bot,
   ContactRound,
+  CreditCard,
   MessageSquare,
   Brain,
   House,
@@ -39,6 +40,7 @@ const navItems = [
   { href: "/settings/models", label: "Model Groups", icon: Cpu },
   { href: "/settings/models/actors", label: "Actor Assignment", icon: Bot },
   { href: "/dashboard/access", label: "Access", icon: ShieldCheck },
+  { href: "/dashboard/settings/billing", label: "Billing", icon: CreditCard },
 ]
 
 function OnboardingGuard({ children }: { children: ReactNode }) {

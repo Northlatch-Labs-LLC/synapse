@@ -6069,6 +6069,31 @@ ALTER TABLE tool_calls
 CREATE INDEX idx_tool_calls_plugin_installation ON tool_calls(plugin_installation_id);
 CREATE INDEX idx_tool_calls_runtime_tool ON tool_calls(runtime_tool_id);
 
+-- In-app billing (docs/PLAN-billing.md): one subscription row per workspace,
+-- created lazily by the billing module (absent row = free plan). Stripe ids
+-- are nullable because a workspace can exist before any billing contact.
+CREATE TABLE workspace_subscriptions (
+  workspace_id UUID PRIMARY KEY REFERENCES workspaces(id) ON DELETE RESTRICT,
+  plan VARCHAR(16) NOT NULL DEFAULT 'free',
+  status VARCHAR(24) NOT NULL DEFAULT 'active',
+  stripe_customer_id VARCHAR(64),
+  stripe_subscription_id VARCHAR(64),
+  stripe_price_id VARCHAR(64),
+  seat_quantity INT NOT NULL DEFAULT 1,
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT ck_workspace_subscriptions_plan CHECK (plan IN ('free', 'pro', 'team')),
+  CONSTRAINT ck_workspace_subscriptions_status CHECK (
+    status IN ('active', 'trialing', 'past_due', 'canceled', 'incomplete', 'unpaid')
+  )
+);
+
+CREATE INDEX idx_workspace_subscriptions_customer ON workspace_subscriptions(stripe_customer_id)
+  WHERE stripe_customer_id IS NOT NULL;
+
 -- 7) `updated_at` is database-owned. Application code may still set it
 --    redundantly, but correctness must not depend on every write path
 --    remembering to do so. Install one generic trigger on every public base
