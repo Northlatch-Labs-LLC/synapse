@@ -1265,6 +1265,9 @@ export async function listMarketplaceRows(filters?: {
 }) {
   const values: unknown[] = []
   const conditions: string[] = []
+  // Deactivated catalog items are hidden from the marketplace list (founder
+  // order: no Chinese-market skills visible). Detail fetches keep working.
+  conditions.push(`item.is_active = TRUE`)
 
   if (filters?.search?.trim()) {
     values.push(`%${filters.search.trim()}%`)

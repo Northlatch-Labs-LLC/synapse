@@ -57,6 +57,35 @@ export default function ChatPage() {
     selectConversation(conversationParam)
   }, [conversationParam, conversations, selectConversation])
 
+  // First-message handoff from the dashboard home composer: the home page
+  // stashes the composed message here before navigating (it cannot send it
+  // itself — the chat store is not bootstrapped there). Send once the
+  // conversation is selected and realtime has a client instance.
+  useEffect(() => {
+    if (!workspaceId || !conversationParam || !clientInstanceId) return
+    const raw = window.sessionStorage.getItem("synappse:pending-first-message")
+    if (!raw) return
+    let pending: { conversationId: string; contentBlocks: unknown[] } | null =
+      null
+    try {
+      pending = JSON.parse(raw)
+    } catch {
+      window.sessionStorage.removeItem("synappse:pending-first-message")
+      return
+    }
+    if (!pending || pending.conversationId !== conversationParam) return
+    window.sessionStorage.removeItem("synappse:pending-first-message")
+    const store = useChatStore.getState()
+    void store
+      .sendMessage(workspaceId, conversationParam, {
+        contentBlocks:
+          pending.contentBlocks as ChatComposerSubmitPayload["contentBlocks"],
+      })
+      .catch((err) =>
+        clientLog.error("Failed to send handed-off message:", err)
+      )
+  }, [workspaceId, conversationParam, clientInstanceId])
+
   useEffect(() => {
     setVisibleConversation(selectedConversationId)
     return () => {

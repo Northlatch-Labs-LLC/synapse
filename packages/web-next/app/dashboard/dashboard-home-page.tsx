@@ -268,6 +268,20 @@ export default function DashboardHomePage() {
     setPickerOpen(false)
     setLaunchActor(nextLaunchActor)
     setComposerResetSignal((currentValue) => currentValue + 1)
+    // Hand the first message to the chat page: it sends after the
+    // conversation opens (the payload previously died in local state and the
+    // message was lost — founder bug report 2026-09-30).
+    try {
+      window.sessionStorage.setItem(
+        "synappse:pending-first-message",
+        JSON.stringify({
+          conversationId,
+          contentBlocks: launchPayload.contentBlocks,
+        })
+      )
+    } catch {
+      // storage unavailable — the message would be lost, but do not block nav
+    }
     startTransition(() => {
       router.push(`/dashboard/chat?conversation=${conversationId}`)
     })
