@@ -18,7 +18,7 @@ import { useSession } from "@/providers/session-provider"
 import { theme } from "@/theme/tokens"
 
 function getErrorMessage(error: unknown) {
-  return getAuthErrorMessage(error, "无法读取二维码登录请求。")
+  return getAuthErrorMessage(error, "Could not read the QR sign-in request.")
 }
 
 type DeviceStatus = "claiming" | "pending" | "approved" | "denied" | "error"
@@ -35,7 +35,7 @@ export default function QrLoginScreen() {
 
   useEffect(() => {
     if (!userCode) {
-      setError("缺少设备登录验证码。")
+      setError("Missing device sign-in code.")
       setStatus("error")
       return
     }
@@ -116,19 +116,21 @@ export default function QrLoginScreen() {
     <ScreenScroll bottomPadding={32}>
       <SectionHeader
         eyebrow="Verification"
-        title="确认 Web 登录"
-        subtitle="确认这次桌面端登录请求是否由你本人发起。请核对验证码与电脑屏幕上显示的一致。"
+        title="Confirm web sign-in"
+        subtitle="Confirm this desktop sign-in request was started by you. Check that the code matches what is shown on your computer screen."
       />
 
       {status === "claiming" ? (
         <Card>
-          <LoadingBlock label="正在读取登录请求..." />
+          <LoadingBlock label="Reading the sign-in request..." />
         </Card>
       ) : status === "error" ? (
         <EmptyState
           icon="shield-off"
-          title="无法确认这个登录"
-          description={error || "设备登录请求不存在或已经失效。"}
+          title="Can't confirm this sign-in"
+          description={
+            error || "The device sign-in request does not exist or has expired."
+          }
         />
       ) : (
         <Card style={styles.confirmCard}>
@@ -149,33 +151,33 @@ export default function QrLoginScreen() {
             <View style={styles.headlineText}>
               <Text style={styles.title}>
                 {status === "pending"
-                  ? "桌面端正在等待你的确认"
+                  ? "Your desktop is waiting for your confirmation"
                   : status === "approved"
-                    ? "这次 Web 登录已批准"
-                    : "这次 Web 登录已拒绝"}
+                    ? "This web sign-in is approved"
+                    : "This web sign-in was denied"}
               </Text>
               <Text style={styles.subtitle}>
                 {status === "pending"
-                  ? "请核对下方验证码与电脑上显示的一致，再批准登录。"
-                  : "如果这是你本人操作，现在可以回到电脑继续使用。"}
+                  ? "Check that the code below matches the one on your computer before approving."
+                  : "If this was you, you can return to your computer to continue."}
               </Text>
             </View>
           </View>
 
           <View style={styles.metaGrid}>
-            <MetaRow label="验证码" value={userCode ?? "-"} />
+            <MetaRow label="Code" value={userCode ?? "-"} />
             <MetaRow
-              label="当前账号"
-              value={user?.name || user?.email || "当前账号"}
+              label="Account"
+              value={user?.name || user?.email || "Current account"}
             />
             <MetaRow
-              label="状态"
+              label="Status"
               value={
                 status === "pending"
-                  ? "待确认"
+                  ? "Pending"
                   : status === "approved"
-                    ? "已批准"
-                    : "已拒绝"
+                    ? "Approved"
+                    : "Denied"
               }
             />
           </View>
@@ -185,13 +187,15 @@ export default function QrLoginScreen() {
           {status === "pending" ? (
             <View style={styles.actions}>
               <Button
-                label={action === "approve" ? "批准中..." : "批准登录"}
+                label={
+                  action === "approve" ? "Approving..." : "Approve sign-in"
+                }
                 icon="shield"
                 onPress={() => void handleApprove()}
                 disabled={action !== null}
               />
               <Button
-                label={action === "deny" ? "拒绝中..." : "拒绝此次登录"}
+                label={action === "deny" ? "Denying..." : "Deny this sign-in"}
                 variant="ghost"
                 icon="x"
                 onPress={() => void handleReject()}

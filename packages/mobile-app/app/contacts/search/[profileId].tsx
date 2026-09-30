@@ -24,13 +24,13 @@ type SearchState =
 function statusLabel(state: SearchState) {
   switch (state) {
     case IDENTITY_SEARCH_MATCH_STATE.SAME_WORKSPACE_MEMBER:
-      return "同 workspace 用户"
+      return "Same workspace member"
     case IDENTITY_SEARCH_MATCH_STATE.FRIEND:
-      return "已是好友"
+      return "Already friends"
     case IDENTITY_SEARCH_MATCH_STATE.PENDING_REQUEST:
-      return "好友申请待处理"
+      return "Friend request pending"
     default:
-      return "可发起好友申请"
+      return "Can send friend request"
   }
 }
 
@@ -75,15 +75,19 @@ export default function SearchContactDetailScreen() {
 
       setMessage(
         result.outcome === "friend_request_created"
-          ? "好友申请已发出。"
+          ? "Friend request sent."
           : result.outcome === "friend_request_pending"
-            ? "好友申请正在等待处理。"
+            ? "Friend request is waiting to be handled."
             : result.outcome === "friend_active"
-              ? "已经是好友了。"
-              : "操作已提交。"
+              ? "You are already friends."
+              : "Request submitted."
       )
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "发起好友申请失败。")
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to send the friend request."
+      )
     } finally {
       setSubmitting(false)
     }
@@ -96,7 +100,7 @@ export default function SearchContactDetailScreen() {
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
-          联系人详情
+          Contact details
         </Text>
         <View style={styles.headerSpacer} />
       </View>
@@ -104,25 +108,27 @@ export default function SearchContactDetailScreen() {
       <SectionBlock>
         <View style={styles.heroRow}>
           <Avatar
-            name={params.title || "用户"}
+            name={params.title || "User"}
             uri={params.avatarUrl}
             size={68}
             icon="user"
           />
           <View style={styles.heroBody}>
-            <Text style={styles.heroTitle}>{params.title || "未命名用户"}</Text>
+            <Text style={styles.heroTitle}>
+              {params.title || "Unnamed user"}
+            </Text>
             <Text style={styles.heroSubtitle}>
-              {params.subtitle || params.workspaceName || "外部用户"}
+              {params.subtitle || params.workspaceName || "External user"}
             </Text>
           </View>
         </View>
         <Button
           label={
             state === IDENTITY_SEARCH_MATCH_STATE.PENDING_REQUEST
-              ? "等待处理"
+              ? "Waiting"
               : submitting
-                ? "提交中..."
-                : "加好友"
+                ? "Submitting..."
+                : "Add friend"
           }
           icon="user-plus"
           onPress={() => void handleRequestFriend()}
@@ -134,16 +140,16 @@ export default function SearchContactDetailScreen() {
       </SectionBlock>
 
       <SectionBlock>
-        <SectionTitleRow title="基础信息" />
+        <SectionTitleRow title="Basics" />
         <View style={styles.metaCard}>
           <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>状态</Text>
+            <Text style={styles.metaLabel}>Status</Text>
             <Text style={styles.metaValue}>{statusLabel(state)}</Text>
           </View>
           <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>来源工作区</Text>
+            <Text style={styles.metaLabel}>Workspace</Text>
             <Text style={styles.metaValue}>
-              {params.workspaceName || "未知工作区"}
+              {params.workspaceName || "Unknown workspace"}
             </Text>
           </View>
           {params.workspaceSlug ? (

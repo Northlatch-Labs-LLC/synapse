@@ -23,18 +23,18 @@ import type { RelationshipScanResponse } from "@/types/api"
 function getRelationshipHint(result: RelationshipScanResponse) {
   switch (result.outcome) {
     case RELATIONSHIP_SCAN_OUTCOME.FRIEND_REQUEST_CREATED:
-      return "好友申请已发出，等待对方处理。"
+      return "Friend request sent. Waiting for them to respond."
     case RELATIONSHIP_SCAN_OUTCOME.FRIEND_REQUEST_PENDING:
-      return "你已经发过好友申请了，等待对方处理。"
+      return "You already sent a friend request. Waiting for them to respond."
     case RELATIONSHIP_SCAN_OUTCOME.ACTOR_ACCESS_REQUEST_CREATED:
-      return "已提交 Actor 访问申请，等待批准。"
+      return "Actor access request submitted. Waiting for approval."
     case RELATIONSHIP_SCAN_OUTCOME.ACTOR_ACCESS_PENDING:
     case RELATIONSHIP_SCAN_OUTCOME.REMOTE_AGENT_ACCESS_PENDING:
-      return "你已经提交过 Actor 访问申请了。"
+      return "You have already submitted an Actor access request."
     case RELATIONSHIP_SCAN_OUTCOME.REMOTE_AGENT_ACCESS_REQUEST_CREATED:
-      return "已提交 Remote agent 访问申请，等待批准。"
+      return "Remote agent access request submitted. Waiting for approval."
     default:
-      return "二维码已识别，但当前没有可直接打开的会话。"
+      return "QR code recognized, but there is no conversation to open right now."
   }
 }
 
@@ -72,7 +72,7 @@ export default function UnifiedScanScreen() {
     }
 
     if (result.outcome === RELATIONSHIP_SCAN_OUTCOME.SELF_SCAN) {
-      setError("不能扫描自己的二维码。")
+      setError("You can't scan your own QR code.")
       return
     }
 
@@ -81,7 +81,9 @@ export default function UnifiedScanScreen() {
 
   async function handleRelationshipToken(token: string) {
     if (!workspaceId) {
-      throw new Error("当前没有可用 workspace，无法处理联系人二维码。")
+      throw new Error(
+        "No workspace available, so the contact QR code can't be processed."
+      )
     }
     const result = await api.scanRelationshipQr(workspaceId, token)
     await handleRelationshipResult(result)
@@ -110,7 +112,7 @@ export default function UnifiedScanScreen() {
       setError(
         nextError instanceof Error
           ? nextError.message
-          : "扫码失败，请稍后重试。"
+          : "Scan failed. Please try again later."
       )
     } finally {
       setLocked(false)
@@ -141,7 +143,7 @@ export default function UnifiedScanScreen() {
 
     const parsed = parseSynapseQrPayload(payload.data)
     if (!parsed) {
-      setError("这个二维码不是 Synappse 的登录或联系人二维码。")
+      setError("This QR code is not a Synappse sign-in or contact code.")
       return
     }
 
@@ -169,25 +171,25 @@ export default function UnifiedScanScreen() {
     <ScreenScroll bottomPadding={32}>
       <SectionHeader
         eyebrow="Unified Scan"
-        title="扫码"
+        title="Scan"
         subtitle={
           intent === "login"
-            ? "同一个入口同时支持 Web 登录二维码和联系人二维码。扫描到登录请求会直接进入确认。"
+            ? "One scanner for both web sign-in and contact QR codes. A sign-in request goes straight to confirmation."
             : intent === "relationship"
-              ? "同一个入口同时支持联系人二维码和 Web 登录二维码。扫描到联系人二维码会按当前 workspace 自动处理。"
-              : `同一个扫码入口支持 Web 登录和联系人添加。当前 workspace：${workspaceName || "未选择"}.`
+              ? "One scanner for both contact and web sign-in QR codes. A contact code is handled automatically for the current workspace."
+              : `One scanner for web sign-in and adding contacts. Current workspace: ${workspaceName || "None"}.`
         }
       />
 
       {!hasPermission ? (
         <EmptyState
           icon="camera"
-          title="需要相机权限"
-          description="允许访问相机后，才能扫描 Synappse 的登录或联系人二维码。"
+          title="Camera permission needed"
+          description="Allow camera access to scan Synappse sign-in or contact QR codes."
           action={
             <View style={styles.permissionAction}>
               <Button
-                label="授权相机"
+                label="Grant camera access"
                 icon="camera"
                 onPress={() => void requestPermission()}
               />
@@ -210,8 +212,8 @@ export default function UnifiedScanScreen() {
             </View>
           </View>
           <Text style={styles.cameraHint}>
-            扫到 Web
-            登录请求会进入确认页；扫到联系人二维码会自动打开私聊或发起申请。
+            A web sign-in request opens the confirmation page; a contact QR code
+            opens the chat or sends a request automatically.
           </Text>
           {error ? <Text style={styles.error}>{error}</Text> : null}
           {hint ? <Text style={styles.hint}>{hint}</Text> : null}
@@ -223,10 +225,10 @@ export default function UnifiedScanScreen() {
               }}
               style={styles.retryLink}
             >
-              <Text style={styles.retryLinkText}>继续扫描</Text>
+              <Text style={styles.retryLinkText}>Keep scanning</Text>
             </Pressable>
             <Button
-              label="查看申请"
+              label="View requests"
               icon="inbox"
               variant="secondary"
               onPress={() => router.push("/contacts/requests")}

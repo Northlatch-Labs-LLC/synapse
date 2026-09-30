@@ -6,16 +6,14 @@ import { Pressable, StyleSheet, Text, View } from "react-native"
 
 import { EmailField } from "@/components/email-field"
 import { Button, Field, ScreenScroll } from "@/components/ui"
-import { getAuthClient } from "@/lib/auth-client"
 import { getAuthErrorMessage } from "@/lib/auth-errors"
-import { assertAuthConfigured } from "@/lib/config"
 import { useSession } from "@/providers/session-provider"
 import { theme } from "@/theme/tokens"
 import { APP_NAME } from "@shared"
 
 export default function LoginScreen() {
   const router = useRouter()
-  const { signIn, verifyOAuthSession, clearLocalSessionForOAuth } = useSession()
+  const { signIn } = useSession()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [acceptedPolicy, setAcceptedPolicy] = useState(false)
@@ -24,12 +22,12 @@ export default function LoginScreen() {
 
   async function handleLogin() {
     if (!email.trim() || !password) {
-      setError("请输入账号和密码。")
+      setError("Enter your email and password.")
       return
     }
 
     if (!acceptedPolicy) {
-      setError("请先勾选隐私政策与用户协议。")
+      setError("Please accept the Terms of Service and Privacy Policy first.")
       return
     }
 
@@ -41,60 +39,6 @@ export default function LoginScreen() {
       router.replace("/")
     } catch (nextError) {
       setError(getAuthErrorMessage(nextError))
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  async function handleFeishuLogin() {
-    if (!acceptedPolicy) {
-      setError("请先勾选隐私政策与用户协议。")
-      return
-    }
-    setSubmitting(true)
-    setError(null)
-    try {
-      // Fail loud before opening the browser: an unset/malformed API or
-      // AUTH_ORIGIN must surface as a config error here, not silently redirect
-      // through better-auth's fallback origin.
-      assertAuthConfigured()
-      // Clear any leftover local session first, so a stale token from a prior
-      // login can't make verifyOAuthSession() below report success after the
-      // user actually cancelled this flow.
-      await clearLocalSessionForOAuth()
-      // Native: opens the system browser and returns via the app scheme deep
-      // link. callbackURL MUST start with "/" so @better-auth/expo rewrites it
-      // to the app scheme (otherwise BA falls back to the public web URL).
-      const { error: oauthError } = await getAuthClient().signIn.oauth2({
-        providerId: "feishu",
-        callbackURL: "/",
-        errorCallbackURL: "/",
-      })
-      if (oauthError) {
-        setError(
-          getAuthErrorMessage(
-            oauthError,
-            "Feishu sign-in failed. Please try again."
-          )
-        )
-        return
-      }
-      // A deep-link return that carries no session cookie (cancel / early
-      // error) still resolves the auth session as "success", so confirm a real
-      // session exists before navigating.
-      const ok = await verifyOAuthSession()
-      if (!ok) {
-        setError("Feishu sign-in failed. Please try again.")
-        return
-      }
-      router.replace("/")
-    } catch (nextError) {
-      setError(
-        getAuthErrorMessage(
-          nextError,
-          "Feishu sign-in failed. Please try again."
-        )
-      )
     } finally {
       setSubmitting(false)
     }
@@ -118,8 +62,8 @@ export default function LoginScreen() {
 
         <View style={styles.formSection}>
           <EmailField
-            label="账号"
-            placeholder="请输入邮箱"
+            label="Email"
+            placeholder="you@example.com"
             autoCapitalize="none"
             keyboardType="email-address"
             autoCorrect={false}
@@ -129,8 +73,8 @@ export default function LoginScreen() {
             onChangeText={setEmail}
           />
           <Field
-            label="密码"
-            placeholder="请输入密码"
+            label="Password"
+            placeholder="Enter your password"
             secureTextEntry
             autoComplete="password"
             textContentType="password"
@@ -158,32 +102,25 @@ export default function LoginScreen() {
               ) : null}
             </View>
             <Text style={styles.policyText}>
-              我已阅读并同意
-              <Text style={styles.policyLink}>《用户协议》</Text>和
-              <Text style={styles.policyLink}>《隐私政策》</Text>
+              I have read and agree to the{" "}
+              <Text style={styles.policyLink}>Terms of Service</Text> and{" "}
+              <Text style={styles.policyLink}>Privacy Policy</Text>
             </Text>
           </Pressable>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
           <Button
-            label={submitting ? "登录中..." : "登录"}
+            label={submitting ? "Signing in..." : "Sign in"}
             onPress={() => void handleLogin()}
             disabled={submitting}
           />
 
-          <Button
-            label="使用飞书登录"
-            variant="secondary"
-            onPress={() => void handleFeishuLogin()}
-            disabled={submitting}
-          />
-
           <View style={styles.footerRow}>
-            <Text style={styles.footerLabel}>还没有账号？</Text>
+            <Text style={styles.footerLabel}>Don&apos;t have an account?</Text>
             <Link href="/register" asChild>
               <Pressable>
-                <Text style={styles.footerLink}>立即注册</Text>
+                <Text style={styles.footerLink}>Sign up</Text>
               </Pressable>
             </Link>
           </View>

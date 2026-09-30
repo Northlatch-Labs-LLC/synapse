@@ -76,21 +76,21 @@ export default function ConversationDetailScreen() {
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
-          会话详情
+          Conversation details
         </Text>
         <View style={styles.headerSpacer} />
       </View>
 
       {loading ? (
         <SectionBlock>
-          <LoadingBlock label="正在加载会话详情..." />
+          <LoadingBlock label="Loading conversation details..." />
         </SectionBlock>
       ) : !conversation ? (
         <SectionBlock>
           <EmptyState
             icon="users"
-            title="没有找到这个会话"
-            description="这个会话可能还没同步下来，或者你当前没有访问权限。"
+            title="Conversation not found"
+            description="This conversation may not have synced yet, or you don't have access right now."
           />
         </SectionBlock>
       ) : (
@@ -106,16 +106,16 @@ export default function ConversationDetailScreen() {
               <View style={styles.heroBody}>
                 <Text style={styles.heroTitle}>{conversation.title}</Text>
                 <Text style={styles.heroSubtitle}>
-                  {`${conversation.kind === CONVERSATION_KIND.DIRECT ? "单聊" : "群聊"} · ${activeCount} 位成员`}
+                  {`${conversation.kind === CONVERSATION_KIND.DIRECT ? "Direct" : "Group"} · ${activeCount} members`}
                 </Text>
               </View>
               <Pill
-                label={conversation.isIm ? "IM" : "应用内"}
+                label={conversation.isIm ? "IM" : "In-app"}
                 tone="primary"
               />
             </View>
             <Button
-              label="打开聊天"
+              label="Open chat"
               icon="message-circle"
               onPress={() =>
                 router.replace(`/chat/${conversation.conversationId}`)
@@ -125,8 +125,8 @@ export default function ConversationDetailScreen() {
 
           <SectionBlock>
             <SectionTitleRow
-              title="成员"
-              action={<Text style={styles.countText}>{activeCount} 人</Text>}
+              title="Members"
+              action={<Text style={styles.countText}>{activeCount}</Text>}
             />
             {members.length > 0 ? (
               <View style={styles.listShell}>
@@ -154,19 +154,19 @@ export default function ConversationDetailScreen() {
                         {member.title ||
                           (member.participantType ===
                           CONVERSATION_PARTICIPANT_TYPE.WORKSPACE_MEMBER
-                            ? "成员"
+                            ? "Member"
                             : member.participantType ===
                                 CONVERSATION_PARTICIPANT_TYPE.ACTOR
                               ? "Actor"
-                              : "会话成员")}
+                              : "Conversation member")}
                       </Text>
                     </View>
                     <Pill
                       label={
                         member.participantType ===
                         CONVERSATION_PARTICIPANT_TYPE.ACTOR
-                          ? "角色"
-                          : "成员"
+                          ? "Actor"
+                          : "Member"
                       }
                     />
                   </View>
@@ -175,8 +175,8 @@ export default function ConversationDetailScreen() {
             ) : (
               <EmptyState
                 icon="users"
-                title="当前没有成员"
-                description="这个会话的成员信息暂时不可用。"
+                title="No members right now"
+                description="Member information for this conversation is not available yet."
               />
             )}
           </SectionBlock>

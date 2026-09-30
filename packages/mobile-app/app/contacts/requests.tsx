@@ -49,7 +49,9 @@ export default function ContactRequestsScreen() {
       setError(null)
     } catch (nextError) {
       setError(
-        nextError instanceof Error ? nextError.message : "申请加载失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to load requests."
       )
     } finally {
       setLoading(false)
@@ -107,19 +109,19 @@ export default function ContactRequestsScreen() {
         <Pressable onPress={() => router.back()} style={styles.headerButton}>
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>好友申请</Text>
+        <Text style={styles.headerTitle}>Requests</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       {loading ? (
         <SectionBlock>
-          <LoadingBlock label="正在加载申请..." />
+          <LoadingBlock label="Loading requests..." />
         </SectionBlock>
       ) : error ? (
         <SectionBlock>
           <EmptyState
             icon="alert-circle"
-            title="申请加载失败"
+            title="Failed to load requests"
             description={error}
           />
         </SectionBlock>
@@ -127,9 +129,9 @@ export default function ContactRequestsScreen() {
         <>
           <SectionBlock>
             <SectionTitleRow
-              title="待处理好友申请"
+              title="Pending friend requests"
               action={
-                <Text style={styles.countText}>{friendIncoming.length} 条</Text>
+                <Text style={styles.countText}>{friendIncoming.length}</Text>
               }
             />
             {friendIncoming.length > 0 ? (
@@ -146,24 +148,26 @@ export default function ContactRequestsScreen() {
                     />
                     <View style={styles.rowBody}>
                       <Text style={styles.rowTitle}>
-                        {request.requester?.name || "未命名用户"}
+                        {request.requester?.name || "Unnamed user"}
                       </Text>
                       <Text style={styles.rowSubtitle}>
                         {request.targetType === CONTACT_TARGET_TYPE.ACTOR
-                          ? `申请添加 Actor：${request.targetActor?.displayName || "未知 Actor"}`
-                          : `申请添加好友 · ${request.requester?.workspace.name || ""}`}
+                          ? `Wants to add actor: ${request.targetActor?.displayName || "Unknown actor"}`
+                          : `Friend request · ${request.requester?.workspace.name || ""}`}
                       </Text>
                     </View>
                     <View style={styles.actionColumn}>
                       <Button
-                        label={submittingId === request.id ? "处理中" : "批准"}
+                        label={
+                          submittingId === request.id ? "Working" : "Approve"
+                        }
                         disabled={submittingId === request.id}
                         onPress={() =>
                           void handleResolveFriend(request.id, "approve")
                         }
                       />
                       <Button
-                        label="拒绝"
+                        label="Reject"
                         variant="ghost"
                         disabled={submittingId === request.id}
                         onPress={() =>
@@ -177,17 +181,17 @@ export default function ContactRequestsScreen() {
             ) : (
               <EmptyState
                 icon="inbox"
-                title="没有待处理好友申请"
-                description="新的好友申请会出现在这里。"
+                title="No pending friend requests"
+                description="New friend requests will appear here."
               />
             )}
           </SectionBlock>
 
           <SectionBlock>
             <SectionTitleRow
-              title="待处理 Actor 访问申请"
+              title="Pending actor access requests"
               action={
-                <Text style={styles.countText}>{actorIncoming.length} 条</Text>
+                <Text style={styles.countText}>{actorIncoming.length}</Text>
               }
             />
             {actorIncoming.length > 0 ? (
@@ -200,22 +204,26 @@ export default function ContactRequestsScreen() {
                     />
                     <View style={styles.rowBody}>
                       <Text style={styles.rowTitle}>
-                        {request.actor?.displayName || "未知 Actor"}
+                        {request.actor?.displayName || "Unknown actor"}
                       </Text>
                       <Text style={styles.rowSubtitle}>
-                        {request.requester?.name || "某位用户"} 想发起私聊
+                        {`${
+                          request.requester?.name || "Someone"
+                        } wants to start a chat`}
                       </Text>
                     </View>
                     <View style={styles.actionColumn}>
                       <Button
-                        label={submittingId === request.id ? "处理中" : "批准"}
+                        label={
+                          submittingId === request.id ? "Working" : "Approve"
+                        }
                         disabled={submittingId === request.id}
                         onPress={() =>
                           void handleResolveActorAccess(request.id, "approve")
                         }
                       />
                       <Button
-                        label="拒绝"
+                        label="Reject"
                         variant="ghost"
                         disabled={submittingId === request.id}
                         onPress={() =>
@@ -229,18 +237,18 @@ export default function ContactRequestsScreen() {
             ) : (
               <EmptyState
                 icon="cpu"
-                title="没有待处理 Actor 访问申请"
-                description="当 Actor 需要人工批准时，请求会出现在这里。"
+                title="No pending actor access requests"
+                description="Requests appear here when an actor needs manual approval."
               />
             )}
           </SectionBlock>
 
           <SectionBlock>
             <SectionTitleRow
-              title="我发出的申请"
+              title="Sent requests"
               action={
                 <Text style={styles.countText}>
-                  {friendOutgoing.length + actorOutgoing.length} 条
+                  {friendOutgoing.length + actorOutgoing.length}
                 </Text>
               }
             />
@@ -250,28 +258,28 @@ export default function ContactRequestsScreen() {
                   <View key={request.id} style={styles.outgoingRow}>
                     <Text style={styles.rowTitle}>
                       {request.targetType === CONTACT_TARGET_TYPE.ACTOR
-                        ? request.targetActor?.displayName || "未知 Actor"
+                        ? request.targetActor?.displayName || "Unknown actor"
                         : request.targetMember?.name ||
                           request.targetMember?.email ||
-                          "未知成员"}
+                          "Unknown member"}
                     </Text>
-                    <Pill label="好友申请中" tone="accent" />
+                    <Pill label="Friend request pending" tone="accent" />
                   </View>
                 ))}
                 {actorOutgoing.map((request) => (
                   <View key={request.id} style={styles.outgoingRow}>
                     <Text style={styles.rowTitle}>
-                      {request.actor?.displayName || "未知 Actor"}
+                      {request.actor?.displayName || "Unknown actor"}
                     </Text>
-                    <Pill label="访问申请中" tone="accent" />
+                    <Pill label="Access request pending" tone="accent" />
                   </View>
                 ))}
               </View>
             ) : (
               <EmptyState
                 icon="clock"
-                title="没有待回执的申请"
-                description="你发出的好友申请或 Actor 访问申请会显示在这里。"
+                title="No requests awaiting a reply"
+                description="Friend or actor access requests you send will show up here."
               />
             )}
           </SectionBlock>

@@ -23,17 +23,17 @@ export default function RegisterScreen() {
 
   async function handleRegister() {
     if (!name.trim() || !email.trim() || !password) {
-      setError("请完整填写昵称、邮箱和密码。")
+      setError("Please fill in your name, email, and password.")
       return
     }
 
     if (password.length < 8) {
-      setError("密码至少需要 8 位。")
+      setError("Password must be at least 8 characters.")
       return
     }
 
     if (!acceptedPolicy) {
-      setError("请先勾选隐私政策与用户协议。")
+      setError("Please accept the Terms of Service and Privacy Policy first.")
       return
     }
 
@@ -44,7 +44,12 @@ export default function RegisterScreen() {
       await signUp(name.trim(), email.trim(), password)
       router.replace("/")
     } catch (nextError) {
-      setError(getAuthErrorMessage(nextError, "注册失败，请检查填写信息。"))
+      setError(
+        getAuthErrorMessage(
+          nextError,
+          "Sign up failed. Please check your details."
+        )
+      )
     } finally {
       setSubmitting(false)
     }
@@ -63,20 +68,20 @@ export default function RegisterScreen() {
             style={styles.logoImage}
             contentFit="contain"
           />
-          <Text style={styles.appName}>注册 {APP_NAME}</Text>
+          <Text style={styles.appName}>Sign up for {APP_NAME}</Text>
         </View>
 
         <View style={styles.formSection}>
           <Field
-            label="昵称"
-            placeholder="请输入你的名字"
+            label="Name"
+            placeholder="Enter your name"
             autoCorrect={false}
             value={name}
             onChangeText={setName}
           />
           <EmailField
-            label="邮箱"
-            placeholder="请输入邮箱"
+            label="Email"
+            placeholder="you@example.com"
             autoCapitalize="none"
             keyboardType="email-address"
             autoCorrect={false}
@@ -86,8 +91,8 @@ export default function RegisterScreen() {
             onChangeText={setEmail}
           />
           <Field
-            label="密码"
-            placeholder="至少 8 位密码"
+            label="Password"
+            placeholder="At least 8 characters"
             secureTextEntry
             autoComplete="password-new"
             textContentType="newPassword"
@@ -115,25 +120,25 @@ export default function RegisterScreen() {
               ) : null}
             </View>
             <Text style={styles.policyText}>
-              我已阅读并同意
-              <Text style={styles.policyLink}>《用户协议》</Text>和
-              <Text style={styles.policyLink}>《隐私政策》</Text>
+              I have read and agree to the{" "}
+              <Text style={styles.policyLink}>Terms of Service</Text> and{" "}
+              <Text style={styles.policyLink}>Privacy Policy</Text>
             </Text>
           </Pressable>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
           <Button
-            label={submitting ? "注册中..." : "注册"}
+            label={submitting ? "Signing up..." : "Sign up"}
             onPress={() => void handleRegister()}
             disabled={submitting}
           />
 
           <View style={styles.footerRow}>
-            <Text style={styles.footerLabel}>已有账号？</Text>
+            <Text style={styles.footerLabel}>Already have an account?</Text>
             <Link href="/login" asChild>
               <Pressable>
-                <Text style={styles.footerLink}>去登录</Text>
+                <Text style={styles.footerLink}>Sign in</Text>
               </Pressable>
             </Link>
           </View>

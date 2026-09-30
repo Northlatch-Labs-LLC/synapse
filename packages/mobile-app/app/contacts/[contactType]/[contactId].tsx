@@ -28,13 +28,13 @@ type ContactType = ContactHubEntryView["kind"]
 function directButtonLabel(entry: ContactHubEntryView) {
   switch (entry.directState.status) {
     case CONTACT_DIRECT_STATE.EXISTING:
-      return "进入已有私聊"
+      return "Open existing chat"
     case CONTACT_DIRECT_STATE.PENDING_APPROVAL:
-      return "等待批准"
+      return "Waiting for approval"
     case CONTACT_DIRECT_STATE.APPROVAL_REQUIRED:
-      return "申请访问并发起私聊"
+      return "Request access & chat"
     default:
-      return "发起私聊"
+      return "Start a chat"
   }
 }
 
@@ -71,7 +71,7 @@ export default function ContactDetailScreen() {
         setError(
           nextError instanceof Error
             ? nextError.message
-            : "联系人详情加载失败。"
+            : "Failed to load contact details."
         )
       } finally {
         setLoading(false)
@@ -101,7 +101,9 @@ export default function ContactDetailScreen() {
       })
 
       if (result.status === DIRECT_CONVERSATION_OPEN_STATUS.PENDING_APPROVAL) {
-        setActionMessage("已提交申请，等待对方批准后才能发起私聊。")
+        setActionMessage(
+          "Request submitted. You can start the chat once they approve."
+        )
         return
       }
 
@@ -110,7 +112,9 @@ export default function ContactDetailScreen() {
       }
     } catch (nextError) {
       setActionMessage(
-        nextError instanceof Error ? nextError.message : "发起私聊失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to start the chat."
       )
     } finally {
       setSubmitting(false)
@@ -124,20 +128,20 @@ export default function ContactDetailScreen() {
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
-          联系人详情
+          Contact details
         </Text>
         <View style={styles.headerSpacer} />
       </View>
 
       {loading ? (
         <SectionBlock>
-          <LoadingBlock label="正在加载联系人详情..." />
+          <LoadingBlock label="Loading contact details..." />
         </SectionBlock>
       ) : error ? (
         <SectionBlock>
           <EmptyState
             icon="alert-circle"
-            title="联系人详情加载失败"
+            title="Failed to load contact details"
             description={error}
           />
         </SectionBlock>
@@ -145,8 +149,8 @@ export default function ContactDetailScreen() {
         <SectionBlock>
           <EmptyState
             icon="users"
-            title="没有找到这个联系人"
-            description="这个联系人可能已经不存在，或者你当前没有访问权限。"
+            title="Contact not found"
+            description="This contact may no longer exist, or you don't have access right now."
           />
         </SectionBlock>
       ) : (
@@ -186,38 +190,38 @@ export default function ContactDetailScreen() {
           </SectionBlock>
 
           <SectionBlock>
-            <SectionTitleRow title="关系与范围" />
+            <SectionTitleRow title="Relationship & scope" />
             <View style={styles.metaCard}>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>类型</Text>
+                <Text style={styles.metaLabel}>Type</Text>
                 <Text style={styles.metaValue}>
                   {detail.contact.targetType === CONTACT_TARGET_TYPE.ACTOR
                     ? "Actor"
                     : detail.contact.targetType ===
                         CONTACT_TARGET_TYPE.REMOTE_AGENT
                       ? "Remote agent"
-                      : "成员"}
+                      : "Member"}
                 </Text>
               </View>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>来源工作区</Text>
+                <Text style={styles.metaLabel}>Workspace</Text>
                 <Text style={styles.metaValue}>
                   {detail.contact.workspace.name}
                 </Text>
               </View>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>私聊状态</Text>
+                <Text style={styles.metaLabel}>Direct chat status</Text>
                 <Text style={styles.metaValue}>
                   {detail.contact.directState.status ===
                   CONTACT_DIRECT_STATE.EXISTING
-                    ? "已有单聊"
+                    ? "Chat exists"
                     : detail.contact.directState.status ===
                         CONTACT_DIRECT_STATE.PENDING_APPROVAL
-                      ? "等待批准"
+                      ? "Waiting for approval"
                       : detail.contact.directState.status ===
                           CONTACT_DIRECT_STATE.APPROVAL_REQUIRED
-                        ? "需要申请"
-                        : "可直接发起"}
+                        ? "Request needed"
+                        : "Ready to start"}
                 </Text>
               </View>
             </View>
@@ -225,9 +229,9 @@ export default function ContactDetailScreen() {
 
           <SectionBlock>
             <SectionTitleRow
-              title="共同所在群聊"
+              title="Shared groups"
               action={
-                <Text style={styles.countText}>{detail.groups.length} 个</Text>
+                <Text style={styles.countText}>{detail.groups.length}</Text>
               }
             />
             {detail.groups.length > 0 ? (
@@ -258,18 +262,18 @@ export default function ContactDetailScreen() {
                       </Text>
                       <Text numberOfLines={1} style={styles.rowSubtitle}>
                         {conversation.lastMessage?.content?.trim() ||
-                          "打开群聊查看消息"}
+                          "Open the group to see messages"}
                       </Text>
                     </View>
-                    <Pill label="群聊" />
+                    <Pill label="Group" />
                   </Pressable>
                 ))}
               </View>
             ) : (
               <EmptyState
                 icon="message-circle"
-                title="暂时没有共同群聊"
-                description="你可以直接发起私聊，或者先创建一个群聊。"
+                title="No shared groups yet"
+                description="You can start a direct chat, or create a group first."
               />
             )}
           </SectionBlock>

@@ -73,13 +73,13 @@ function buildSearchDetailParams(match: IdentitySearchMatchView) {
 function friendStateLabel(match: IdentitySearchMatchView) {
   switch (match.state) {
     case IDENTITY_SEARCH_MATCH_STATE.SAME_WORKSPACE_MEMBER:
-      return "同 workspace 用户"
+      return "Same workspace member"
     case IDENTITY_SEARCH_MATCH_STATE.FRIEND:
-      return "已是好友"
+      return "Already friends"
     case IDENTITY_SEARCH_MATCH_STATE.PENDING_REQUEST:
-      return "好友申请待处理"
+      return "Friend request pending"
     default:
-      return "可发起好友申请"
+      return "Can send friend request"
   }
 }
 
@@ -119,18 +119,18 @@ export default function GlobalSearchScreen() {
     if (identityQuery.error) {
       return identityQuery.error instanceof Error
         ? identityQuery.error.message
-        : "搜索好友 ID 失败。"
+        : "Friend ID search failed."
     }
     const result = identityQuery.data
     if (!result) return null
     if (result.outcome === IDENTITY_SEARCH_OUTCOME.INVALID) {
-      return "好友 ID 需为 4-32 位，只能包含字母、数字、点、下划线或短横线。"
+      return "A friend ID must be 4-32 characters and can only contain letters, numbers, dots, underscores, or hyphens."
     }
     if (result.outcome === IDENTITY_SEARCH_OUTCOME.NOT_FOUND) {
-      return "没有匹配的好友 ID。"
+      return "No matching friend ID."
     }
     if (result.outcome === IDENTITY_SEARCH_OUTCOME.SELF) {
-      return "这是你自己的好友 ID。"
+      return "That is your own friend ID."
     }
     return null
   }, [workspaceId, deferredQuery, identityQuery.data, identityQuery.error])
@@ -157,7 +157,7 @@ export default function GlobalSearchScreen() {
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
-          搜索
+          Search
         </Text>
         <View style={styles.headerSpacer} />
       </View>
@@ -170,7 +170,7 @@ export default function GlobalSearchScreen() {
             onChangeText={setQuery}
             autoCapitalize="none"
             autoCorrect={false}
-            placeholder="搜索群聊记录、联系人或好友 ID"
+            placeholder="Search chats, contacts, or friend IDs"
             placeholderTextColor={theme.colors.textSoft}
             style={styles.searchInput}
             autoFocus
@@ -180,24 +180,24 @@ export default function GlobalSearchScreen() {
 
       {loading ? (
         <SectionBlock>
-          <LoadingBlock label="正在准备搜索..." />
+          <LoadingBlock label="Preparing search..." />
         </SectionBlock>
       ) : !deferredQuery ? (
         <SectionBlock>
           <EmptyState
             icon="search"
-            title="输入关键词开始搜索"
-            description="这里会同时搜索会话记录、已有联系人和好友 ID。"
+            title="Type a keyword to start searching"
+            description="This searches your chats, existing contacts, and friend IDs at once."
           />
         </SectionBlock>
       ) : (
         <>
           <SectionBlock>
             <SectionTitleRow
-              title="会话记录"
+              title="Chats"
               action={
                 <Text style={styles.countText}>
-                  {matchedConversations.length} 条
+                  {matchedConversations.length}
                 </Text>
               }
             />
@@ -223,14 +223,14 @@ export default function GlobalSearchScreen() {
                       <Text style={styles.rowTitle}>{conversation.title}</Text>
                       <Text numberOfLines={1} style={styles.rowSubtitle}>
                         {conversation.lastItem?.previewText?.trim() ||
-                          "打开会话"}
+                          "Open chat"}
                       </Text>
                     </View>
                     <Pill
                       label={
                         conversation.kind === CONVERSATION_KIND.DIRECT
-                          ? "单聊"
-                          : "群聊"
+                          ? "Direct"
+                          : "Group"
                       }
                     />
                   </Pressable>
@@ -239,19 +239,17 @@ export default function GlobalSearchScreen() {
             ) : (
               <EmptyState
                 icon="message-square"
-                title="没有匹配的会话"
-                description="试试别的关键词。"
+                title="No matching chats"
+                description="Try a different keyword."
               />
             )}
           </SectionBlock>
 
           <SectionBlock>
             <SectionTitleRow
-              title="已有联系人"
+              title="Contacts"
               action={
-                <Text style={styles.countText}>
-                  {matchedContacts.length} 条
-                </Text>
+                <Text style={styles.countText}>{matchedContacts.length}</Text>
               }
             />
             {matchedContacts.length > 0 ? (
@@ -296,18 +294,18 @@ export default function GlobalSearchScreen() {
             ) : (
               <EmptyState
                 icon="users"
-                title="没有匹配的联系人"
-                description="试试姓名、邮箱、Workspace 名称或角色名。"
+                title="No matching contacts"
+                description="Try a name, email, workspace name, or actor name."
               />
             )}
           </SectionBlock>
 
           <SectionBlock>
             <SectionTitleRow
-              title="好友 ID"
+              title="Friend IDs"
               action={
                 <Text style={styles.countText}>
-                  {identityResults?.matches?.length || 0} 条
+                  {identityResults?.matches?.length || 0}
                 </Text>
               }
             />
@@ -360,8 +358,10 @@ export default function GlobalSearchScreen() {
             ) : (
               <EmptyState
                 icon="at-sign"
-                title="没有匹配的好友 ID"
-                description={friendIdMessage || "试试完整输入好友 ID。"}
+                title="No matching friend IDs"
+                description={
+                  friendIdMessage || "Try entering a full friend ID."
+                }
               />
             )}
           </SectionBlock>

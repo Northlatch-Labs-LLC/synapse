@@ -70,7 +70,7 @@ function AudioPreview({
           color={theme.colors.white}
         />
         <Text style={styles.audioButtonLabel}>
-          {status.playing ? "暂停" : "播放"}
+          {status.playing ? "Pause" : "Play"}
         </Text>
       </Pressable>
     </View>
@@ -91,7 +91,7 @@ export default function FilePreviewScreen() {
 
   const uri = params.uri || ""
   const mimeType = params.mimeType || "application/octet-stream"
-  const fileName = params.name || "文件"
+  const fileName = params.name || "File"
   const category = (params.category || "document") as PreviewCategory
   const sourceType = (params.source || "remote") as PreviewSource
   const remoteSource = useAuthenticatedMediaSource(
@@ -141,7 +141,7 @@ export default function FilePreviewScreen() {
         }
 
         if (!response.ok) {
-          throw new Error(`下载失败 (${response.status})`)
+          throw new Error(`Download failed (${response.status})`)
         }
 
         const blob = await response.blob()
@@ -160,7 +160,7 @@ export default function FilePreviewScreen() {
         if (await Sharing.isAvailableAsync()) {
           await Sharing.shareAsync(uri)
         } else {
-          Alert.alert("当前设备不支持导出该文件。")
+          Alert.alert("This device does not support exporting this file.")
         }
         return
       }
@@ -174,12 +174,12 @@ export default function FilePreviewScreen() {
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(result.uri)
       } else {
-        Alert.alert("文件已下载", result.uri)
+        Alert.alert("File downloaded", result.uri)
       }
     } catch (error) {
       Alert.alert(
-        "下载失败",
-        error instanceof Error ? error.message : "请稍后重试"
+        "Download failed",
+        error instanceof Error ? error.message : "Please try again later"
       )
     } finally {
       setDownloading(false)

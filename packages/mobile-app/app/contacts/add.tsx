@@ -34,13 +34,13 @@ function buildSearchDetailParams(match: IdentitySearchMatchView) {
 function resultStateLabel(match: IdentitySearchMatchView) {
   switch (match.state) {
     case "same_workspace_member":
-      return "同 workspace 用户"
+      return "Same workspace member"
     case "friend":
-      return "已是好友"
+      return "Already friends"
     case "pending_request":
-      return "好友申请待处理"
+      return "Friend request pending"
     default:
-      return "可查看并发起好友申请"
+      return "View profile & send friend request"
   }
 }
 
@@ -62,24 +62,24 @@ export default function AddFriendScreen() {
 
       if (result.outcome === "empty") {
         setResults([])
-        setMessage("请输入好友 ID。")
+        setMessage("Enter a friend ID.")
         return
       }
       if (result.outcome === "invalid") {
         setResults([])
         setMessage(
-          "好友 ID 需为 4-32 位，只能包含字母、数字、点、下划线或短横线。"
+          "A friend ID must be 4-32 characters and can only contain letters, numbers, dots, underscores, or hyphens."
         )
         return
       }
       if (result.outcome === "self") {
         setResults([])
-        setMessage("这是你自己的好友 ID。")
+        setMessage("That is your own friend ID.")
         return
       }
       if (result.outcome === "not_found" || result.matches.length === 0) {
         setResults([])
-        setMessage("没有找到结果。对方可能关闭了 ID 搜索。")
+        setMessage("No results found. They may have disabled ID search.")
         return
       }
 
@@ -101,10 +101,14 @@ export default function AddFriendScreen() {
         return
       }
 
-      setMessage("同一个账号在多个 workspace 中可被添加，请选择具体身份。")
+      setMessage(
+        "The same account can be added in multiple workspaces. Pick the identity to use."
+      )
     } catch (error) {
       setResults([])
-      setMessage(error instanceof Error ? error.message : "搜索好友失败。")
+      setMessage(
+        error instanceof Error ? error.message : "Friend search failed."
+      )
     } finally {
       setSearching(false)
     }
@@ -132,15 +136,15 @@ export default function AddFriendScreen() {
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
-          添加好友
+          Add friend
         </Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <SectionBlock>
         <Text style={styles.tipText}>
-          输入对方的好友
-          ID。查到后会进入联系人详情；如果没有结果，会直接在这里提示。
+          Enter their friend ID. A match opens the contact details; if there is
+          no result, you will see a hint here.
         </Text>
         <View style={styles.searchShell}>
           <Feather name="search" size={16} color={theme.colors.textSoft} />
@@ -149,14 +153,14 @@ export default function AddFriendScreen() {
             onChangeText={setQuery}
             autoCapitalize="none"
             autoCorrect={false}
-            placeholder="输入好友 ID"
+            placeholder="Enter a friend ID"
             placeholderTextColor={theme.colors.textSoft}
             style={styles.searchInput}
             onSubmitEditing={() => void handleSearch()}
           />
         </View>
         <Button
-          label={searching ? "搜索中..." : "搜索好友 ID"}
+          label={searching ? "Searching..." : "Search friend ID"}
           icon="search"
           onPress={() => void handleSearch()}
           disabled={searching}
@@ -165,11 +169,15 @@ export default function AddFriendScreen() {
 
       {searching ? (
         <SectionBlock>
-          <LoadingBlock label="正在搜索好友..." />
+          <LoadingBlock label="Searching friends..." />
         </SectionBlock>
       ) : message && results.length === 0 ? (
         <SectionBlock>
-          <EmptyState icon="search" title="搜索结果" description={message} />
+          <EmptyState
+            icon="search"
+            title="Search results"
+            description={message}
+          />
         </SectionBlock>
       ) : results.length > 1 ? (
         <SectionBlock>

@@ -11,10 +11,10 @@ export default function NotFoundScreen() {
       <View style={styles.wrap}>
         <EmptyState
           icon="compass"
-          title="页面不存在"
-          description="这个移动端路由还没有内容，或者链接已经失效。"
+          title="Page not found"
+          description="This mobile route has no content yet, or the link has expired."
         />
-        <Button label="回到首页" onPress={() => router.replace("/")} />
+        <Button label="Back to home" onPress={() => router.replace("/")} />
       </View>
     </ScreenView>
   )

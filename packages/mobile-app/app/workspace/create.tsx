@@ -17,7 +17,9 @@ import { useWorkspace } from "@/providers/workspace-provider"
 import { theme } from "@/theme/tokens"
 
 function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : "创建工作区失败。"
+  return error instanceof Error
+    ? error.message
+    : "Failed to create the workspace."
 }
 
 export default function CreateWorkspaceScreen() {
@@ -42,15 +44,15 @@ export default function CreateWorkspaceScreen() {
 
   function confirmLeaveWithoutWorkspace() {
     Alert.alert(
-      "需要先创建工作区",
-      "创建工作区后才能继续使用。继续返回会退出当前账号，并回到登录页。",
+      "Create a workspace first",
+      "You need a workspace to continue. Going back will sign you out and return you to the sign-in page.",
       [
         {
-          text: "继续创建",
+          text: "Keep creating",
           style: "cancel",
         },
         {
-          text: "退出登录",
+          text: "Sign out",
           style: "destructive",
           onPress: () => {
             void leaveToLogin()
@@ -88,7 +90,7 @@ export default function CreateWorkspaceScreen() {
   async function handleCreateWorkspace() {
     const nextName = name.trim()
     if (!nextName) {
-      setError("请输入工作区名称。")
+      setError("Please enter a workspace name.")
       return
     }
 
@@ -119,22 +121,23 @@ export default function CreateWorkspaceScreen() {
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
-          创建工作区
+          Create workspace
         </Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <SectionBlock>
-        <Text style={styles.introTitle}>开始你的第一个工作区</Text>
+        <Text style={styles.introTitle}>Start your first workspace</Text>
         <Text style={styles.introCopy}>
-          为团队、项目或个人协作创建一个独立工作区。创建完成后会自动进入首页。
+          Create a separate workspace for your team, project, or personal work.
+          You will go straight to the home screen once it is created.
         </Text>
       </SectionBlock>
 
       <SectionBlock>
         <Field
-          label="工作区名称"
-          placeholder="例如：产品组 / My Team"
+          label="Workspace name"
+          placeholder="e.g. Product Team / My Team"
           value={name}
           onChangeText={setName}
           returnKeyType="done"
@@ -142,7 +145,7 @@ export default function CreateWorkspaceScreen() {
         />
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <Button
-          label={submitting ? "创建中..." : "创建工作区"}
+          label={submitting ? "Creating..." : "Create workspace"}
           icon="plus"
           onPress={() => void handleCreateWorkspace()}
           disabled={submitting}

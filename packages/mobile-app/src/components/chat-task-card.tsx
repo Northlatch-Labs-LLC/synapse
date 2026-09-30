@@ -324,7 +324,7 @@ function describeRuntimeAuthorizationSpec(
             ? `Working directory: ${cmd.workingDirectory}`
             : null,
           cmd.allowBundledToolchain
-            ? "Allow the Synapse bundled toolchain"
+            ? "Allow the Synappse bundled toolchain"
             : null,
           cmd.allowedEnv && cmd.allowedEnv.length > 0
             ? `Inherited environment variables: ${cmd.allowedEnv.join(", ")}`

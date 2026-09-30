@@ -38,19 +38,19 @@ function buildSearchDetailParams(match: IdentitySearchMatchView) {
 function requestStateLabel(match: IdentitySearchMatchView) {
   switch (match.state) {
     case IDENTITY_SEARCH_MATCH_STATE.SAME_WORKSPACE_MEMBER:
-      return "同工作区成员"
+      return "Same workspace member"
     case IDENTITY_SEARCH_MATCH_STATE.FRIEND:
     case IDENTITY_SEARCH_MATCH_STATE.EXISTING:
-      return "已建立关系"
+      return "Already connected"
     case IDENTITY_SEARCH_MATCH_STATE.PENDING_REQUEST:
     case IDENTITY_SEARCH_MATCH_STATE.PENDING_APPROVAL:
-      return "等待处理"
+      return "Waiting"
     case IDENTITY_SEARCH_MATCH_STATE.APPROVAL_REQUIRED:
-      return "需要批准"
+      return "Approval required"
     case IDENTITY_SEARCH_MATCH_STATE.AVAILABLE:
-      return "可直接发起"
+      return "Ready to connect"
     default:
-      return "可发起连接"
+      return "Can connect"
   }
 }
 
@@ -97,7 +97,7 @@ export default function DiscoverContactsScreen() {
         setError(
           nextError instanceof Error
             ? nextError.message
-            : "远端联系人发现失败。"
+            : "Remote contact discovery failed."
         )
       } finally {
         if (!cancelled) {
@@ -156,10 +156,12 @@ export default function DiscoverContactsScreen() {
             : item
         )
       )
-      setMessage("连接请求已提交，等待对方处理。")
+      setMessage("Connection request sent. Waiting for them to respond.")
     } catch (nextError) {
       setError(
-        nextError instanceof Error ? nextError.message : "发起连接失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to send the connection request."
       )
     } finally {
       setSubmittingProfileId(null)
@@ -173,21 +175,23 @@ export default function DiscoverContactsScreen() {
           <Feather name="chevron-left" size={20} color={theme.colors.text} />
         </Pressable>
         <Text numberOfLines={1} style={styles.headerTitle}>
-          远端发现
+          Discover
         </Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <SectionBlock>
         <Text style={styles.tipText}>
-          搜索别的工作区里的成员或角色，然后直接发起关系请求；已经建立关系的对象会直接带你进入联系人详情。
+          Search for members or actors in other workspaces and send a connection
+          request; anyone you are already connected to opens their contact
+          details directly.
         </Text>
         <View style={styles.searchShell}>
           <Feather name="search" size={16} color={theme.colors.textSoft} />
           <TextInput
             value={search}
             onChangeText={setSearch}
-            placeholder="搜索工作区、成员名、邮箱或角色名"
+            placeholder="Search workspaces, member names, emails, or actors"
             placeholderTextColor={theme.colors.textSoft}
             style={styles.searchInput}
           />
@@ -197,13 +201,13 @@ export default function DiscoverContactsScreen() {
 
       {loading ? (
         <SectionBlock>
-          <LoadingBlock label="正在搜索远端联系人..." />
+          <LoadingBlock label="Searching remote contacts..." />
         </SectionBlock>
       ) : error ? (
         <SectionBlock>
           <EmptyState
             icon="alert-circle"
-            title="远端联系人发现失败"
+            title="Remote contact discovery failed"
             description={error}
           />
         </SectionBlock>
@@ -211,16 +215,18 @@ export default function DiscoverContactsScreen() {
         <SectionBlock>
           <EmptyState
             icon="compass"
-            title="没有发现结果"
-            description="换个关键词试试，或者确认对方开启了身份搜索。"
+            title="No discoveries"
+            description="Try a different keyword, or make sure they have identity search enabled."
           />
         </SectionBlock>
       ) : (
         <>
           <SectionBlock>
             <SectionTitleRow
-              title="远端角色"
-              action={<Text style={styles.countText}>{actors.length} 个</Text>}
+              title="Remote actors"
+              action={
+                <Text style={styles.countText}>{actors.length} found</Text>
+              }
             />
             {actors.length > 0 ? (
               <View style={styles.listShell}>
@@ -253,15 +259,15 @@ export default function DiscoverContactsScreen() {
                       <Button
                         label={
                           actor.contact
-                            ? "查看详情"
+                            ? "View details"
                             : submittingProfileId === actor.profileId
-                              ? "处理中..."
+                              ? "Working..."
                               : actor.state ===
                                     IDENTITY_SEARCH_MATCH_STATE.PENDING_REQUEST ||
                                   actor.state ===
                                     IDENTITY_SEARCH_MATCH_STATE.PENDING_APPROVAL
-                                ? "等待处理"
-                                : "发起连接"
+                                ? "Waiting"
+                                : "Connect"
                         }
                         variant={actor.contact ? "secondary" : "primary"}
                         onPress={() => void handleRequest(actor)}
@@ -281,16 +287,18 @@ export default function DiscoverContactsScreen() {
             ) : (
               <EmptyState
                 icon="cpu"
-                title="没有匹配到远端角色"
-                description="可以尝试搜索角色名称、职能或工作区名称。"
+                title="No remote actors matched"
+                description="Try searching by actor name, role, or workspace name."
               />
             )}
           </SectionBlock>
 
           <SectionBlock>
             <SectionTitleRow
-              title="远端成员"
-              action={<Text style={styles.countText}>{members.length} 个</Text>}
+              title="Remote members"
+              action={
+                <Text style={styles.countText}>{members.length} found</Text>
+              }
             />
             {members.length > 0 ? (
               <View style={styles.listShell}>
@@ -298,7 +306,7 @@ export default function DiscoverContactsScreen() {
                   <View key={member.profileId} style={styles.discoveryCard}>
                     <View style={styles.discoveryHeader}>
                       <Avatar
-                        name={member.title || "远端成员"}
+                        name={member.title || "Remote member"}
                         uri={member.avatarUrl || undefined}
                         icon="user"
                         size={46}
@@ -306,12 +314,12 @@ export default function DiscoverContactsScreen() {
                       <View style={styles.discoveryBody}>
                         <View style={styles.discoveryTitleLine}>
                           <Text style={styles.rowTitle}>
-                            {member.title || "未命名成员"}
+                            {member.title || "Unnamed member"}
                           </Text>
                           <Pill label={member.workspace.name} tone="accent" />
                         </View>
                         <Text style={styles.rowSubtitle}>
-                          {member.subtitle || "暂无补充信息"}
+                          {member.subtitle || "No additional info"}
                         </Text>
                         <Text style={styles.rowCopy}>
                           {requestStateLabel(member)}
@@ -322,15 +330,15 @@ export default function DiscoverContactsScreen() {
                       <Button
                         label={
                           member.contact
-                            ? "查看详情"
+                            ? "View details"
                             : submittingProfileId === member.profileId
-                              ? "处理中..."
+                              ? "Working..."
                               : member.state ===
                                     IDENTITY_SEARCH_MATCH_STATE.PENDING_REQUEST ||
                                   member.state ===
                                     IDENTITY_SEARCH_MATCH_STATE.PENDING_APPROVAL
-                                ? "等待处理"
-                                : "发起连接"
+                                ? "Waiting"
+                                : "Connect"
                         }
                         variant={member.contact ? "secondary" : "primary"}
                         onPress={() => void handleRequest(member)}
@@ -350,8 +358,8 @@ export default function DiscoverContactsScreen() {
             ) : (
               <EmptyState
                 icon="users"
-                title="没有匹配到远端成员"
-                description="可以尝试搜索姓名、邮箱或工作区名称。"
+                title="No remote members matched"
+                description="Try searching by name, email, or workspace name."
               />
             )}
           </SectionBlock>

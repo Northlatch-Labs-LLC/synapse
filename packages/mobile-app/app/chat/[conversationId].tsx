@@ -97,7 +97,7 @@ export default function ChatDetailScreen() {
   const loading = status === "loading" && !conversation
   const headerTitle = conversation
     ? getConversationDisplayName(conversation, workspaceMemberId)
-    : "聊天"
+    : "Chat"
   const directActorParticipant =
     conversation?.kind === CONVERSATION_KIND.DIRECT
       ? (conversation.participants.find(
@@ -350,8 +350,8 @@ export default function ChatDetailScreen() {
       <ScreenView>
         <EmptyState
           icon="message-square"
-          title="当前无法打开会话"
-          description="缺少有效的会话标识。"
+          title="Can't open this conversation"
+          description="A valid conversation ID is missing."
         />
       </ScreenView>
     )
@@ -382,7 +382,7 @@ export default function ChatDetailScreen() {
               </Text>
               {showTypingHint ? (
                 <Text numberOfLines={1} style={styles.headerSubtitle}>
-                  对方正在输入中...
+                  They are typing...
                 </Text>
               ) : null}
             </View>
@@ -406,17 +406,17 @@ export default function ChatDetailScreen() {
 
         {loading ? (
           <View style={styles.placeholder}>
-            <LoadingBlock label="正在加载聊天记录..." />
+            <LoadingBlock label="Loading chat history..." />
           </View>
         ) : !conversation ? (
           <View style={styles.placeholder}>
             <EmptyState
               icon="message-circle"
-              title="会话还没同步下来"
-              description="下拉重试一次，或者稍后再进。"
+              title="Conversation hasn't synced yet"
+              description="Pull down to retry, or come back later."
               action={
                 <Button
-                  label="重试"
+                  label="Retry"
                   icon="refresh-cw"
                   onPress={() => void handleRefresh()}
                 />
@@ -455,7 +455,9 @@ export default function ChatDetailScreen() {
               {meta?.hasMoreBefore ? (
                 <View style={styles.topAction}>
                   <Button
-                    label={loadingOlder ? "加载中..." : "加载更早消息"}
+                    label={
+                      loadingOlder ? "Loading..." : "Load earlier messages"
+                    }
                     variant="ghost"
                     icon="chevrons-up"
                     disabled={loadingOlder}
@@ -483,15 +485,15 @@ export default function ChatDetailScreen() {
                   ))}
                 </>
               ) : loadingConversationHistory ? (
-                <LoadingBlock label="正在加载聊天记录..." />
+                <LoadingBlock label="Loading chat history..." />
               ) : conversationHistoryLoadFailed ? (
                 <EmptyState
                   icon="alert-circle"
-                  title="聊天记录加载失败"
-                  description={meta?.latestLoadError || "下拉重试一次。"}
+                  title="Chat history failed to load"
+                  description={meta?.latestLoadError || "Pull down to retry."}
                   action={
                     <Button
-                      label="重试"
+                      label="Retry"
                       icon="refresh-cw"
                       onPress={() => void handleRefresh()}
                     />
@@ -501,8 +503,8 @@ export default function ChatDetailScreen() {
                 <>
                   <EmptyState
                     icon="message-circle"
-                    title="还没有消息"
-                    description="发一条消息开始对话。"
+                    title="No messages yet"
+                    description="Send a message to start the conversation."
                   />
                   {currentTurnRuntimes.map((runtime) => (
                     <ActorActivityBubble
