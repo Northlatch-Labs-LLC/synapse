@@ -263,13 +263,13 @@ export function LandingHeroHeadline() {
   return (
     <div
       ref={fitRef}
-      className="font-display animate-fade-up relative mt-6 text-[clamp(2rem,7vw,5rem)] leading-[0.96] font-semibold tracking-tight text-slate-950"
+      className="font-display animate-fade-up relative mt-6 text-center text-[clamp(2rem,7vw,5rem)] leading-[0.96] font-semibold tracking-tight text-slate-950"
     >
       <ProbeStrip ref={probeRef} />
 
       <div
         ref={lineRef}
-        className="inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 leading-none whitespace-nowrap sm:gap-x-1.5"
+        className="inline-flex w-max flex-nowrap items-center justify-center gap-x-1 leading-none whitespace-nowrap sm:gap-x-1.5"
         style={{
           transform: scale < 1 ? `scale(${scale})` : undefined,
           transformOrigin: "center center",
