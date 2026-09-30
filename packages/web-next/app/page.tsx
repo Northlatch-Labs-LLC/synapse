@@ -130,12 +130,7 @@ export default function HomePage() {
                     <Link href="/register">Create a team</Link>
                   </Button>
                 )}
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="border-border/70 bg-white/70"
-                >
+                <Button asChild size="lg" variant="secondary">
                   <Link href="#trust">Learn about self-hosting</Link>
                 </Button>
               </div>
