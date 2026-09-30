@@ -191,7 +191,7 @@ function OrbitField() {
           <div className="relative flex size-16 items-center justify-center rounded-full border border-white/95 bg-[radial-gradient(circle_at_30%_28%,rgba(255,255,255,0.98),rgba(241,245,249,0.96)_58%,rgba(226,232,240,0.98))] shadow-[0_18px_36px_-22px_rgba(148,163,184,0.45)] ring-1 ring-slate-200/70">
             <Image
               src="/synapse.svg"
-              alt="Synapse"
+              alt="Synappse"
               width={28}
               height={28}
               className="size-7"

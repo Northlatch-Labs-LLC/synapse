@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Synapse Mobile",
+    "name": "Synappse Mobile",
     "slug": "synapse-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,9 +17,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.synapse.mobile",
       "infoPlist": {
-        "NSCameraUsageDescription": "Synapse uses the camera to scan QR codes and capture photos or videos in chat.",
-        "NSMicrophoneUsageDescription": "Synapse uses the microphone to record voice messages and video audio.",
-        "NSPhotoLibraryUsageDescription": "Synapse accesses your photo library so you can send images and videos in chat."
+        "NSCameraUsageDescription": "Synappse uses the camera to scan QR codes and capture photos or videos in chat.",
+        "NSMicrophoneUsageDescription": "Synappse uses the microphone to record voice messages and video audio.",
+        "NSPhotoLibraryUsageDescription": "Synappse accesses your photo library so you can send images and videos in chat."
       }
     },
     "android": {
@@ -36,8 +36,8 @@
       "bundler": "metro",
       "output": "static",
       "favicon": "./public/favicon.ico",
-      "name": "Synapse Mobile",
-      "shortName": "Synapse"
+      "name": "Synappse Mobile",
+      "shortName": "Synappse"
     },
     "plugins": [
       "expo-router",
@@ -45,15 +45,15 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Synapse to use your camera to scan login QR codes and capture media."
+          "cameraPermission": "Allow Synappse to use your camera to scan login QR codes and capture media."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow Synapse to access your photo library so you can share images and videos.",
-          "cameraPermission": "Allow Synapse to use your camera to capture photos and videos in chat.",
-          "microphonePermission": "Allow Synapse to record audio for voice messages and videos."
+          "photosPermission": "Allow Synappse to access your photo library so you can share images and videos.",
+          "cameraPermission": "Allow Synappse to use your camera to capture photos and videos in chat.",
+          "microphonePermission": "Allow Synappse to record audio for voice messages and videos."
         }
       ],
       "expo-audio",
@@ -62,7 +62,7 @@
       "@sentry/react-native"
     ],
     "extra": {
-      "appDisplayName": "Synapse Mobile"
+      "appDisplayName": "Synappse Mobile"
     },
     "experiments": {
       "baseUrl": "/mobile",

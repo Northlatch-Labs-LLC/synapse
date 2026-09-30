@@ -44,7 +44,7 @@ export function MobileLandingStickyCta() {
             <div className="flex flex-1 flex-col">
               <span className="text-[11px] font-medium text-slate-500">
                 {IS_REPO_LINK_MODE
-                  ? "Synapse open-source repo"
+                  ? "Synappse open-source repo"
                   : "Organize AI into a team"}
               </span>
               <span className="text-[12.5px] font-semibold text-slate-950">
@@ -124,7 +124,7 @@ export function MobileLandingTail() {
         </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5 text-[10.5px] tracking-[0.18em] text-slate-400 uppercase">
-          <span>Synapse</span>
+          <span>Synappse</span>
           <span>·</span>
           <span>AI collaboration runtime</span>
         </div>

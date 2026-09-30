@@ -137,8 +137,8 @@ function RootLayout() {
   return (
     <>
       <Head>
-        <title>Synapse Mobile</title>
-        <meta property="og:title" content="Synapse Mobile" />
+        <title>Synappse Mobile</title>
+        <meta property="og:title" content="Synappse Mobile" />
       </Head>
       <AppProviders>
         <ThemeProvider value={navigationTheme}>
@@ -206,7 +206,7 @@ function ProtectedNavigation() {
         contentStyle: {
           backgroundColor: theme.colors.background,
         },
-        title: "Synapse Mobile",
+        title: "Synappse Mobile",
         fullScreenGestureEnabled: process.env.EXPO_OS === "ios",
         gestureEnabled: true,
       }}

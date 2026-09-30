@@ -141,7 +141,7 @@ export default function UnifiedScanScreen() {
 
     const parsed = parseSynapseQrPayload(payload.data)
     if (!parsed) {
-      setError("这个二维码不是 Synapse 的登录或联系人二维码。")
+      setError("这个二维码不是 Synappse 的登录或联系人二维码。")
       return
     }
 
@@ -183,7 +183,7 @@ export default function UnifiedScanScreen() {
         <EmptyState
           icon="camera"
           title="需要相机权限"
-          description="允许访问相机后，才能扫描 Synapse 的登录或联系人二维码。"
+          description="允许访问相机后，才能扫描 Synappse 的登录或联系人二维码。"
           action={
             <View style={styles.permissionAction}>
               <Button

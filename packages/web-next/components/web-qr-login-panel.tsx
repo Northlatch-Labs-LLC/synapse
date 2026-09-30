@@ -141,7 +141,7 @@ export function WebQrLoginPanel({ redirect }: { redirect: string | null }) {
               className="size-[220px]"
             />
             <p className="text-sm font-medium text-muted-foreground">
-              Scan with the Synapse app and confirm sign-in on your phone
+              Scan with the Synappse app and confirm sign-in on your phone
             </p>
           </>
         ) : (

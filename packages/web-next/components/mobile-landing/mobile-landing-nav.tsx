@@ -54,9 +54,9 @@ export function MobileLandingNav() {
           }`}
         >
           <Link href="/m" className="flex items-center gap-2 pl-1">
-            <Image src="/synapse.svg" alt="Synapse" width={22} height={22} />
+            <Image src="/synapse.svg" alt="Synappse" width={22} height={22} />
             <span className="font-display text-[15px] font-semibold tracking-tight text-foreground">
-              Synapse
+              Synappse
             </span>
           </Link>
 

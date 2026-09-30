@@ -106,7 +106,7 @@ export function AuthConversationPreview() {
       <div className="relative h-full px-6 py-8 text-white md:px-8">
         <div className="relative z-10 max-w-xs">
           <div className="text-[11px] font-medium tracking-[0.28em] text-cyan-200/80 uppercase">
-            Synapse
+            Synappse
           </div>
           <h2 className="mt-3 max-w-xs text-3xl font-semibold tracking-tight text-white">
             One chat. Real work.

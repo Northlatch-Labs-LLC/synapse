@@ -63,7 +63,7 @@ export function WorkspaceLoadingScreen({
         role="status"
       >
         <Image
-          alt="Synapse"
+          alt="Synappse"
           className="h-11 w-auto drop-shadow-[0_14px_30px_rgba(37,99,235,0.18)] select-none dark:drop-shadow-[0_14px_30px_rgba(56,189,248,0.12)]"
           height={44}
           priority
