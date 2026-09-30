@@ -56,7 +56,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { SidebarWeixinBinding } from "@/components/sidebar-weixin-binding"
+import { SidebarTelegramBinding } from "@/components/sidebar-telegram-binding"
 import { TeamSwitcher } from "@/components/team-switcher"
 import { toast } from "sonner"
 
@@ -520,7 +520,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <SidebarWeixinBinding />
+        <SidebarTelegramBinding />
         <NavUser user={user} onLogout={onLogout} />
       </SidebarFooter>
     </Sidebar>
