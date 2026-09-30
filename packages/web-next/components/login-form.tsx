@@ -78,7 +78,9 @@ function CornerSwitch({
 export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = normalizeRedirectTarget(searchParams.get("redirect"))
+  const redirect =
+    normalizeRedirectTarget(searchParams.get("redirect")) ??
+    normalizeRedirectTarget(searchParams.get("next"))
   const { login } = useAuthStore()
   // Surface an OAuth failure relayed via /auth/callback -> /login?error=<code>
   // (the full-page fallback path; the popup path reports inline instead).

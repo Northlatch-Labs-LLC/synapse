@@ -9,6 +9,7 @@ import { LandingHeroHeadline } from "@/components/landing-hero-headline"
 import { LandingHeroStack } from "@/components/landing-hero-stack"
 import { LandingLocalAccessSection } from "@/components/landing-local-access-section"
 import { LandingMotionProvider } from "@/components/landing-motion-provider"
+import { LandingPricingSection } from "@/components/landing-pricing-section"
 import { LandingPluginMarketSection } from "@/components/landing-plugin-market-section"
 import { LandingReveal } from "@/components/landing-motion"
 import { LandingShareNetworkSection } from "@/components/landing-share-network-section"
@@ -87,7 +88,19 @@ export default function HomePage() {
               >
                 Governance
               </Link>
+              <Link
+                href="#pricing"
+                className="transition-colors hover:text-foreground/90"
+              >
+                Pricing
+              </Link>
             </nav>
+            <Link
+              href="/login"
+              className="shrink-0 rounded-full border border-border/70 bg-background/70 px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              Sign in
+            </Link>
           </div>
         </header>
 
@@ -155,6 +168,8 @@ export default function HomePage() {
         <LandingEventDrivenSection />
 
         <LandingTeamGovernanceSection />
+
+        <LandingPricingSection />
 
         <section
           data-landing-tail="true"
