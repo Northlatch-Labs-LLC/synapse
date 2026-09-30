@@ -33,6 +33,7 @@ export default function HomePage() {
       <RepoLinkStaticRedirect page="desktop" />
       <LandingSnapScrollController />
       <LandingMotionProvider>
+        <div className="light">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[42rem] bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.18),transparent_34%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.2),transparent_32%),linear-gradient(180deg,rgba(15,23,42,0.04),transparent_62%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.03)_1px,transparent_1px)] [mask-image:linear-gradient(180deg,rgba(0,0,0,0.7),transparent_85%)] bg-[size:28px_28px]" />
 
@@ -212,6 +213,7 @@ export default function HomePage() {
         </section>
 
         <DesktopMobileHint />
+      </div>
       </LandingMotionProvider>
     </main>
   )

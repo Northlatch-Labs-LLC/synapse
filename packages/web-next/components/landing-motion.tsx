@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useEffect, useState } from "react"
 import { m, useReducedMotion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
@@ -27,20 +28,30 @@ export function LandingReveal({
   x = 0,
   y = 24,
   scale = 1,
-  amount = 0.32,
+  amount = 0.12,
   once = true,
 }: LandingRevealProps) {
   const shouldReduceMotion = useReducedMotion()
+  // Fail-safe: whileInView can miss on fast scrolls / snap containers and
+  // leave content stuck at opacity 0 (founder bug report 2026-09-30). After
+  // 2.5s everything is forced visible — content must never stay hidden.
+  const [forceVisible, setForceVisible] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => setForceVisible(true), 2500)
+    return () => clearTimeout(timer)
+  }, [])
 
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>
   }
 
+  const visible = { opacity: 1, x: 0, y: 0, scale: 1 }
   return (
     <m.div
       className={className}
       initial={{ opacity: 0, x, y, scale }}
-      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      animate={forceVisible ? visible : undefined}
+      whileInView={forceVisible ? undefined : visible}
       viewport={{ once, amount }}
       transition={{ duration, delay, ease: MOTION_EASE }}
     >
