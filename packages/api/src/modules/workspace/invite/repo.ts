@@ -4,11 +4,13 @@ import type { WorkspaceInvitesTrustLevel } from "../../../infrastructure/databas
 import {
   db,
   withDbTransaction,
+  type DatabaseTransaction,
   type TableRow,
 } from "../../../infrastructure/database/kysely.js"
 import { parseInstantString } from "../../../infrastructure/datetime.js"
 import type { Timestamp } from "@synapse/shared"
 import { assignOfficialChiefActorPreference } from "../service.js"
+import { enforceMemberCapOn } from "../../billing/service.js"
 
 /**
  * Invite data-access layer. The ONLY invite file allowed to touch
@@ -95,96 +97,122 @@ export async function updateInviteRevoked(
  * Transactional redeem: locks the invite, validates liveness, adds the member,
  * assigns the official chief actor preference, and bumps the use count.
  * Returns the joined workspace id/name + granted trust level.
+ *
+ * Member-cap enforcement runs INSIDE this transaction: the workspace row is
+ * locked FOR UPDATE (serializing concurrent redemptions for the workspace) and
+ * the plan cap is checked against a member count taken on the same trx, so a
+ * workspace at its plan's seat cap rejects the redemption with
+ * PlanLimitReachedError instead of over seating (mapped to 402 upstream).
  */
 export async function redeemInviteTx(
   token: string,
   userId: string
 ): Promise<WorkspaceInviteRedeemRecord> {
-  return withDbTransaction(async (trx) => {
-    const invite = await trx
-      .selectFrom("workspaceInvites")
-      .selectAll()
-      .where("token", "=", token)
-      .forUpdate()
-      .executeTakeFirst()
-    if (!invite) {
-      throw new Error("Invite not found")
+  return withDbTransaction((trx) =>
+    redeemInviteInTransaction(trx, token, userId)
+  )
+}
+
+/** Tx-scoped redeem body; also directly testable against an outer test
+ * transaction (same shape as the *InTransaction helpers elsewhere). */
+export async function redeemInviteInTransaction(
+  trx: DatabaseTransaction,
+  token: string,
+  userId: string
+): Promise<WorkspaceInviteRedeemRecord> {
+  const invite = await trx
+    .selectFrom("workspaceInvites")
+    .selectAll()
+    .where("token", "=", token)
+    .forUpdate()
+    .executeTakeFirst()
+  if (!invite) {
+    throw new Error("Invite not found")
+  }
+
+  // Lock the workspace row FOR UPDATE: concurrent redemptions (possibly via
+  // different invites) serialize here, so the member count below reflects
+  // every committed redemption before this one — closing the check-then-act
+  // window around the cap check.
+  const workspace = await trx
+    .selectFrom("workspaces")
+    .select("name")
+    .where("id", "=", invite.workspaceId)
+    .forUpdate()
+    .executeTakeFirst()
+
+  if (invite.isRevoked) {
+    throw new Error("Invite has been revoked")
+  }
+  if (invite.expiresAt) {
+    // expiresAt is a DB `Date | null` column. A corrupt (Invalid) Date makes
+    // `NaN < now` false (fail-open); treat unparseable as already expired
+    // (fail-closed) so a garbage expiry can never let a redeem through.
+    const expMs = Number.isNaN(invite.expiresAt.getTime())
+      ? 0
+      : invite.expiresAt.getTime()
+    if (expMs < Date.now()) {
+      throw new Error("Invite has expired")
     }
+  }
+  if (invite.maxUses !== null && invite.useCount >= invite.maxUses) {
+    throw new Error("Invite has reached maximum uses")
+  }
 
-    const workspace = await trx
-      .selectFrom("workspaces")
-      .select("name")
-      .where("id", "=", invite.workspaceId)
-      .executeTakeFirst()
+  // Single durable membership row (UNIQUE(workspace_id,user_id)): only an
+  // ACTIVE member is "already a member"; a previously 'left'/'removed' row is
+  // revived on redeem rather than blocking re-join. Mirrors addMemberTx.
+  const memberCheck = await trx
+    .selectFrom("workspaceMembers")
+    .select(["id", "status"])
+    .where("workspaceId", "=", invite.workspaceId)
+    .where("userId", "=", userId)
+    .executeTakeFirst()
+  if (memberCheck?.status === "active") {
+    throw new Error("Already a member of this workspace")
+  }
 
-    if (invite.isRevoked) {
-      throw new Error("Invite has been revoked")
-    }
-    if (invite.expiresAt) {
-      // expiresAt is a DB `Date | null` column. A corrupt (Invalid) Date makes
-      // `NaN < now` false (fail-open); treat unparseable as already expired
-      // (fail-closed) so a garbage expiry can never let a redeem through.
-      const expMs = Number.isNaN(invite.expiresAt.getTime())
-        ? 0
-        : invite.expiresAt.getTime()
-      if (expMs < Date.now()) {
-        throw new Error("Invite has expired")
-      }
-    }
-    if (invite.maxUses !== null && invite.useCount >= invite.maxUses) {
-      throw new Error("Invite has reached maximum uses")
-    }
+  // Plan seat cap (free/pro static limits; team = purchased seats), counted on
+  // this transaction. Checked AFTER the already-member case so a current
+  // member re-redeeming still gets the precise 409, not a cap rejection.
+  await enforceMemberCapOn(trx, invite.workspaceId)
 
-    // Single durable membership row (UNIQUE(workspace_id,user_id)): only an
-    // ACTIVE member is "already a member"; a previously 'left'/'removed' row is
-    // revived on redeem rather than blocking re-join. Mirrors addMemberTx.
-    const memberCheck = await trx
-      .selectFrom("workspaceMembers")
-      .select(["id", "status"])
-      .where("workspaceId", "=", invite.workspaceId)
-      .where("userId", "=", userId)
-      .executeTakeFirst()
-    if (memberCheck?.status === "active") {
-      throw new Error("Already a member of this workspace")
-    }
-
-    const memberRow = await trx
-      .insertInto("workspaceMembers")
-      .values({
-        workspaceId: invite.workspaceId,
-        userId: userId,
-        trustLevel: invite.trustLevel,
-      })
-      .onConflict((oc) =>
-        oc.columns(["workspaceId", "userId"]).doUpdateSet({
-          status: "active",
-          trustLevel: invite.trustLevel,
-          leftAt: null,
-          removedAt: null,
-        })
-      )
-      .returning("id")
-      .executeTakeFirst()
-    if (!memberRow) {
-      throw new Error("Failed to create workspace member")
-    }
-
-    await assignOfficialChiefActorPreference(
-      trx,
-      invite.workspaceId,
-      memberRow.id
-    )
-
-    await trx
-      .updateTable("workspaceInvites")
-      .set({ useCount: sql`use_count + 1` })
-      .where("id", "=", invite.id)
-      .execute()
-
-    return {
+  const memberRow = await trx
+    .insertInto("workspaceMembers")
+    .values({
       workspaceId: invite.workspaceId,
-      workspaceName: workspace?.name ?? null,
+      userId: userId,
       trustLevel: invite.trustLevel,
-    }
-  })
+    })
+    .onConflict((oc) =>
+      oc.columns(["workspaceId", "userId"]).doUpdateSet({
+        status: "active",
+        trustLevel: invite.trustLevel,
+        leftAt: null,
+        removedAt: null,
+      })
+    )
+    .returning("id")
+    .executeTakeFirst()
+  if (!memberRow) {
+    throw new Error("Failed to create workspace member")
+  }
+
+  await assignOfficialChiefActorPreference(
+    trx,
+    invite.workspaceId,
+    memberRow.id
+  )
+
+  await trx
+    .updateTable("workspaceInvites")
+    .set({ useCount: sql`use_count + 1` })
+    .where("id", "=", invite.id)
+    .execute()
+
+  return {
+    workspaceId: invite.workspaceId,
+    workspaceName: workspace?.name ?? null,
+    trustLevel: invite.trustLevel,
+  }
 }

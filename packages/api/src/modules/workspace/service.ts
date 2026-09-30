@@ -150,6 +150,13 @@ export async function checkMembership(workspaceId: string, userId: string) {
   return row ? deriveWorkspaceTrustLevel(row) : null
 }
 
+/**
+ * Direct member add. Runs the same transactional seat-cap gate as invite
+ * redemption (workspace row locked FOR UPDATE + plan cap counted in the add
+ * transaction), so it can throw PlanLimitReachedError — the controller maps
+ * that to 402 plan_limit_reached. Returns null when the user is already an
+ * active member (the 409 path).
+ */
 export async function addMember(input: repo.AddMemberInput) {
   const result = await repo.addMemberTx(input)
 

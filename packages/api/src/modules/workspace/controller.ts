@@ -242,11 +242,27 @@ export async function handleAddMember(
   }
 
   const { workspaceId } = request.params as WorkspaceParams
-  const member = await addMember({
-    workspaceId,
-    userId: parsed.data.userId,
-    trustLevel: parsed.data.trustLevel,
-  })
+  let member
+  try {
+    member = await addMember({
+      workspaceId,
+      userId: parsed.data.userId,
+      trustLevel: parsed.data.trustLevel,
+    })
+  } catch (error) {
+    // Direct add runs the same transactional seat-cap gate as invite
+    // redemption (addMemberInTransaction) — same 402 plan_limit_reached body.
+    if (error instanceof PlanLimitReachedError) {
+      reply.status(402).send({
+        error: error.message,
+        code: "plan_limit_reached",
+        limit: "members",
+        currentPlan: error.currentPlan,
+      })
+      return undefined
+    }
+    throw error
+  }
 
   if (!member) {
     reply
@@ -639,6 +655,17 @@ export async function handleRedeemInvite(
   try {
     return presentWorkspaceInviteRedeemResult(await redeemInvite(token, userId))
   } catch (err: any) {
+    // Workspace is at its plan's seat cap (free/pro static limit, team =
+    // purchased seats) — same 402 plan_limit_reached body as invite creation.
+    if (err instanceof PlanLimitReachedError) {
+      reply.status(402).send({
+        error: err.message,
+        code: "plan_limit_reached",
+        limit: "members",
+        currentPlan: err.currentPlan,
+      })
+      return undefined
+    }
     const msg = err.message || "Failed to redeem invite"
     if (msg === "Already a member of this workspace") {
       reply.status(409).send({ error: msg })

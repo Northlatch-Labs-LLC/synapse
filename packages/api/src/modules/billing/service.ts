@@ -14,13 +14,16 @@ import {
 } from "./stripe-client.js"
 import {
   checkPlanLimit,
+  countActiveMembersOn,
   ensureFreeSubscriptionRow,
   selectSubscription,
+  selectSubscriptionOn,
   selectWorkspaceOwner,
   selectWorkspaceUsage,
   upsertSubscription,
 } from "./repo.js"
 import { createLogger } from "../../infrastructure/logger/index.js"
+import type { Executor } from "../../infrastructure/database/kysely.js"
 import { presentSubscription } from "./presenter.js"
 import type {
   BillingPlanId,
@@ -319,4 +322,72 @@ export async function enforcePlanLimit(
       violation.max
     )
   }
+}
+
+/**
+ * Member cap derived from the workspace's subscription. Mirrors
+ * presentSubscription's plan semantics (only active/trialing grants a paid
+ * plan; anything else reads as free) and BILLING_PLAN_LIMITS for the caps:
+ * free = 3 members, pro = 10. Team is per-seat ($25/seat/month) with a static
+ * maxMembers of -1, so its real cap is the purchased seat_quantity on the
+ * subscription row (synced from Stripe; absent row = free).
+ */
+export function deriveMemberCap(input: {
+  plan: BillingPlanId
+  status: BillingSubscriptionStatus
+  seatQuantity: number | null
+}): { plan: BillingPlanId; max: number } {
+  const effectivePlan =
+    input.plan !== "free" &&
+    input.status !== "active" &&
+    input.status !== "trialing"
+      ? "free"
+      : input.plan
+  const limits = BILLING_PLAN_LIMITS[effectivePlan]
+  const max =
+    limits.perSeat && limits.maxMembers < 0
+      ? Math.max(1, input.seatQuantity ?? 1)
+      : limits.maxMembers
+  return { plan: effectivePlan, max }
+}
+
+/**
+ * Pure seat-cap gate for a membership add (invite redemption). Same comparison
+ * rule as checkPlanLimit (`current >= max` rejects; max < 0 = unlimited) but
+ * the team cap honors purchased seats. Throws PlanLimitReachedError — callers
+ * map it to the standard 402 plan_limit_reached body.
+ */
+export function assertMemberCap(input: {
+  plan: BillingPlanId
+  status: BillingSubscriptionStatus
+  seatQuantity: number | null
+  activeMembers: number
+}): void {
+  const { plan, max } = deriveMemberCap(input)
+  if (max >= 0 && input.activeMembers >= max) {
+    throw new PlanLimitReachedError("members", plan, input.activeMembers, max)
+  }
+}
+
+/**
+ * Transaction-aware member-cap gate for invite redemption. Both the
+ * subscription row and the active-member count are read on the caller's
+ * executor (an open transaction), so an enforcement inside the redeem
+ * transaction counts the same transactional state it is about to extend —
+ * unlike enforcePlanLimit, which reads on the global db outside any tx.
+ * An absent subscription row means free (same as ensureFreeSubscriptionRow's
+ * lazy-insert semantics).
+ */
+export async function enforceMemberCapOn(
+  executor: Executor,
+  workspaceId: string
+): Promise<void> {
+  const sub = await selectSubscriptionOn(executor, workspaceId)
+  const activeMembers = await countActiveMembersOn(executor, workspaceId)
+  assertMemberCap({
+    plan: sub?.plan ?? "free",
+    status: sub?.status ?? "active",
+    seatQuantity: sub?.seatQuantity ?? 1,
+    activeMembers,
+  })
 }

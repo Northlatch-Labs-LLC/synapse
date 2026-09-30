@@ -1,5 +1,5 @@
 import { sql } from "kysely"
-import { db } from "../../infrastructure/database/kysely.js"
+import { db, type Executor } from "../../infrastructure/database/kysely.js"
 import type {
   BillingPlanId,
   BillingSubscriptionStatus,
@@ -27,6 +27,18 @@ export async function selectSubscription(
   workspaceId: string
 ): Promise<WorkspaceSubscriptionRow | undefined> {
   const row = await db
+    .selectFrom("workspaceSubscriptions")
+    .selectAll()
+    .where("workspaceId", "=", workspaceId)
+    .executeTakeFirst()
+  return (row as unknown as WorkspaceSubscriptionRow) || undefined
+}
+
+export async function selectSubscriptionOn(
+  executor: Executor,
+  workspaceId: string
+): Promise<WorkspaceSubscriptionRow | undefined> {
+  const row = await executor
     .selectFrom("workspaceSubscriptions")
     .selectAll()
     .where("workspaceId", "=", workspaceId)
@@ -128,6 +140,26 @@ export async function selectWorkspaceUsage(
     members: Number(row?.members ?? 0),
     actors: Number(row?.actors ?? 0),
   }
+}
+
+/**
+ * Active-member count on a caller-supplied executor (db OR an open
+ * transaction). Same predicate as the `members` column of
+ * {@link selectWorkspaceUsage} — enforcement points that must count inside a
+ * transaction (invite redemption) use this so the check is not check-then-act
+ * against concurrent redemptions.
+ */
+export async function countActiveMembersOn(
+  executor: Executor,
+  workspaceId: string
+): Promise<number> {
+  const result = await sql<{ members: string }>`
+    SELECT COUNT(*)::text AS members
+    FROM workspace_members
+    WHERE workspace_id = ${workspaceId}
+      AND status = 'active'
+  `.execute(executor)
+  return Number(result.rows[0]?.members ?? 0)
 }
 
 /**

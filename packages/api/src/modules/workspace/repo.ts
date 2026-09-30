@@ -3,6 +3,7 @@ import { sql } from "kysely"
 import {
   db,
   withDbTransaction,
+  type DatabaseTransaction,
   type Executor,
 } from "../../infrastructure/database/kysely.js"
 import { DEFAULT_OFFICIAL_ACTOR_TEMPLATE_SLUG } from "../../infrastructure/database/seeds/actors/index.js"
@@ -14,6 +15,7 @@ import {
   type ActorRole,
 } from "@synapse/shared"
 import { seedWorkspaceCapabilityConversationTypePolicies } from "../capabilities/conversation-type-policies.js"
+import { enforceMemberCapOn } from "../billing/service.js"
 import { markWorkspaceDeleted } from "../soft-delete/orchestration.js"
 import { insertWorkspaceResourceRoot } from "../workspace-resources/repo.js"
 import type {
@@ -544,52 +546,93 @@ export async function bumpCatalogDownloadCount(templateId: string) {
 }
 
 export async function addMemberTx(input: AddMemberInput) {
-  return withDbTransaction(async (trx) => {
-    // Single durable membership row (design §6): re-joining a previously
-    // left/removed member REVIVES the row (status→active) rather than failing.
-    // "already an active member" is detected via the pre-existing status.
-    const existing = await trx
-      .selectFrom("workspaceMembers")
-      .select(["id", "status"])
-      .where("workspaceId", "=", input.workspaceId)
-      .where("userId", "=", input.userId)
-      .executeTakeFirst()
-    if (existing?.status === "active") {
-      return null
-    }
+  return withDbTransaction((trx) => addMemberInTransaction(trx, input))
+}
 
-    const memberRow = await trx
-      .insertInto("workspaceMembers")
-      .values({
-        workspaceId: input.workspaceId,
-        userId: input.userId,
+/**
+ * Tx-scoped direct-add body; also directly testable against an outer test
+ * transaction (same shape as redeemInviteInTransaction).
+ *
+ * Member-cap enforcement runs INSIDE this transaction, mirroring invite
+ * redemption: the workspace row is locked FOR UPDATE first — serializing a
+ * direct add against concurrent redemptions and other direct adds for the
+ * same workspace — then the plan cap is checked against a member count taken
+ * on the same trx, so a workspace at its plan's seat cap rejects the add
+ * with PlanLimitReachedError instead of over seating (mapped to 402
+ * upstream). Without this lock the members endpoint could over-seat any
+ * plan and race a redemption past its cap check.
+ */
+export async function addMemberInTransaction(
+  trx: DatabaseTransaction,
+  input: AddMemberInput
+) {
+  // Single durable membership row (design §6): re-joining a previously
+  // left/removed member REVIVES the row (status→active) rather than failing.
+  // "already an active member" is detected via the pre-existing status.
+  const existing = await trx
+    .selectFrom("workspaceMembers")
+    .select(["id", "status"])
+    .where("workspaceId", "=", input.workspaceId)
+    .where("userId", "=", input.userId)
+    .executeTakeFirst()
+  if (existing?.status === "active") {
+    return null
+  }
+
+  // Lock the workspace row FOR UPDATE: the SAME row lock invite redemption
+  // takes (invite/repo.ts), so a direct add and a redemption — or two direct
+  // adds — for one workspace serialize here and the member count below
+  // reflects every committed membership add before this one. This is what
+  // makes the member-cap invariant hold product-wide, not just on the
+  // redemption path. Read through workspaces_live (soft-delete guard rule 2:
+  // no new naked root reads): FOR UPDATE propagates through the simple view
+  // to the base workspaces row, so it still conflicts with redemption's lock,
+  // and a soft-deleted workspace locks nothing.
+  await trx
+    .selectFrom("workspacesLive")
+    .select("id")
+    .where("id", "=", input.workspaceId)
+    .forUpdate()
+    .executeTakeFirst()
+
+  // Plan seat cap (free/pro static limits; team = purchased seats), counted
+  // on this transaction. Checked AFTER the already-member case so re-adding a
+  // current member still gets the precise 409, not a cap rejection. A revival
+  // of a left/removed member re-consumes a seat, so it passes through the
+  // gate too — same rule as redemption.
+  await enforceMemberCapOn(trx, input.workspaceId)
+
+  const memberRow = await trx
+    .insertInto("workspaceMembers")
+    .values({
+      workspaceId: input.workspaceId,
+      userId: input.userId,
+      trustLevel: input.trustLevel,
+    })
+    .onConflict((oc) =>
+      oc.columns(["workspaceId", "userId"]).doUpdateSet({
+        status: "active",
         trustLevel: input.trustLevel,
+        leftAt: null,
+        removedAt: null,
       })
-      .onConflict((oc) =>
-        oc.columns(["workspaceId", "userId"]).doUpdateSet({
-          status: "active",
-          trustLevel: input.trustLevel,
-          leftAt: null,
-          removedAt: null,
-        })
-      )
-      .returningAll()
-      .executeTakeFirst()
-
-    if (!memberRow) {
-      return null
-    }
-
-    await assignOfficialChiefActorPreference(
-      trx,
-      input.workspaceId,
-      String(memberRow.id)
     )
+    .returningAll()
+    .executeTakeFirst()
 
-    return {
-      member: memberRow,
-    }
-  })
+  if (!memberRow) {
+    return null
+  }
+
+  await assignOfficialChiefActorPreference(
+    trx,
+    input.workspaceId,
+    String(memberRow.id)
+  )
+
+  return {
+    member: memberRow,
+  }
 }
 
 // ---------------------------------------------------------------------------
