@@ -11,10 +11,9 @@ import {
 
 const headlineSteps = [
   { lead: "think like", tail: "" },
-  { lead: "manage like", tail: "" },
-  { lead: "remember like", tail: "" },
   { lead: "work like", tail: "" },
   { lead: "chat like", tail: "" },
+  { lead: "ship like", tail: "" },
 ] as const
 
 const IDLE_MS = 2100
