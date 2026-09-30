@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo } from "react"
 import {
+  APP_NAME,
   extractText,
   type ChatSocketEvent,
   type ChatSyncEvent,
@@ -70,7 +71,7 @@ export function useChatRealtimeSync({
           }
 
           const content = extractText(item.contentBlocks || [])
-          const name = item.author?.name || "Synapse"
+          const name = item.author?.name || APP_NAME
           notify(name, content, payload.conversationId)
           break
         }
