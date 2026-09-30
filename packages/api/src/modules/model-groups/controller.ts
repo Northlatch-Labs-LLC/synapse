@@ -54,6 +54,7 @@ import {
   ModelGroupUpdateInputSchema as updateGroupSchema,
   ModelGroupViewSchema,
 } from "@synapse/shared/schemas"
+import { hasPlatformAccess } from "../platform/admin-service.js"
 import { appRoute } from "../../infrastructure/http/route.js"
 
 function handleError(error: unknown, reply: FastifyReply) {
@@ -152,6 +153,18 @@ async function requireModelGroupPermission(
     }
   }
   const action = resolveAction()
+
+  // Platform gate: super_admin / model_admin may edit PLATFORM-scoped groups
+  // (no workspaceId) outright — seeded platform groups carry no grants, so the
+  // grant-only path below would 403 even for platform admins.
+  if (!workspaceId) {
+    const platformAllowed = await hasPlatformAccess(principalId, [
+      "super_admin",
+      "model_admin",
+    ])
+    if (platformAllowed) return true
+  }
+
   const allowed = await authorizeActionDefault({
     subject: workspaceId
       ? workspaceMemberSubject(principalId)

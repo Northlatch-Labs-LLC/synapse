@@ -1748,7 +1748,9 @@ export function startSessionThinkingWorker() {
                 role: "assistant",
                 subtype: CONVERSATION_MESSAGE_SUBTYPE.MODEL_ERROR_NOTICE,
                 visibility: "shared_visible",
-                contentBlocks: textBlocks("出错了"),
+                contentBlocks: textBlocks(
+                  "Something went wrong — the model call failed. Try again."
+                ),
                 fromActorId: actorId,
                 restrictedAudienceParticipantIds,
                 projectTransportOutbound: true,
