@@ -6,7 +6,7 @@ work or claims credit for gaps that are known and open.
 
 - **Live:** https://synappse.work (production, apex). Old `synapse.xlaunch.work` 301s page
   routes to the apex; `/api/v1` and `/ws` are exempt (the Stripe webhook still delivers there by design).
-- **Trunk:** `main` only, all branches deleted by founder. Revision of last update: `df939efa` (2026-09-30).
+- **Trunk:** `main` only, all branches deleted by founder. Code HEAD: `df939efa` (2026-09-30); this doc updated same day (ops round: spin capture, prune rule, blips).
 - **Brand:** user-facing mark is **Synappse** (double-p). Internal identifiers stay `synapse`
   (`@synapse/*` packages, `SYNAPSE_*` env, `synapse://` scheme, repo name) — do not "fix" them.
 - **Adjacent programs (separate state, separate repos):** Latch (desktop/CLI/mobile harness,
@@ -16,18 +16,18 @@ work or claims credit for gaps that are known and open.
 
 ## 1. Production topology
 
-| Thing                 | Value                                                                                                                                           |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| GridFrames team       | "Synapse" under ops@northlatch.dev; project "Synapse"                                                                                           |
-| Platform service uuid | `1jrsnyfksvyfkivawvyhej4x`                                                                                                                      |
-| VM                    | Incus `gf-30-synapse`, 10.28.242.100 (4cpu/8GB/40GB), from gf-host: `sudo incus exec gf-30-synapse -- …`                                        |
-| Containers on VM      | `api web postgres redis embed tesseract docextract` + `web-public` forwarder :30080                                                             |
-| Edge                  | gf-host Traefik file-provider: `/data/xlaunch/proxy/dynamic/synappse-apex.yml` (apex+www, LE) + `synapse-old-redirect.yml` (301, API/ws exempt) |
-| Access                | `ssh gf-host` (ubuntu); docker and `/data/synapse/.env` require **sudo** there                                                                  |
-| DB                    | `docker exec postgres-1jrsnyfksvyfkivawvyhej4x psql -U synapse -d synapse -c "…"` on the VM (use `-c`, never stdin heredocs)                    |
-| Secrets/cards         | gf-host `/data/synapse/.env` (Stripe, gateway key, base URLs), `FOUNDER-CREDENTIALS.txt` (0600)                                                 |
-| Backups               | nightly 03:17Z `pg_dump.gz` → gf-host `/data/backups/synapse`, 7d retention; restore drill passed 2026-09-29                                    |
-| Monitoring            | gf-host `/data/synapse/monitor.sh`, cron \*/5 → `metrics.log`; auto-forensics fires on api CPU > 80%                                            |
+| Thing                 | Value                                                                                                                                                                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GridFrames team       | "Synapse" under ops@northlatch.dev; project "Synapse"                                                                                                                                                                                                             |
+| Platform service uuid | `1jrsnyfksvyfkivawvyhej4x`                                                                                                                                                                                                                                        |
+| VM                    | Incus `gf-30-synapse`, 10.28.242.100 (4cpu/8GB/40GB), from gf-host: `sudo incus exec gf-30-synapse -- …`                                                                                                                                                          |
+| Containers on VM      | `api web postgres redis embed tesseract docextract` + `web-public` forwarder :30080                                                                                                                                                                               |
+| Edge                  | gf-host Traefik file-provider: `/data/xlaunch/proxy/dynamic/synappse-apex.yml` (apex+www, LE) + `synapse-old-redirect.yml` (301, API/ws exempt)                                                                                                                   |
+| Access                | `ssh gf-host` (ubuntu); docker and `/data/synapse/.env` require **sudo** there                                                                                                                                                                                    |
+| DB                    | `docker exec postgres-1jrsnyfksvyfkivawvyhej4x psql -U synapse -d synapse -c "…"` on the VM (use `-c`, never stdin heredocs)                                                                                                                                      |
+| Secrets/cards         | gf-host `/data/synapse/.env` (Stripe, gateway key, base URLs), `FOUNDER-CREDENTIALS.txt` (0600)                                                                                                                                                                   |
+| Backups               | nightly 03:17Z `pg_dump.gz` → gf-host `/data/backups/synapse`, 7d retention; restore drill passed 2026-09-29                                                                                                                                                      |
+| Monitoring            | gf-host `/data/synapse/monitor.sh`, cron \*/5 → log `/data/backups/synapse/metrics.log`; flags in `/data/backups/synapse/FLAGS/` (`alerts.log` + sentinel file `ATTENTION-REQUIRED`); auto-forensics on api CPU > 80% → `FLAGS/spin-HHMM.log` (throttled 1/30min) |
 
 ## 2. DONE — shipped and verified (do not redo)
 
@@ -90,6 +90,8 @@ verify PUBLIC (curl health + playwright screenshot of the real page)
 - The model-binding resolver caches → restart api after direct `model_bindings` edits.
 - Full-page screenshots need a scroll-through pass first (whileInView renders blank otherwise);
   Cloudflare 1010 blocks python-urllib (use curl or a real browser UA).
+- After the VM `pull`, run `docker image prune -f` on the VM: a `--no-cache` rebuild orphans
+  the previous image layers (~7.6GB; on 2026-09-30 the disk went 29%→48% until pruned).
 - **Never fix a visual bug without screenshotting prod and reading the image.**
 
 ## 4. Founder-dependent (waiting on founder input, not on engineering)
@@ -107,9 +109,14 @@ verify PUBLIC (curl health + playwright screenshot of the real page)
 
 ## 5. Honestly NOT done (known gaps — do not claim these as done)
 
-1. **API CPU spin, root cause unknown.** 2026-09-30 ~04:00Z the api container pinned one core;
-   `docker restart api` cleared it; logs/outbox clean. Auto-forensics is armed for the next
-   trigger; until it fires, the cause is unidentified, not fixed.
+1. **API CPU spin — captured once, cause still not proven.** 2026-09-30 ~04:00Z the api
+   container pinned one core; `docker restart api` cleared it. Auto-forensics FIRED at 05:10Z
+   (`FLAGS/spin-0510.log`): the api was serving normal traffic while an actor conversation
+   ping-ponged (`send_to` between two actors, `Conversation changed before send_to; rethinking`,
+   rounds 3–6) and latencies ballooned (health 743ms, message GETs 3–6.6s); the PG snapshot
+   caught the `realtime_event_outbox` claim query sitting idle-in-transaction. Working
+   hypothesis: an actor-to-actor send loop spinning the think pipeline — NOT proven. No repeat
+   through 09:30Z (no further api-cpu-HIGH flags). Forensics stays armed.
 2. **Mobile app is unshipped.** `packages/mobile-app` (Expo, "Synappse Mobile") — email login
    works against prod, but no APK/IPA exists, mobile login still shows the Feishu button, and
    `register.tsx` still says 注册. A west-first mobile sweep + signed APK was offered; founder
@@ -128,6 +135,9 @@ database/seeds/actors/*`, `createCollaborationRoleTemplateSeed` zh/en structure)
    in DB, `is_active=false`).
 8. **gf-host `HANDOFF.md` / `FOUNDER-CREDENTIALS.txt` still reference the old domain** in places;
    this file is the authoritative state doc.
+9. **Transient health blips.** Single-sample health-DOWN at 05:30Z and 07:35Z on 09-30 (plus
+   three the evening of 09-29), each self-recovered within one 5-min cycle; only the 05:30 one
+   correlates with the spin window. Left alone while health stays green.
 
 ## 6. Verified-false leads (do not re-chase)
 
