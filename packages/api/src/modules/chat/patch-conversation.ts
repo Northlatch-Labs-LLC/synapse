@@ -79,6 +79,7 @@ export async function patchChatConversationUseCase(
 
     const updated = await updateConversationMutableFields(client, {
       conversationId: params.conversationId,
+      workspaceMemberId: params.workspaceMemberId,
       title: params.title,
       metadata: params.metadata,
       archived: params.archived,

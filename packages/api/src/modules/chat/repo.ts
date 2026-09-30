@@ -782,6 +782,7 @@ export async function updateConversationMutableFields(
   executor: Executor,
   input: {
     conversationId: string
+    workspaceMemberId?: string
     title?: string | null
     metadata?: Record<string, unknown>
     archived?: boolean
@@ -790,7 +791,6 @@ export async function updateConversationMutableFields(
   const update: {
     title?: string | null
     metadata?: RawBuilder<JsonValue>
-    archived?: boolean
   } = {}
   if (input.title !== undefined) {
     update.title = input.title?.trim() || null
@@ -798,20 +798,39 @@ export async function updateConversationMutableFields(
   if (input.metadata !== undefined) {
     update.metadata = jsonbValue(input.metadata)
   }
+  if (Object.keys(update).length > 0) {
+    void executor
+      .updateTable("conversations")
+      .set(update)
+      .where("id", "=", input.conversationId)
+      .execute()
+  }
+
+  // archived is PER-MEMBER view state (workspace_member_conversation_views),
+  // not a conversation column. Upsert the member's view row; read paths join
+  // this table for the archived/muted flags.
   if (input.archived !== undefined) {
-    update.archived = input.archived
-  }
-  if (Object.keys(update).length === 0) {
-    return false
+    if (!input.workspaceMemberId) {
+      throw new Error(
+        "archived requires workspaceMemberId (per-member view state)"
+      )
+    }
+    void executor
+      .insertInto("workspaceMemberConversationViews")
+      .values({
+        workspaceMemberId: input.workspaceMemberId,
+        conversationId: input.conversationId,
+        archived: input.archived,
+      })
+      .onConflict((oc) =>
+        oc.columns(["workspaceMemberId", "conversationId"]).doUpdateSet({
+          archived: input.archived,
+        })
+      )
+      .execute()
   }
 
-  await executor
-    .updateTable("conversations")
-    .set(update)
-    .where("id", "=", input.conversationId)
-    .execute()
-
-  return true
+  return input.archived !== undefined || Object.keys(update).length > 0
 }
 
 export async function getConversationParticipantById(
