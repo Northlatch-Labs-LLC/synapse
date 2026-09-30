@@ -20,34 +20,34 @@ import {
 function formatTargetsLabel(runtime: ActorRuntimeState) {
   const targets = getActorRuntimeProcessingTargets(runtime)
   if (targets.length === 0) {
-    return "当前 turn 正在处理中"
+    return "Processing current turn"
   }
 
   const names = targets.map((target) => target.name).filter(Boolean)
   if (names.length <= 2) {
-    return `正在处理 ${names.join("、")}`
+    return `Working with ${names.join(", ")}`
   }
-  return `正在处理 ${names.slice(0, 2).join("、")} 等 ${names.length} 人`
+  return `Working with ${names.slice(0, 2).join(", ")} +${names.length - 2} more`
 }
 
 function formatToolStateLabel(state: string) {
   switch (state) {
     case "running":
-      return "运行中"
+      return "Running"
     case "pending":
-      return "等待中"
+      return "Pending"
     case "input_required":
-      return "等待输入"
+      return "Waiting for input"
     case "completed":
-      return "已完成"
+      return "Completed"
     case "failed":
-      return "失败"
+      return "Failed"
     case "cancelled":
-      return "已取消"
+      return "Cancelled"
     case "skipped":
-      return "已跳过"
+      return "Skipped"
     default:
-      return "处理中"
+      return "Processing"
   }
 }
 
@@ -99,7 +99,7 @@ function ActivityBlocks({ blocks }: { blocks: CanonicalContentBlock[] }) {
   if (blocks.length === 0) {
     return (
       <View style={styles.emptyBlock}>
-        <Text style={styles.emptyBlockText}>暂无细节</Text>
+        <Text style={styles.emptyBlockText}>No details yet</Text>
       </View>
     )
   }
@@ -196,7 +196,7 @@ export function ActorActivityBubble({
         setError(
           fetchError instanceof Error
             ? fetchError.message
-            : "加载当前 turn 细节失败"
+            : "Failed to load current turn details"
         )
       })
       .finally(() => {
@@ -219,12 +219,12 @@ export function ActorActivityBubble({
 
   const countsLabel = useMemo(() => {
     if (!preview || preview.totalToolCallCount === 0) return null
-    const parts = [`${preview.totalToolCallCount} 个工具调用`]
+    const parts = [`${preview.totalToolCallCount} tool calls`]
     if (preview.completedToolCallCount > 0) {
-      parts.push(`${preview.completedToolCallCount} 已完成`)
+      parts.push(`${preview.completedToolCallCount} completed`)
     }
     if (preview.failedToolCallCount > 0) {
-      parts.push(`${preview.failedToolCallCount} 失败`)
+      parts.push(`${preview.failedToolCallCount} failed`)
     }
     return parts.join(" · ")
   }, [preview])
@@ -310,7 +310,7 @@ export function ActorActivityBubble({
                   color={theme.colors.textMuted}
                 />
                 <Text style={styles.loadingText}>
-                  正在加载当前 turn 活动...
+                  Loading current turn activity...
                 </Text>
               </View>
             ) : error ? (
@@ -348,11 +348,11 @@ export function ActorActivityBubble({
                         </Text>
                       ) : null}
                       <View style={styles.section}>
-                        <Text style={styles.sectionLabel}>调用</Text>
+                        <Text style={styles.sectionLabel}>Call</Text>
                         <ActivityBlocks blocks={item.requestBlocks} />
                       </View>
                       <View style={styles.section}>
-                        <Text style={styles.sectionLabel}>结果</Text>
+                        <Text style={styles.sectionLabel}>Result</Text>
                         {resolvePresentation(item.resultSummary) ? (
                           <Text style={styles.itemDetail}>
                             {resolvePresentation(item.resultSummary)}
@@ -367,7 +367,7 @@ export function ActorActivityBubble({
             ) : (
               <View style={styles.emptyBlock}>
                 <Text style={styles.emptyBlockText}>
-                  这个 turn 里还没有工具调用
+                  No tool calls in this turn yet
                 </Text>
               </View>
             )}

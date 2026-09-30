@@ -6,6 +6,7 @@ import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import {
+  CreditCard,
   Bell,
   Bot,
   Brain,
@@ -55,7 +56,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { SidebarWeixinBinding } from "@/components/sidebar-weixin-binding"
+import { SidebarTelegramBinding } from "@/components/sidebar-telegram-binding"
 import { TeamSwitcher } from "@/components/team-switcher"
 import { toast } from "sonner"
 
@@ -92,6 +93,11 @@ const modelItems = [
 
 const accessItems = [
   { href: "/dashboard/access", label: "Access", icon: ShieldCheck },
+  {
+    href: "/dashboard/settings/billing",
+    label: "Billing",
+    icon: CreditCard,
+  },
 ]
 
 const emptyWorkspaceNavigation = {
@@ -514,7 +520,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <SidebarWeixinBinding />
+        <SidebarTelegramBinding />
         <NavUser user={user} onLogout={onLogout} />
       </SidebarFooter>
     </Sidebar>

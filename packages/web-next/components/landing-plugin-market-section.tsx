@@ -10,48 +10,54 @@ import { Card, CardContent } from "@/components/ui/card"
 const pluginHighlights = [
   {
     icon: ShieldCheck,
-    title: "官方维护",
-    description: "内置和官方维护能力直接可用，不必再自己先搭一层集成。",
+    title: "Officially maintained",
+    description:
+      "Built-in and officially maintained capabilities work out of the box — no integration layer to build first.",
   },
   {
     icon: PlugZap,
-    title: "装到工作区",
-    description: "插件先进入工作区，再按角色、会话或团队范围发放给合适的人。",
+    title: "Install to the workspace",
+    description:
+      "Plugins land in the workspace first, then get issued by role, session, or team scope.",
   },
   {
     icon: LockKeyhole,
-    title: "统一授权",
-    description: "谁能装、谁能用、在哪些范围生效，都能在同一处管理。",
+    title: "Unified authorization",
+    description:
+      "Who can install, who can use, and where it applies — managed in one place.",
   },
 ] as const
 
 const pluginCards = [
   {
     name: "Zhipu Toolkit",
-    summary: "网页搜索、文档读取、OCR 和信息采集",
-    meta: "官方维护",
-    action: "安装到工作区",
+    summary: "Web search, document reading, OCR, and information collection",
+    meta: "Official",
+    action: "Install to workspace",
     accent: "bg-sky-100 text-sky-900",
   },
   {
     name: "Browser Operator",
-    summary: "让数字员工直接操作浏览器，完成真实页面里的执行任务。",
-    meta: "官方维护",
-    action: "授权给角色",
+    summary:
+      "Lets digital workers drive the browser directly and complete execution tasks on real pages.",
+    meta: "Official",
+    action: "Grant to roles",
     accent: "bg-emerald-100 text-emerald-900",
   },
   {
     name: "Docs Connector",
-    summary: "把文档、知识库和附件接进同一条工作链里。",
-    meta: "工作区常用",
-    action: "安装并授权",
+    summary:
+      "Brings documents, knowledge bases, and attachments into the same workflow.",
+    meta: "Frequently used",
+    action: "Install and authorize",
     accent: "bg-amber-100 text-amber-900",
   },
   {
     name: "SQL Access",
-    summary: "让分析和运营角色按权限读取结构化数据。",
-    meta: "受控访问",
-    action: "配置访问范围",
+    summary:
+      "Lets analyst and operations roles read structured data within their permissions.",
+    meta: "Controlled access",
+    action: "Configure access scope",
     accent: "bg-violet-100 text-violet-900",
   },
 ] as const
@@ -67,10 +73,12 @@ export function LandingPluginMarketSection() {
         <div className="grid gap-12 lg:grid-cols-[0.84fr_1.16fr] lg:items-center lg:gap-14">
           <LandingReveal className="max-w-xl" x={-24}>
             <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-              插件先进入工作区，再交给角色去用
+              Plugins land in the workspace first, then go to the roles
             </h2>
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-              搜索、安装、分配、授权都在同一个后台完成。插件先成为工作区资源，再交给合适的角色和会话去调用
+              Search, install, assign, and authorize in one console. Plugins
+              become workspace resources, then get called by the right roles and
+              sessions
             </p>
 
             <LandingStagger className="mt-8 space-y-4" delay={0.08}>
@@ -107,15 +115,16 @@ export function LandingPluginMarketSection() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="text-sm font-semibold text-slate-950">
-                      官方插件市场
+                      Official plugin marketplace
                     </div>
                     <div className="mt-1 text-[11px] text-slate-500">
-                      先安装到工作区，再按规则分配给数字团队
+                      Install to the workspace first, then assign to digital
+                      teams by rule
                     </div>
                   </div>
                   <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-500">
                     <Search className="size-4" />
-                    搜索官方插件
+                    Search official plugins
                   </div>
                 </div>
               </div>
@@ -127,16 +136,16 @@ export function LandingPluginMarketSection() {
                   y={14}
                 >
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
-                    研究
+                    Research
                   </span>
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
-                    浏览器
+                    Browser
                   </span>
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
-                    文档
+                    Docs
                   </span>
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
-                    数据
+                    Data
                   </span>
                 </LandingReveal>
 

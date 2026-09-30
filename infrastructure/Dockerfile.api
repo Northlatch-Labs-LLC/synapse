@@ -123,9 +123,18 @@ WORKDIR /app
 # (infrastructure/media/transcode.ts → OGG/Opus mono). Callers gate supportsVoice
 # on ffmpegAvailable(), so absent → outbound voice silently degrades to a document
 # attachment. The ASR sidecars bake their own ffmpeg; the api needs its own here.
-ARG DOCKER_CLI_VERSION=27.5.1
+ARG DOCKER_CLI_VERSION=29.8.1
 RUN apt-get update \
+  # Targeted security-package refresh, not a blanket `apt-get upgrade`:
+  # bookworm-slim upgrades of bash trip an update-alternatives error on the
+  # man page this slim image omits (bash-builtins.7.gz), failing the build.
+  # Installing the CVE-carrying packages by name pulls their fixed versions.
+  && apt-get install -y --no-install-recommends libgnutls30 libpcre2-8-0 libcap2 \
   && apt-get install -y --no-install-recommends ca-certificates curl bubblewrap ripgrep ffmpeg \
+  # node:20 ships npm 10 whose vendored deps (tar@6.2.1, undici@5.29, pacote,
+  # sigstore, minimatch) carry known CRITICAL/HIGH CVEs that Trivy flags on
+  # the final image. npm 11 vendors the fixed lines.
+  && npm install -g npm@11 \
   && curl -fsSL "https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_CLI_VERSION}.tgz" \
        -o /tmp/docker.tgz \
   && tar -xzf /tmp/docker.tgz -C /tmp \

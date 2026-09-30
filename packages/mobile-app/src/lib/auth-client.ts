@@ -1,21 +1,57 @@
 import { createAuthClient } from "better-auth/react"
 import { expoClient } from "@better-auth/expo/client"
-import {
-  genericOAuthClient,
-  deviceAuthorizationClient,
-} from "better-auth/client/plugins"
+import { deviceAuthorizationClient } from "better-auth/client/plugins"
 import * as SecureStore from "expo-secure-store"
 import { Platform } from "react-native"
 
 import { getAuthBaseURLForClient } from "@/lib/config"
 
 /**
- * Platform-aware synchronous storage for the Expo cookie-jar.
+ * Local stand-in for the genericOAuth client plugin.
  *
- * `@better-auth/expo`'s expoClient persists the Better Auth session cookie via
- * `storage.getItem`/`setItem`. On native we back it with expo-secure-store; on
- * web (`Platform.OS === "web"`) expo-secure-store's native module is empty and
- * `SecureStore.getItem` THROWS, so we fall back to `localStorage` (and the
+ * better-auth@1.7.6 ships the SERVER plugin (`better-auth/plugins` →
+ * genericOAuth, which registers `/sign-in/oauth2` at runtime and declares "no
+ * plugin-specific endpoints" in its types, so nothing is inferred) but no
+ * client companion export. This declares the one action the app uses,
+ * against the same route the server serves, via the client-plugin
+ * `getActions` contract (see BetterAuthClientPlugin in @better-auth/core).
+ */
+const genericOAuthClient = () => ({
+  id: "generic-oauth",
+  getActions: (
+    $fetch: (
+      path: string,
+      options?: Record<string, unknown>
+    ) => Promise<{ error?: { message?: string } | null }>
+  ) => ({
+    signIn: {
+      oauth2: (
+        data: {
+          providerId: string
+          callbackURL?: string
+          errorCallbackURL?: string
+          scopes?: string[]
+        },
+        options?: Record<string, unknown>
+      ) =>
+        $fetch("/sign-in/oauth2", {
+          method: "POST",
+          body: data,
+          ...(options ?? {}),
+        }),
+    },
+  }),
+})
+
+/**
+ * Platform-aware storage for the Expo cookie-jar.
+ *
+ * `@better-auth/expo`'s expoClient types storage as SecureStore's shape —
+ * `Pick<typeof SecureStore, getItem | getItemAsync | setItem | setItemAsync>`
+ * (see ExpoClientStorage in its client.d.ts) — and coordinates async access
+ * through the async pair. On native we pass SecureStore through; on web
+ * (`Platform.OS === "web"`) expo-secure-store's native module is empty and
+ * SecureStore.getItem THROWS, so we back all four with localStorage (and the
  * browser cookie jar is used anyway).
  */
 const authStorage =
@@ -25,16 +61,31 @@ const authStorage =
           typeof window !== "undefined"
             ? window.localStorage.getItem(key)
             : null,
+        getItemAsync: (key: string): Promise<string | null> =>
+          Promise.resolve(
+            typeof window !== "undefined"
+              ? window.localStorage.getItem(key)
+              : null
+          ),
         setItem: (key: string, value: string): void => {
           if (typeof window !== "undefined") {
             window.localStorage.setItem(key, value)
           }
         },
+        setItemAsync: (key: string, value: string): Promise<void> =>
+          Promise.resolve(
+            typeof window !== "undefined"
+              ? window.localStorage.setItem(key, value)
+              : undefined
+          ),
       }
     : {
         getItem: (key: string) => SecureStore.getItem(key),
+        getItemAsync: (key: string) => SecureStore.getItemAsync(key),
         setItem: (key: string, value: string) =>
           SecureStore.setItem(key, value),
+        setItemAsync: (key: string, value: string) =>
+          SecureStore.setItemAsync(key, value),
       }
 
 // Lazily constructed so this module can be imported during Expo web static
@@ -80,11 +131,12 @@ export function getAuthClient(): AuthClient {
  * there). The signed value (which contains a `.`) is what the server's bearer
  * plugin verifies; we never send the whole `a=b; c=d` cookie string as a token.
  *
- * Returns null on web (the cookie-jar is empty there; web uses the browser
- * cookie store) or when no session cookie is present.
+ * Async because the expo client's `getCookie` action reads the async storage
+ * adapter. Returns null on web (the cookie-jar is empty there; web uses the
+ * browser cookie store) or when no session cookie is present.
  */
-export function getSessionBearerToken(): string | null {
-  const header = getAuthClient().getCookie()
+export async function getSessionBearerToken(): Promise<string | null> {
+  const header = await getAuthClient().getCookie()
   if (!header) return null
   for (const part of header.split(";")) {
     const eq = part.indexOf("=")

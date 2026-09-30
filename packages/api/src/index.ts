@@ -51,6 +51,7 @@ import { parseJsonBodyWithRawCapture } from "./infrastructure/http/json-body-par
 // Module imports
 import authModule from "./modules/auth/index.js"
 import workspaceModule from "./modules/workspace/index.js"
+import billingModule from "./modules/billing/index.js"
 import workspaceResourcesModule from "./modules/workspace-resources/index.js"
 import organizationModule from "./modules/organization/index.js"
 import skillsModule from "./modules/skills/index.js"
@@ -63,6 +64,7 @@ import memoryModule from "./modules/memory/index.js"
 import mcpPluginsModule from "./modules/mcp-plugins/index.js"
 import devicesModule from "./modules/devices/index.js"
 import runtimeAuthorizationsModule from "./modules/runtime-authorizations/index.js"
+import auditExportModule from "./modules/audit-export/index.js"
 import modelGroupsModule from "./modules/model-groups/index.js"
 import platformModule from "./modules/platform/index.js"
 import imModule from "./modules/im/index.js"
@@ -147,11 +149,14 @@ async function main() {
   // logs are now one logger, so level/format never drift. Fastify-compatible
   // req/res/err serializers + pino-pretty-in-dev are baked into the instance
   // (passing an instance bypasses Fastify's own serializer injection).
-  // Cast to FastifyBaseLogger so Fastify's `Logger` generic resolves to the
-  // default (not the concrete pino Logger type) — otherwise `app` would not be
-  // assignable to helpers typed as FastifyInstance<…, FastifyBaseLogger>.
+  // Fastify 5: a ready-made logger instance must be passed as `loggerInstance`
+  // — `logger` accepts only config, and an instance there fails validation
+  // (FST_ERR_LOG_INVALID_LOGGER_CONFIG). Cast to FastifyBaseLogger so
+  // Fastify's `Logger` generic resolves to the default (not the concrete pino
+  // Logger type) — otherwise `app` would not be assignable to helpers typed
+  // as FastifyInstance<…, FastifyBaseLogger>.
   const app = Fastify({
-    logger: logger as FastifyBaseLogger,
+    loggerInstance: logger as FastifyBaseLogger,
     // Stable per-request id. We do NOT derive it from the active span: Fastify
     // calls genReqId before @fastify/otel's onRequest span exists, so a
     // span-derived id would never match. Correlation across logs/traces is via
@@ -224,7 +229,7 @@ async function main() {
       error:
         statusCode >= 500
           ? "Internal Server Error"
-          : error.message || "Request failed",
+          : (error as { message?: string }).message || "Request failed",
       code,
     })
   })
@@ -318,6 +323,7 @@ async function main() {
   // Register modules
   await app.register(authModule)
   await app.register(workspaceModule)
+  await app.register(billingModule)
   await app.register(workspaceResourcesModule)
   await app.register(organizationModule)
   await app.register(skillsModule)
@@ -330,6 +336,7 @@ async function main() {
   await app.register(mcpPluginsModule)
   await app.register(devicesModule)
   await app.register(runtimeAuthorizationsModule)
+  await app.register(auditExportModule)
   await app.register(modelGroupsModule)
   await app.register(logsModule)
   await app.register(reportsModule)

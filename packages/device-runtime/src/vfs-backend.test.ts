@@ -9,7 +9,7 @@ import {
   promises as fsp,
 } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 import { execSync } from "node:child_process"
 
 import {
@@ -34,7 +34,16 @@ test("safeResolve('/') succeeds and returns root", async () => {
     const be = createLocalFsBackend({ rootPath: root })
     await be.start()
     const host = await be.safeResolve("/")
-    assert.equal(host, await fsp.realpath(root))
+    // Operational contract: safeResolve returns the CONSTRUCTED root-relative
+    // host path (every consumer opens/reads through it). The original
+    // assertion (realpathSync) is unsatisfiable under a symlinked root prefix
+    // — macOS tmpdir lives under /var -> /private/var — where constructed and
+    // resolved roots legitimately differ (issue #6). Assert both properties
+    // separately: it IS the constructed root, AND that root resolves within
+    // the resolved root (same inode chain).
+    assert.equal(host, resolve(root))
+    const realHost = await fsp.realpath(host)
+    assert.equal(realHost, await fsp.realpath(root))
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
@@ -565,6 +574,28 @@ test("start rejects when /.synapse-internal/tmp is a symlink to another in-root 
     )
   } finally {
     rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test("start succeeds when root sits under a symlinked parent (macOS /var → /private/var, issue #6)", async () => {
+  const realRoot = freshRoot("synapse-real-")
+  const linkParent = freshRoot("synapse-linkparent-")
+  const linkPath = join(linkParent, "aliased-root")
+  try {
+    symlinkSync(realRoot, linkPath)
+    // rootPath goes through the symlink: every internal dir's realpath
+    // differs from its constructed path by the symlinked prefix. The alias
+    // check must anchor to the ROOT's realpath, not the constructed string —
+    // otherwise every macOS-tmpdir-rooted sandbox false-trips "resolves to
+    // /private/var/..." at startup (issue #6).
+    const be = createLocalFsBackend({ rootPath: linkPath })
+    await be.start()
+    // Usable through the aliased root, not merely startable.
+    writeFileSync(join(realRoot, "probe.txt"), "p")
+    assert.equal((await be.safeStat("/probe.txt"))?.kind, "file")
+  } finally {
+    rmSync(linkParent, { recursive: true, force: true })
+    rmSync(realRoot, { recursive: true, force: true })
   }
 })
 

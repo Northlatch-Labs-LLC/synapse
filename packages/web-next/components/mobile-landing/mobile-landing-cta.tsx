@@ -43,12 +43,14 @@ export function MobileLandingStickyCta() {
           <div className="flex items-center gap-2 rounded-full border border-white/72 bg-white/90 p-1.5 pl-4 shadow-[0_22px_44px_-22px_rgba(15,23,42,0.4)] backdrop-blur-xl">
             <div className="flex flex-1 flex-col">
               <span className="text-[11px] font-medium text-slate-500">
-                {IS_REPO_LINK_MODE ? "Synapse 开源仓库" : "把 AI 组织成团队"}
+                {IS_REPO_LINK_MODE
+                  ? "Synapse open-source repo"
+                  : "Organize AI into a team"}
               </span>
               <span className="text-[12.5px] font-semibold text-slate-950">
                 {IS_REPO_LINK_MODE
-                  ? "在 GitHub 查看源码与说明"
-                  : "现在开始搭建你的数字组织"}
+                  ? "View source and docs on GitHub"
+                  : "Start building your digital organization"}
               </span>
             </div>
             {IS_REPO_LINK_MODE ? (
@@ -66,7 +68,7 @@ export function MobileLandingStickyCta() {
                 href="/register"
                 className="flex items-center gap-1.5 rounded-full bg-slate-950 px-3.5 py-2.5 text-[12.5px] font-semibold text-white transition-transform active:scale-[0.97]"
               >
-                创建团队
+                Create a team
                 <ArrowRight className="size-3.5" />
               </Link>
             )}
@@ -88,10 +90,11 @@ export function MobileLandingTail() {
         className="mx-auto max-w-md text-center"
       >
         <h2 className="font-display text-[22px] leading-[1.2] font-semibold tracking-tight text-slate-950">
-          把 AI 从聊天窗口，升级成团队能力
+          Turn AI from a chat window into team capability
         </h2>
         <p className="mx-auto mt-3 max-w-[20rem] text-[13px] leading-6 text-slate-600">
-          角色、记忆、授权、事件唤醒和执行环境都进入同一个中枢
+          Roles, memory, grants, event wake-ups, and execution environments come
+          together in one hub
         </p>
         <div className="mt-6 flex flex-col items-stretch gap-2">
           {IS_REPO_LINK_MODE ? (
@@ -102,28 +105,28 @@ export function MobileLandingTail() {
               className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[0_18px_32px_-16px_rgba(15,23,42,0.55)] transition-transform active:scale-[0.98]"
             >
               <Github className="size-4" />
-              GitHub 开源仓库
+              GitHub open-source repo
             </a>
           ) : (
             <Link
               href="/register"
               className="rounded-full bg-slate-950 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[0_18px_32px_-16px_rgba(15,23,42,0.55)] transition-transform active:scale-[0.98]"
             >
-              创建团队
+              Create a team
             </Link>
           )}
           <Link
             href="#trust"
             className="rounded-full border border-slate-200/90 bg-white/85 px-5 py-3.5 text-[15px] font-semibold text-slate-800 backdrop-blur transition-colors active:bg-white"
           >
-            了解私有部署
+            Learn about self-hosting
           </Link>
         </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5 text-[10.5px] tracking-[0.18em] text-slate-400 uppercase">
           <span>Synapse</span>
           <span>·</span>
-          <span>AI 协作运行时</span>
+          <span>AI collaboration runtime</span>
         </div>
       </m.div>
     </section>

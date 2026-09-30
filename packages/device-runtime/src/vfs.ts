@@ -462,6 +462,21 @@ export function createLocalFsBackend(
   const internalTmpAbs = resolve(internalDirAbs, "tmp")
   const internalRestoreAbs = resolve(internalDirAbs, "restore")
 
+  // Resolved (realpath) root, computed lazily once the root exists. CONTAINMENT
+  // comparisons must anchor to the real path: under a symlinked root prefix
+  // (macOS /var -> /private/var) every realpath produced below the root
+  // differs from its constructed string, so comparing realpaths against the
+  // constructed root false-trips "escapes root" / strips nothing (issue #6).
+  // Path CONSTRUCTION keeps using the constructed root unchanged; only the
+  // alias-sensitive comparisons below anchor to the resolved root.
+  let realHostRoot: string | null = null
+  async function ensureRealHostRoot(): Promise<string> {
+    if (realHostRoot === null) {
+      realHostRoot = await fsp.realpath(hostRootPath)
+    }
+    return realHostRoot
+  }
+
   const state: InternalState = {
     pathLocks: new Map(),
     grantPrefixStore: new AsyncLocalStorage<GrantScopeState>(),
@@ -479,10 +494,20 @@ export function createLocalFsBackend(
     return state.fallbackGrantPrefixes
   }
 
-  function realpathToCanonical(hostPath: string): string | null {
-    if (hostPath === hostRootPath) return "/"
-    if (!hostPath.startsWith(hostRootWithSep)) return null
-    const rel = relative(hostRootPath, hostPath)
+  function realpathToCanonical(
+    hostPath: string,
+    realRoot?: string
+  ): string | null {
+    // realRoot: the RESOLVED root to strip against (issue #6). Callers that
+    // pass a realpath produced under the root must strip against the resolved
+    // root or the alias prefix defeats the strip. Omitted (external/legacy
+    // callers passing constructed paths): strip against the constructed root,
+    // which is identity on non-symlinked hosts and for constructed inputs.
+    const root = realRoot ?? hostRootPath
+    const rootWithSep = root === hostRootPath ? hostRootWithSep : root + sep
+    if (hostPath === root) return "/"
+    if (!hostPath.startsWith(rootWithSep)) return null
+    const rel = relative(root, hostPath)
     if (rel.startsWith("..")) return null
     return `/${rel.split(sep).join("/")}`
   }
@@ -550,7 +575,9 @@ export function createLocalFsBackend(
     }
     const candidate = resolve(hostRootPath, canonical.slice(1))
     const real = await realpathOfPossiblyMissing(candidate)
-    if (real !== hostRootPath && !real.startsWith(hostRootWithSep)) {
+    const realRoot = await ensureRealHostRoot()
+    const realRootWithSep = realRoot.endsWith(sep) ? realRoot : realRoot + sep
+    if (real !== realRoot && !real.startsWith(realRootWithSep)) {
       throw new CanonicalPathError(
         "invalid_path",
         `path escapes root via realpath: ${canonical}`
@@ -573,7 +600,7 @@ export function createLocalFsBackend(
       throw new GrantPrefixDeniedError(canonical)
     }
     if (grants !== WHOLE_SCOPE && grants) {
-      const realCanonical = realpathToCanonical(real)
+      const realCanonical = realpathToCanonical(real, realRoot)
       if (realCanonical === null) {
         throw new GrantPrefixDeniedError(canonical)
       }
@@ -1176,7 +1203,18 @@ export function createLocalFsBackend(
       //     `.synapse-internal -> /public/internal` would let staging
       //     files be aliased out through a list/read-visible path.
       //   - After mkdir, lstat each and reject symlinks; verify realpath
-      //     equals the constructed host path (no in-root alias either).
+      //     matches the root-anchored expected path (no in-root or
+      //     out-of-root alias).
+      // The alias check is anchored to the REALPATH OF THE ROOT, not to the
+      // constructed (unresolved) path: on macOS the system tmpdir lives
+      // under /var -> /private/var, so every tmpdir-rooted sandbox would
+      // otherwise false-trip on "resolves to /private/var/..." (issue #6).
+      // Anchoring to the root keeps the actual security property — an
+      // intermediate symlink moving the internal namespace elsewhere,
+      // including to another path inside the root, still mismatches — while
+      // host-level symlink prefixes that shift root and namespace together
+      // are tolerated.
+      const realRoot = await ensureRealHostRoot()
       await fsp.mkdir(internalDirAbs, { recursive: true })
       await fsp.mkdir(internalTmpAbs, { recursive: true })
       await fsp.mkdir(internalRestoreAbs, { recursive: true })
@@ -1193,7 +1231,8 @@ export function createLocalFsBackend(
           )
         }
         const real = await fsp.realpath(dir)
-        if (real !== dir) {
+        const expected = resolve(realRoot, relative(hostRootPath, dir))
+        if (real !== expected) {
           // Either an intermediate-component symlink, or the dir itself
           // resolves elsewhere even though lstat says directory. Reject —
           // we want the internal namespace addressable by exactly one

@@ -43,8 +43,8 @@ const CONTACT_FILTER = {
 type ContactFilter = (typeof CONTACT_FILTER)[keyof typeof CONTACT_FILTER]
 
 const FILTER_OPTIONS: Array<{ value: ContactFilter; label: string }> = [
-  { value: CONTACT_FILTER.ALL, label: "默认" },
-  { value: CONTACT_FILTER.FRIEND, label: "好友" },
+  { value: CONTACT_FILTER.ALL, label: "All" },
+  { value: CONTACT_FILTER.FRIEND, label: "Friends" },
   { value: CONTACT_FILTER.ACTOR, label: "Actor" },
   { value: CONTACT_FILTER.WORKSPACE_MEMBER, label: "Workspace Member" },
 ]
@@ -96,7 +96,7 @@ export default function ContactsTabScreen() {
   const error = hubQuery.error
     ? hubQuery.error instanceof Error
       ? hubQuery.error.message
-      : "联系人加载失败。"
+      : "Failed to load contacts."
     : null
   const loadHub = () => hubQuery.refetch()
 
@@ -131,7 +131,7 @@ export default function ContactsTabScreen() {
             ? ALPHABET_ENTITY_TARGET_TYPE.ACTOR
             : ALPHABET_ENTITY_TARGET_TYPE.USER,
         trailingAccessory: isFriendEntry(entry) ? (
-          <Pill label="好友" tone="primary" />
+          <Pill label="Friend" tone="primary" />
         ) : undefined,
         onPress: () =>
           router.push({
@@ -146,7 +146,7 @@ export default function ContactsTabScreen() {
   )
 
   const filterLabel =
-    FILTER_OPTIONS.find((option) => option.value === filter)?.label || "默认"
+    FILTER_OPTIONS.find((option) => option.value === filter)?.label || "All"
   const pendingRequestCount = hub?.requestSummary.totalPendingCount || 0
 
   return (
@@ -154,7 +154,7 @@ export default function ContactsTabScreen() {
       <View style={styles.pageShell}>
         <View style={styles.headerGutter}>
           <MobilePageHeader
-            title="联系人"
+            title="Contacts"
             action={
               <MobileHeaderActions
                 onSearch={() => router.push("/search")}
@@ -164,7 +164,7 @@ export default function ContactsTabScreen() {
                 extraAction={
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="好友申请"
+                    accessibilityLabel="Friend requests"
                     onPress={() => router.push("/contacts/requests")}
                     style={({ pressed }) => [
                       styles.headerRequestTrigger,
@@ -188,18 +188,18 @@ export default function ContactsTabScreen() {
 
         {loading ? (
           <View style={styles.stateWrap}>
-            <LoadingBlock label="正在加载联系人..." />
+            <LoadingBlock label="Loading contacts..." />
           </View>
         ) : error ? (
           <View style={styles.stateWrap}>
             <EmptyState
               icon="alert-circle"
-              title="联系人加载失败"
+              title="Failed to load contacts"
               description={error}
               action={
                 <View style={styles.retryAction}>
                   <Button
-                    label="重试"
+                    label="Retry"
                     icon="refresh-cw"
                     onPress={() => void loadHub()}
                   />
@@ -233,7 +233,7 @@ export default function ContactsTabScreen() {
                   />
                 </Pressable>
                 <Text style={styles.countText}>
-                  {filteredEntries.length} 人
+                  {filteredEntries.length} contacts
                 </Text>
               </View>
             }
@@ -241,8 +241,8 @@ export default function ContactsTabScreen() {
               <View style={styles.emptyWrap}>
                 <EmptyState
                   icon="users"
-                  title="当前分类下没有联系人"
-                  description="切换分类，或者通过右上角 + 添加好友。"
+                  title="No contacts in this category"
+                  description="Try another category, or tap + in the top right to add friends."
                 />
               </View>
             }

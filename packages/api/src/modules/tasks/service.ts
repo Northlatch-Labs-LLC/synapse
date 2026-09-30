@@ -84,6 +84,7 @@ import {
   clearRemoteAgentConversationContextOnResolve,
   decodeTaskPromptPayload,
   decodeTaskResolutionPayload,
+  findWorkspaceMemberTrustLevelOn,
   resolveParticipantSubjectId,
   taskViewableByUser,
   updateTaskConversationItemId,
@@ -190,6 +191,14 @@ export interface CreateRuntimeAuthorizationTaskParams {
    * The approval flow now uses principalSubjectId + presetToOwnerScope.
    */
   principalRemoteAgentId?: string
+}
+
+/** G-S1 ledger RBAC: resolver lacks the trust level to approve a grant. */
+export class TaskResolverTrustLevelError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = "TaskResolverTrustLevelError"
+  }
 }
 
 export type ResolveTaskRequestParams = ChatTaskResolveInput & {
@@ -1797,6 +1806,24 @@ export async function resolveTaskRequest(
       locked.targetParticipantId !== params.resolverParticipantId
     ) {
       throw new Error("Only the targeted user can resolve this task")
+    }
+
+    // G-S1 ledger RBAC: runtime-authorization grants (filesystem / browser /
+    // cua / commandline capability) may only be approved or rejected by
+    // members at trust level admin or member — guests can request, never
+    // grant. Checked inside the lock so a concurrent trust-level demotion
+    // cannot race an in-flight approval.
+    if (locked.kind === TASK_REQUEST_KIND.RUNTIME_AUTHORIZATION) {
+      const trustLevel = await findWorkspaceMemberTrustLevelOn(
+        client,
+        params.resolverWorkspaceMemberId,
+        locked.workspaceId
+      )
+      if (!trustLevel || trustLevel === "guest") {
+        throw new TaskResolverTrustLevelError(
+          "Guests cannot approve runtime-authorization requests"
+        )
+      }
     }
 
     if (

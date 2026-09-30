@@ -848,6 +848,11 @@ tables:
       - column: subject_id
         resolvesSubject: target
         action: update
+  workspace_subscriptions:
+    class: child
+    softDelete: none
+    derived: true
+    workspaceScope: workspace_id
   workspaces:
     class: root
     softDelete: deleted_at
@@ -887,6 +892,11 @@ tables:
     softDelete: none
     workspaceScope: none
 foreignKeys:
+  digest:1467164d10412138:
+    targetAction: RESTRICT
+    liveIntegrity: none
+    _child: workspace_subscriptions(workspace_id)
+    _parent: workspaces(id)
   digest:e8948e1046f77257:
     targetAction: RESTRICT
     liveIntegrity: enforce

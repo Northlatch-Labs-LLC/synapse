@@ -43,7 +43,7 @@ function buildCallbackUrl(providerId: string, finalDestination: string) {
 
 type SignInOptions = {
   providerId: string
-  actionLabel?: "登录" | "注册"
+  actionLabel?: "Sign in" | "Sign up"
   /** Where the opener should navigate on success (already-normalized path). */
   finalDestination: string
   onSuccess: () => void
@@ -66,7 +66,7 @@ type SignInOptions = {
  */
 export function signInWithOAuthPopup({
   providerId,
-  actionLabel = "登录",
+  actionLabel = "Sign in",
   finalDestination,
   onSuccess,
   onCancel,

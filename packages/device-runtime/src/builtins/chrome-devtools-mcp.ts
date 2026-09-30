@@ -61,7 +61,7 @@ import {
 import staticSchemas from "./chrome-devtools-mcp.static-input-schemas.json" with { type: "json" }
 
 export const PROVIDER_KEY = "builtin.browser.chrome-devtools-mcp"
-export const PINNED_VERSION = "0.7.0"
+export const PINNED_VERSION = "1.10.1"
 const SUPPORTED_NODE_RANGE = "^20.19.0 || ^22.12.0 || >=23"
 
 const PATH_BLACKLIST = [

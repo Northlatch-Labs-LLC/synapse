@@ -1,0 +1,77 @@
+# Default values — G-S1 enterprise topology.
+#
+# HA posture (handout §5 G-S1): the chart runs api/web with replicas>=2,
+# anti-affinity and PDBs. Databases are EXTERNAL by default — HA Postgres
+# (Patroni/CloudSQL/RDS) and HA Redis (Valkey/Sentinel or managed) are
+# services you point the chart at via `postgresql.external` / `redis.external`.
+# The embedded single-node options exist for dev/eval ONLY.
+
+global:
+  imageRegistry: ""        # e.g. ghcr.io/northlatch-labs-llc
+  imagePullSecrets: []     # [{ name: regcred }]
+  appBase_url: ""          # public origin users hit (drives OAuth redirects)
+
+api:
+  image:
+    repository: synapse-api
+    tag: "0.28.0"          # keep in lockstep with appVersion
+  replicas: 2
+  resources:
+    requests: { cpu: 500m, memory: 1Gi }
+    limits: { cpu: "2", memory: 2Gi }
+  env:
+    # Runtime config that is NOT secret goes through the configmap template.
+    otelExporterOtlpEndpoint: ""     # e.g. http://otel-collector.observability:4318
+    ssoOidcProviders: ""             # JSON array — see docs/adr/0002 + .env.example
+    sandboxProvider: none            # local requires bwrap+fs-helper; docker needs DooD socket
+    platformAdminEmails: ""
+  existingSecret: synapse-api-secrets   # BETTER_AUTH_SECRET, AUDIT_EXPORT_SIGNING_KEY, ...
+
+web:
+  enabled: true
+  image:
+    repository: synapse-web
+    tag: "0.28.0"
+  # NEXT_PUBLIC_* is BUILD-TIME inlined by Next.js: either prebuild the image
+  # per environment (values here are then informational) or run the documented
+  # entrypoint envsubst wrapper. See README "Web runtime configuration".
+  replicas: 2
+  resources:
+    requests: { cpu: 200m, memory: 512Mi }
+    limits: { cpu: "1", memory: 1Gi }
+
+postgresql:
+  external:
+    enabled: true            # HA Postgres is pointed at, never embedded in prod
+    host: ""                 # e.g. patroni-primary.postgres.svc
+    port: 5432
+    database: synapse
+    username: synapse
+    existingSecret: synapse-postgres   # key: password
+  embedded:                  # dev/eval only — NOT HA, NOT for production
+    enabled: false
+    image: pgvector/pgvector:pg16
+    storage: 20Gi
+
+redis:
+  external:
+    enabled: true
+    host: ""                 # e.g. valkey-primary.redis.svc
+    port: 6379
+    existingSecret: synapse-redis      # key: password (omitted for no-auth)
+  embedded:                  # dev/eval only
+    enabled: false
+    image: redis:7-alpine
+    storage: 5Gi
+
+ingress:
+  enabled: true
+  className: nginx
+  host: ""                   # REQUIRED when enabled — the public origin
+  tls:
+    enabled: true
+    existingSecret: ""       # cert-manager or pre-provisioned; empty => http only (dev)
+
+observability:
+  serviceMonitor: false      # requires Prometheus Operator CRDs
+  otlpService: ""            # collector address for api/web traces (see api.env)

@@ -17,18 +17,19 @@ import { Card, CardContent } from "@/components/ui/card"
 const collaborationFeatures = [
   {
     icon: MessageSquareMore,
-    title: "同群协作",
-    description: "人和 Agent 在同一条线程里一起推进事情",
+    title: "Work in one thread",
+    description: "Humans and agents push work forward in the same thread",
   },
   {
     icon: BrainCircuit,
-    title: "共享记忆",
-    description: "交付结果写回记忆，后续角色进来就能接着做",
+    title: "Shared memory",
+    description:
+      "Deliverables are written back to memory, so the next role picks up where the last one stopped",
   },
   {
     icon: UsersRound,
-    title: "过程可见",
-    description: "谁被拉入、谁更新了什么，系统消息都看得清楚",
+    title: "Visible process",
+    description: "System messages make it clear who joined and what changed",
   },
 ] as const
 
@@ -55,14 +56,15 @@ type CollaborationMessage =
 const collaborationMessages: CollaborationMessage[] = [
   {
     kind: "system",
-    content: "Celine 将 Brief Writer 拉入了群聊",
+    content: "Celine added Brief Writer to the group",
   },
   {
     kind: "user",
     name: "Celine",
     initials: "CE",
     tone: "bg-slate-950 text-white",
-    content: "先起一版董事会发布摘要，把结论和 blocker 一起写进共享记忆。",
+    content:
+      "Draft the board release summary first, and write the conclusions and blockers into shared memory.",
   },
   {
     kind: "actor",
@@ -70,23 +72,24 @@ const collaborationMessages: CollaborationMessage[] = [
     initials: "BW",
     tone: "bg-sky-100 text-sky-950",
     content:
-      "初稿已提交，核心结论和当前 blocker 已写回共享记忆，后续角色可以直接接着补。",
-    meta: "已交付 · 共享记忆已更新",
+      "Draft submitted. Key conclusions and current blockers are written back to shared memory, so the next role can pick up directly.",
+    meta: "Delivered · Shared memory updated",
   },
   {
     kind: "system",
-    content: "Brief Writer 更新了共享记忆",
+    content: "Brief Writer updated the shared memory",
   },
   {
     kind: "system",
-    content: "Celine 将 Risk Analyst 拉入了群聊",
+    content: "Celine added Risk Analyst to the group",
   },
   {
     kind: "user",
     name: "Celine",
     initials: "CE",
     tone: "bg-slate-950 text-white",
-    content: "@Risk Analyst 基于当前共享记忆补一段风险判断。",
+    content:
+      "@Risk Analyst add a risk assessment based on the current shared memory.",
   },
   {
     kind: "actor",
@@ -94,7 +97,7 @@ const collaborationMessages: CollaborationMessage[] = [
     initials: "RA",
     tone: "bg-amber-100 text-amber-950",
     content:
-      "我已读取共享记忆：当前主要风险是移动 onboarding 回落，建议单列风险栏并保留 ETA 备注。",
+      "I've read the shared memory: the main risk is the mobile onboarding drop-off. I suggest a dedicated risk section with ETA notes.",
   },
 ]
 
@@ -130,11 +133,11 @@ export function LandingCollaborationSection() {
         <div className="grid gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-14">
           <LandingReveal className="max-w-xl" x={-24}>
             <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-              同一条群聊，就是同一个协作现场
+              One group chat is where the work happens
             </h2>
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-              拉人、分工、交付、沉淀记忆都发生在同一处，不用在多个 Bot
-              和文档之间来回切换
+              Pull people in, assign work, deliver, and build memory in one
+              place — no switching between bots and docs
             </p>
 
             <LandingStagger className="mt-7 space-y-4" delay={0.08}>
@@ -171,10 +174,11 @@ export function LandingCollaborationSection() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <div className="text-sm font-semibold text-slate-950">
-                      董事会发布摘要
+                      Board release summary
                     </div>
                     <div className="mt-1 text-[11px] text-slate-500">
-                      系统消息可见，共享记忆负责承接上下文
+                      System messages stay visible; shared memory carries the
+                      context
                     </div>
                   </div>
                   <AvatarGroup>

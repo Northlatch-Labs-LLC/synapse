@@ -71,7 +71,12 @@ export default function LoginScreen() {
         errorCallbackURL: "/",
       })
       if (oauthError) {
-        setError(getAuthErrorMessage(oauthError, "飞书登录失败，请稍后再试。"))
+        setError(
+          getAuthErrorMessage(
+            oauthError,
+            "Feishu sign-in failed. Please try again."
+          )
+        )
         return
       }
       // A deep-link return that carries no session cookie (cancel / early
@@ -79,12 +84,17 @@ export default function LoginScreen() {
       // session exists before navigating.
       const ok = await verifyOAuthSession()
       if (!ok) {
-        setError("飞书登录失败，请稍后再试。")
+        setError("Feishu sign-in failed. Please try again.")
         return
       }
       router.replace("/")
     } catch (nextError) {
-      setError(getAuthErrorMessage(nextError, "飞书登录失败，请稍后再试。"))
+      setError(
+        getAuthErrorMessage(
+          nextError,
+          "Feishu sign-in failed. Please try again."
+        )
+      )
     } finally {
       setSubmitting(false)
     }

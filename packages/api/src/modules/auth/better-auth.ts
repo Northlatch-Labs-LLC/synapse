@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth"
-import { bearer, genericOAuth } from "better-auth/plugins"
+import { bearer, genericOAuth, phoneNumber } from "better-auth/plugins"
 import { deviceAuthorization } from "better-auth/plugins"
+import { randomBytes } from "node:crypto"
 import { getOAuth2Tokens } from "better-auth/oauth2"
 import { expo } from "@better-auth/expo"
 import { config } from "../../config/index.js"
@@ -10,6 +11,7 @@ import { backfillGeneratedUserAvatar, selectUserDeletedState } from "./repo.js"
 import { AUTH_SESSION_MAX_AGE_SECONDS } from "@synapse/shared"
 import { disconnectSocketsForSession } from "../../infrastructure/websocket/auth-session-registry.js"
 import { deviceSessionCookie } from "./device-session-cookie.js"
+import { buildSsoOidcProviders } from "./sso-providers.js"
 
 const log = createLogger("auth.better-auth")
 
@@ -261,6 +263,8 @@ function buildFeishuProvider() {
 }
 
 const feishuProvider = buildFeishuProvider()
+// G-S1: enterprise OIDC providers from SSO_OIDC_PROVIDERS (empty by default).
+const ssoOidcProviders = buildSsoOidcProviders()
 
 /**
  * The single Better Auth instance. Owns the user/account/session/verification +
@@ -381,6 +385,9 @@ export const auth = betterAuth({
     modelName: "users",
     fields: {
       emailVerified: "email_verified",
+      // phoneNumber plugin fields (west-first WhatsApp OTP sign-in)
+      phoneNumber: "phone_number",
+      phoneNumberVerified: "phone_number_verified",
       createdAt: "created_at",
       updatedAt: "updated_at",
     },
@@ -539,7 +546,77 @@ export const auth = betterAuth({
         },
       },
     }),
-    ...(feishuProvider ? [genericOAuth({ config: [feishuProvider] })] : []),
+    ...(feishuProvider || ssoOidcProviders.length > 0
+      ? [
+          genericOAuth({
+            config: [
+              ...(feishuProvider ? [feishuProvider] : []),
+              // G-S1 enterprise SSO: env-driven OIDC providers (empty ⇒
+              // login surface unchanged). See modules/auth/sso-providers.ts.
+              ...ssoOidcProviders,
+            ],
+          }),
+        ]
+      : []),
+
+    // West-first default sign-in (founder order 2026-09-29): WhatsApp OTP.
+    // Delivery via the WhatsApp Cloud API; the Meta business token + phone
+    // number id arrive as env. Fail loud when unconfigured — never fall back
+    // to a silent channel.
+    phoneNumber({
+      otpLength: 6,
+      sendOTP: async ({ phoneNumber: dest, code }) => {
+        const token = config.whatsapp.cloudToken
+        const phoneId = config.whatsapp.cloudPhoneNumberId
+        if (!token || !phoneId) {
+          throw new Error(
+            "WhatsApp sign-in is not configured on this deployment (WHATSAPP_CLOUD_TOKEN / WHATSAPP_CLOUD_PHONE_NUMBER_ID missing)"
+          )
+        }
+        const to = dest.replace(/[^0-9]/g, "")
+        const template = config.whatsapp.otpTemplate
+        const message = template
+          ? {
+              messaging_product: "whatsapp",
+              to,
+              type: "template",
+              template: {
+                name: template,
+                language: { code: "en" },
+                components: [
+                  { type: "body", parameters: [{ type: "text", text: code }] },
+                ],
+              },
+            }
+          : {
+              messaging_product: "whatsapp",
+              to,
+              type: "text",
+              text: { body: `Your Synapse verification code is ${code}` },
+            }
+        const res = await fetch(
+          `https://graph.facebook.com/v21.0/${phoneId}/messages`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+          }
+        )
+        if (!res.ok) {
+          log.error({ status: res.status }, "whatsapp otp delivery failed")
+          throw new Error("WhatsApp OTP delivery failed")
+        }
+        log.info({ to: dest }, "whatsapp otp sent")
+      },
+      signUpOnVerification: {
+        getTempEmail: (dest: string) =>
+          `${dest.replace(/[^0-9]/g, "")}@whatsapp.local`,
+        getTempName: (dest: string) => `WhatsApp user ${dest.slice(-4)}`,
+      },
+    }),
   ],
 })
 

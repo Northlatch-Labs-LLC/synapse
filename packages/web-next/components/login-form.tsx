@@ -13,7 +13,7 @@ import { normalizeRedirectTarget } from "@/lib/auth"
 import { resolveDestination } from "@/lib/post-login"
 import { useAuthStore } from "@/stores/auth-store"
 import { AuthShell } from "@/components/auth-shell"
-import { FeishuSignInButton } from "@/components/feishu-sign-in-button"
+import { WhatsAppSignInPanel } from "@/components/whatsapp-sign-in-panel"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -36,8 +36,8 @@ import { PasswordInput } from "@/components/ui/password-input"
 import { WebQrLoginPanel } from "@/components/web-qr-login-panel"
 
 const loginSchema = z.object({
-  email: z.email("请输入有效的邮箱地址"),
-  password: z.string().min(1, "请输入密码"),
+  email: z.email("Enter a valid email address"),
+  password: z.string().min(1, "Enter your password"),
   temporaryLogin: z.boolean(),
 })
 
@@ -60,8 +60,10 @@ function CornerSwitch({
     <button
       type="button"
       onClick={onToggle}
-      aria-label={showingQr ? "切换为密码登录" : "切换为扫码登录"}
-      title={showingQr ? "密码登录" : "扫码登录"}
+      aria-label={
+        showingQr ? "Switch to password sign in" : "Switch to QR code sign in"
+      }
+      title={showingQr ? "Password sign in" : "QR code sign in"}
       className="group/corner absolute end-0 top-0 z-10 size-14 outline-none"
     >
       <span
@@ -82,7 +84,7 @@ export function LoginForm() {
   // (the full-page fallback path; the popup path reports inline instead).
   const [submitError, setSubmitError] = useState(() => {
     const oauthError = searchParams.get("error")
-    return oauthError ? getOAuthErrorMessage(oauthError, "登录") : ""
+    return oauthError ? getOAuthErrorMessage(oauthError, "Sign in") : ""
   })
   const [showingQr, setShowingQr] = useState(false)
 
@@ -104,7 +106,7 @@ export function LoginForm() {
 
       router.push(await resolveDestination(redirect))
     } catch (err) {
-      setSubmitError(getAuthErrorMessage(err, "登录"))
+      setSubmitError(getAuthErrorMessage(err, "Sign in"))
     }
   })
 
@@ -116,11 +118,11 @@ export function LoginForm() {
           onToggle={() => setShowingQr((value) => !value)}
         />
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">登录</CardTitle>
+          <CardTitle className="text-xl">Sign in</CardTitle>
           <CardDescription>
             {showingQr
-              ? "请使用 Synapse App 扫码登录"
-              : "使用飞书、邮箱或扫码登录"}
+              ? "Scan the QR code with the Synapse app to sign in"
+              : "Sign in with Feishu, email, or QR code"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -130,16 +132,16 @@ export function LoginForm() {
             <form method="post" onSubmit={onSubmit} noValidate>
               <FieldGroup>
                 <Field>
-                  <FeishuSignInButton
-                    actionLabel="登录"
+                  <WhatsAppSignInPanel
+                    actionLabel="Sign in"
                     redirect={redirect}
                     disabled={isSubmitting}
                     onError={setSubmitError}
                   />
                 </Field>
-                <FieldSeparator>或使用邮箱登录</FieldSeparator>
+                <FieldSeparator>Or sign in with email</FieldSeparator>
                 <Field data-invalid={Boolean(errors.email) || undefined}>
-                  <FieldLabel htmlFor="email">邮箱</FieldLabel>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
                   <Controller
                     control={control}
                     name="email"
@@ -163,7 +165,7 @@ export function LoginForm() {
                   />
                 </Field>
                 <Field data-invalid={Boolean(errors.password) || undefined}>
-                  <FieldLabel htmlFor="password">密码</FieldLabel>
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
                   <Controller
                     control={control}
                     name="password"
@@ -201,7 +203,7 @@ export function LoginForm() {
                       )}
                     />
                     <span className="text-sm font-medium text-foreground">
-                      仅在当前设备临时登录
+                      Sign in temporarily on this device only
                     </span>
                   </label>
                 </Field>
@@ -214,15 +216,15 @@ export function LoginForm() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="size-4 animate-spin" aria-hidden />
-                        正在登录
+                        Signing in
                       </>
                     ) : (
-                      "登录"
+                      "Sign in"
                     )}
                   </Button>
                 </Field>
                 <FieldDescription className="text-center">
-                  还没有账号？{" "}
+                  No account yet?{" "}
                   <Link
                     href={
                       redirect
@@ -231,7 +233,7 @@ export function LoginForm() {
                     }
                     className="underline-offset-2 hover:underline"
                   >
-                    去注册
+                    Sign up
                   </Link>
                 </FieldDescription>
               </FieldGroup>

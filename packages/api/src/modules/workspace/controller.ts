@@ -80,6 +80,7 @@ import {
   WorkspaceUpdateInputSchema,
   WorkspaceViewSchema,
 } from "@synapse/shared/schemas"
+import { PlanLimitReachedError, enforcePlanLimit } from "../billing/service.js"
 import { appRoute } from "../../infrastructure/http/route.js"
 
 // ── Helpers ──
@@ -539,6 +540,20 @@ export async function handleCreateInvite(
   }
 
   const { workspaceId } = request.params as WorkspaceParams
+  try {
+    await enforcePlanLimit(workspaceId, "members")
+  } catch (error) {
+    if (error instanceof PlanLimitReachedError) {
+      reply.status(402).send({
+        error: error.message,
+        code: "plan_limit_reached",
+        limit: "members",
+        currentPlan: error.currentPlan,
+      })
+      return undefined
+    }
+    throw error
+  }
   const invite = await createInvite({
     workspaceId,
     createdByWorkspaceMemberId: (request as any).workspaceMember!.id,

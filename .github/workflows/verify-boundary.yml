@@ -19,6 +19,21 @@ permissions:
 jobs:
   verify-boundary:
     runs-on: ubuntu-latest
+    services:
+      # verify:boundary runs the FULL api suite (verify-boundary.sh), whose
+      # modules construct real ioredis clients at module scope — without a
+      # reachable Redis they retry forever and the workflow hangs until the
+      # 360-min job timeout (why no verify-boundary run had ever completed;
+      # same service as the ci workflow's gates job).
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     env:
       # The fs-helper is a Rust sidecar not needed for the boundary contract;
       # let pretest skip its rebuild so the gate is deterministic in CI. The
@@ -26,6 +41,22 @@ jobs:
       ALLOW_MISSING_FS_HELPER: "1"
     steps:
       - uses: actions/checkout@v4
+        # Bundle sidecar archives are git-LFS objects; checkout@v4 skips LFS
+        # content by default, leaving pointer files whose sha256 can never match
+        # the manifest — the requirePrestaged suites then fail on "no matching
+        # archive" although the archives are committed.
+        with:
+          lfs: true
+      - name: Install sandbox plane prerequisites + enable userns
+        # The boundary gate runs device-runtime's full suite, whose bwrap-backed
+        # exec/VFS tests need (a) the bubblewrap + ripgrep binaries and (b)
+        # unprivileged user namespaces actually permitted — ubuntu-latest 24.04
+        # ships AppArmor's userns restriction ON, so the binary resolves but
+        # every jail spawn is denied and the tests fail on misleading
+        # assertions. `|| true` keeps older images (no such key) portable.
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends bubblewrap ripgrep libx11-dev libxtst-dev libxkbfile-dev libxcomposite-dev libxrandr-dev libxfixes-dev libxinerama-dev libxcursor-dev
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -37,5 +68,13 @@ jobs:
         # install it; its typecheck (pretypecheck → sync:shared → tsc) needs
         # its own node_modules.
         run: npm --prefix packages/mobile-app ci
+      - name: Build fs-helper (release profile)
+        # The API suites inside verify:boundary resolve the RELEASE fs-helper
+        # profile; build it so helper-backed cases run for real. The step env
+        # neutralizes the job-level ALLOW_MISSING_FS_HELPER=1 (which skips the
+        # script itself); tests still see the job-level opt-out for freshness.
+        env:
+          ALLOW_MISSING_FS_HELPER: ""
+        run: bash scripts/pretest-fs-helper.sh release
       - name: verify:boundary
         run: npm run verify:boundary

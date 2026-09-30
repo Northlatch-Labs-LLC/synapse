@@ -103,6 +103,8 @@ const classifiedJsonParseFiles = {
       "WeCom outbound router Redis frames are internal protocol payloads.",
     "packages/api/src/modules/im/connectors/weixin/outbound-codec.ts":
       "Weixin outbound HTTP responses are provider payloads.",
+    "packages/api/src/modules/billing/stripe-client.ts":
+      "Stripe REST API responses are third-party provider payloads.",
     "packages/api/src/modules/im/connectors/weixin/qr-login-codec.ts":
       "Weixin QR login HTTP responses are provider payloads.",
     "packages/api/src/modules/im/connectors/weixin/client.ts":
@@ -177,6 +179,8 @@ const classifiedJsonParseFiles = {
       "Device identity and keystore files are runtime-local file state.",
   },
   configImportBootstrapAdapter: {
+    "packages/api/src/modules/auth/sso-providers.ts":
+      "SSO_OIDC_PROVIDERS env JSON (strict-validated, fail-loud at startup) is bootstrap/config input.",
     "packages/api/src/infrastructure/storage/remote/config.ts":
       "Remote content-storage backend + credential config from env is bootstrap/config input.",
     "packages/api/src/infrastructure/runtime-tuning-bootstrap.ts":

@@ -73,7 +73,7 @@ function PickerHeader({
     <View style={styles.header}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="返回"
+        accessibilityLabel="Back"
         hitSlop={8}
         onPress={onBack}
         style={({ pressed }) => [
@@ -176,8 +176,8 @@ export function WorkspaceEntityPickerScreen({
         nextError instanceof Error
           ? nextError.message
           : mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR
-            ? "Actor 列表加载失败。"
-            : "可选联系人加载失败。"
+            ? "Failed to load the Actor list."
+            : "Failed to load selectable contacts."
       )
     } finally {
       setLoading(false)
@@ -260,7 +260,9 @@ export function WorkspaceEntityPickerScreen({
       })
     } catch (nextError) {
       setError(
-        nextError instanceof Error ? nextError.message : "切换 Actor 失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to switch Actor."
       )
     } finally {
       setSubmitting(false)
@@ -283,7 +285,7 @@ export function WorkspaceEntityPickerScreen({
         )
       ) {
         throw new Error(
-          "存在缺少 workspace 成员身份的联系人，暂时无法发起群聊。"
+          "Some contacts are missing a workspace member identity, so the group chat can't be started yet."
         )
       }
 
@@ -294,13 +296,15 @@ export function WorkspaceEntityPickerScreen({
       })
 
       if (!created.conversation.conversationId) {
-        throw new Error("服务器没有返回 conversationId")
+        throw new Error("The server did not return a conversationId")
       }
 
       router.replace(`/chat/${created.conversation.conversationId}`)
     } catch (nextError) {
       setError(
-        nextError instanceof Error ? nextError.message : "发起群聊失败。"
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to start the group chat."
       )
     } finally {
       setSubmitting(false)
@@ -313,7 +317,7 @@ export function WorkspaceEntityPickerScreen({
         key: actor.id,
         title: actor.definition.displayName,
         subtitle:
-          actor.definition.role || actor.definition.title || "工作区 Actor",
+          actor.definition.role || actor.definition.title || "Workspace Actor",
         avatarUrl: actor.avatarUrl || null,
         targetType: ALPHABET_ENTITY_TARGET_TYPE.ACTOR,
         onPress: () => void handleSelectActor(actor),
@@ -343,20 +347,22 @@ export function WorkspaceEntityPickerScreen({
   }, [actors, groupEntries, mode, selectedKeys, submitting, workspaceId])
 
   const title =
-    mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR ? "选择Actor" : "发起群聊"
+    mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR
+      ? "Select Actor"
+      : "New Group Chat"
   const emptyState = (
     <View style={styles.emptyWrap}>
       <EmptyState
         icon={mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR ? "cpu" : "users"}
         title={
           mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR
-            ? "当前没有可选 Actor"
-            : "当前没有可选对象"
+            ? "No Actors available"
+            : "No contacts available"
         }
         description={
           mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR
-            ? "请先在工作区里创建或启用一个 Actor。"
-            : "当前工作区里还没有可以发起群聊的对象。"
+            ? "Create or enable an Actor in the workspace first."
+            : "There's no one in this workspace to start a group chat with yet."
         }
       />
     </View>
@@ -370,7 +376,7 @@ export function WorkspaceEntityPickerScreen({
           onBack={() => router.back()}
           confirmVisible={mode === WORKSPACE_ENTITY_PICKER_MODE.GROUP}
           confirmDisabled={selectedEntries.length === 0 || submitting}
-          confirmLabel="完成"
+          confirmLabel="Done"
           onConfirm={() => void handleCreateGroup()}
         />
 
@@ -379,8 +385,8 @@ export function WorkspaceEntityPickerScreen({
             <LoadingBlock
               label={
                 mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR
-                  ? "正在加载 Actor..."
-                  : "正在加载可选对象..."
+                  ? "Loading Actors..."
+                  : "Loading contacts..."
               }
             />
           </View>
@@ -390,8 +396,8 @@ export function WorkspaceEntityPickerScreen({
               icon="alert-circle"
               title={
                 mode === WORKSPACE_ENTITY_PICKER_MODE.ACTOR
-                  ? "Actor 列表加载失败"
-                  : "群聊列表加载失败"
+                  ? "Failed to load the Actor list"
+                  : "Failed to load contacts"
               }
               description={error}
             />

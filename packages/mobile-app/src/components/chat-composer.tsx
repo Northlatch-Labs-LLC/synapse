@@ -267,7 +267,7 @@ function AttachmentListSheet({
           ]}
         >
           <View style={styles.attachmentSheetHandle} />
-          <Text style={styles.attachmentSheetTitle}>待发送文件</Text>
+          <Text style={styles.attachmentSheetTitle}>Files to send</Text>
           <ScrollView
             style={styles.attachmentSheetScroll}
             contentContainerStyle={styles.attachmentSheetContent}
@@ -280,7 +280,7 @@ function AttachmentListSheet({
                 accessory={
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel={`移除 ${attachment.name}`}
+                    accessibilityLabel={`Remove ${attachment.name}`}
                     onPress={(event) => {
                       event.stopPropagation()
                       onRemove(attachment.id)
@@ -509,7 +509,9 @@ export function ChatComposer({
           progress: 1,
           status: "failed",
           errorMessage:
-            error instanceof Error ? error.message : "上传失败，请移除后重试",
+            error instanceof Error
+              ? error.message
+              : "Upload failed. Please remove and try again.",
         }))
       })
   }
@@ -538,7 +540,10 @@ export function ChatComposer({
   async function pickLibrary() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (!permission.granted) {
-      Alert.alert("无法访问相册", "请先授权照片和视频访问权限。")
+      Alert.alert(
+        "Cannot access photo library",
+        "Please allow access to photos and videos first."
+      )
       return
     }
 
@@ -572,7 +577,7 @@ export function ChatComposer({
   async function launchCamera() {
     const permission = await ImagePicker.requestCameraPermissionsAsync()
     if (!permission.granted) {
-      Alert.alert("无法使用相机", "请先授权相机权限。")
+      Alert.alert("Cannot use camera", "Please allow camera access first.")
       return
     }
 
@@ -652,7 +657,10 @@ export function ChatComposer({
 
     const permission = await requestRecordingPermissionsAsync()
     if (!permission.granted) {
-      Alert.alert("无法录音", "请先授权麦克风权限。")
+      Alert.alert(
+        "Cannot record audio",
+        "Please allow microphone access first."
+      )
       return
     }
 
@@ -805,7 +813,10 @@ export function ChatComposer({
     }
 
     if (attachment.kind === "file" && Platform.OS !== "web") {
-      Alert.alert("文件上传完成后可预览", "文档类附件会在上传成功后打开预览。")
+      Alert.alert(
+        "Preview available after upload",
+        "Document attachments open in preview once the upload succeeds."
+      )
       return
     }
 
@@ -842,7 +853,7 @@ export function ChatComposer({
           </Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="取消引用"
+            accessibilityLabel="Cancel reply"
             onPress={onCancelReply}
             style={styles.replyBarClose}
           >
@@ -877,7 +888,7 @@ export function ChatComposer({
             ) : (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`移除 ${primaryAttachment.name}`}
+                accessibilityLabel={`Remove ${primaryAttachment.name}`}
                 onPress={(event) => {
                   event.stopPropagation()
                   removeAttachment(primaryAttachment.id)
@@ -892,7 +903,9 @@ export function ChatComposer({
       ) : null}
 
       {recorderState.isRecording ? (
-        <Text style={styles.recordingHint}>录音中，再点一次麦克风结束</Text>
+        <Text style={styles.recordingHint}>
+          Recording — tap the mic again to stop
+        </Text>
       ) : null}
 
       <View style={styles.composerShell}>
@@ -945,7 +958,7 @@ export function ChatComposer({
                 )
               )
             }}
-            placeholder="发消息"
+            placeholder="Message"
             placeholderTextColor={theme.colors.textSoft}
             multiline
             scrollEnabled={inputHeight >= maxInputHeight}
@@ -983,17 +996,17 @@ export function ChatComposer({
         <View style={styles.quickMenu}>
           <MenuAction
             icon="image"
-            label="相册"
+            label="Photos"
             onPress={() => void pickLibrary()}
           />
           <MenuAction
             icon="camera"
-            label="拍照"
+            label="Camera"
             onPress={() => void launchCamera()}
           />
           <MenuAction
             icon="paperclip"
-            label="文件"
+            label="File"
             onPress={() => void pickDocument()}
           />
         </View>
