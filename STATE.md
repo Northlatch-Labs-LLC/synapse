@@ -109,14 +109,19 @@ verify PUBLIC (curl health + playwright screenshot of the real page)
 
 ## 5. Honestly NOT done (known gaps — do not claim these as done)
 
-1. **API CPU spin — captured once, cause still not proven.** 2026-09-30 ~04:00Z the api
-   container pinned one core; `docker restart api` cleared it. Auto-forensics FIRED at 05:10Z
-   (`FLAGS/spin-0510.log`): the api was serving normal traffic while an actor conversation
-   ping-ponged (`send_to` between two actors, `Conversation changed before send_to; rethinking`,
-   rounds 3–6) and latencies ballooned (health 743ms, message GETs 3–6.6s); the PG snapshot
-   caught the `realtime_event_outbox` claim query sitting idle-in-transaction. Working
-   hypothesis: an actor-to-actor send loop spinning the think pipeline — NOT proven. No repeat
-   through 09:30Z (no further api-cpu-HIGH flags). Forensics stays armed.
+1. **API CPU spin — ROOT-CAUSED (founder + telemetry), remediated by config.** During the
+   09-29 evening → 09-30 ~04:00Z window, actor turns ran on the Northlatch Gateway group whose
+   priority-0 binding is `auto` on gateway.xlaunch.work/v1 — the gateway light/test model
+   (founder: auto is for very light tasks and testing only). `provider_steps` telemetry proves
+   it: 72/6/11 auto steps the 09-29 20:00–22:00Z hours, then 44+7 in the 03:00–04:00Z window,
+   step latencies 10–44s; ZERO auto steps after the founder moved all 6 actor assignments (and
+   the workspace default) to Z.ai_coding_plan (GLM-5.3-Flash; binding later set to glm-5.1).
+   The 05:10Z capture's actor ping-pong (`send_to` loops, "rethinking", ballooning latencies)
+   was that degraded-model behavior, not an api code bug. No recurrence since the move;
+   forensics stays armed. RESIDUAL: the PLATFORM-scope default model group is still Northlatch
+   Gateway (`auto` at priority 0) — a future workspace without an explicit assignment would
+   land on auto; founder to decide whether that stays as a cheap/test default or gets a
+   platform-scope replacement.
 2. **Mobile app is unshipped.** `packages/mobile-app` (Expo, "Synappse Mobile") — email login
    works against prod, but no APK/IPA exists, mobile login still shows the Feishu button, and
    `register.tsx` still says 注册. A west-first mobile sweep + signed APK was offered; founder
@@ -150,6 +155,9 @@ database/seeds/actors/*`, `createCollaborationRoleTemplateSeed` zh/en structure)
 - The archive 500 was writing `archived` to `conversations` (column doesn't exist) instead of
   the per-member views table.
 - "Billing missing" incidents were build-cache/push-pipeline issues, never missing code.
+- The CPU spin was never an api scheduler/code bug: actors were bound to the gateway `auto`
+  model (test-grade), whose looping produced the ping-pong. Founder moved actors to Z.ai —
+  closed. Don't hunt the think pipeline for this.
 - Repo-wide `oxlint` fails on a pristine tree (pre-existing upstream breakage) — not ours.
 
 ---
