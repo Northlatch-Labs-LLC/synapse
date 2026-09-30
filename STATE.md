@@ -122,20 +122,22 @@ verify PUBLIC (curl health + playwright screenshot of the real page)
    Gateway (`auto` at priority 0) — a future workspace without an explicit assignment would
    land on auto; founder to decide whether that stays as a cheap/test default or gets a
    platform-scope replacement.
-2. **Mobile app is unshipped — code sweep DONE, build not.** The west-first sweep of
-   `packages/mobile-app` is complete on main (03372423: all CJK → English, Feishu login button
-   removed, no old-brand marks; greps + mobile typecheck green). But no APK/IPA exists and
-   nothing is published: **never present the mobile app as shipped** until a signed build is
-   in the founder's hands.
+2. **Mobile app: code done + STAGED on Android emulator (Expo Go, prod API), still no APK.**
+   West-first sweep on main (03372423) + a startup-crash fix (fedf3381: Hermes has no
+   globalThis.crypto — all shared UUID call sites now go through createUuid). Staged and
+   screenshot-verified 2026-09-30: emulator Pixel_9_API_36 + Expo Go 54.0.8 + Metro
+   (`packages/mobile-app`, `.env` EXPO_PUBLIC_API_URL=https://synappse.work/api/v1, git-
+   ignored) — login screen renders English-only, no Feishu button. Still NOT a signed build:
+   no APK/IPA exists, never present as shipped. (This Mac has no JDK: no native debug build.)
 3. ~~Actor seed catalog bilingual~~ — DONE on main (0625b6a6): `BilingualCopy` removed at the
    type level, 21 seed files English-only. Inert on prod (db:seed never runs there); repo now
    clean of CJK in the seed catalog.
-4. ~~Member-cap enforcement at invite redemption~~ — IMPLEMENTED on main (ec6781ed), **NOT
-   deployed**. Both membership paths (redeem + admin direct add) lock the workspace row FOR
-   UPDATE and enforce the plan cap in-transaction (free=3, pro=10, team=purchased
-   seat_quantity → 402 `plan_limit_reached`); 14 unit tests pass (verified locally with
-   Docker+Redis up). Deploy awaits the founder's go — it changes invite behavior on the money
-   path. Pre-existing suite note: 8 api tests fail on the pristine tree too (5 need outbound
+4. ~~Member-cap enforcement at invite redemption~~ — IMPLEMENTED (ec6781ed) **and DEPLOYED
+   to prod 2026-09-30 ~20:00Z** (founder go). Both membership paths (redeem + admin direct
+   add) lock the workspace row FOR UPDATE and enforce the plan cap in-transaction (free=3,
+   pro=10, team=purchased seat_quantity → 402 `plan_limit_reached`); 14 unit tests pass;
+   deploy followed the full rule (artifact grep, push, VM pull+up+prune, public health green).
+   Pre-existing suite note: 8 api tests fail on the pristine tree too (5 need outbound
    network, 3 IM transport-schema tests date from the west-first enum narrowing) — not ours.
 5. **`main` has no branch protection.** Main-only trunk by founder choice; flagged, unprotected.
 6. **Frontend spec phases 2–3 not approved/started:** type-scale tokens, login state-matrix
