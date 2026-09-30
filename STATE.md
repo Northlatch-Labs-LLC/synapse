@@ -118,10 +118,12 @@ verify PUBLIC (curl health + playwright screenshot of the real page)
    the workspace default) to Z.ai_coding_plan (GLM-5.3-Flash; binding later set to glm-5.1).
    The 05:10Z capture's actor ping-pong (`send_to` loops, "rethinking", ballooning latencies)
    was that degraded-model behavior, not an api code bug. No recurrence since the move;
-   forensics stays armed. RESIDUAL: the PLATFORM-scope default model group is still Northlatch
-   Gateway (`auto` at priority 0) — a future workspace without an explicit assignment would
-   land on auto; founder to decide whether that stays as a cheap/test default or gets a
-   platform-scope replacement.
+   forensics stays armed. RESIDUAL CLOSED 2026-09-30 ~20:30Z (lead decision, founder
+   ratified "auto is for very light tasks/testing only"): the platform default group's `auto`
+   binding is DISABLED (`is_enabled=false` on 'Auto (gateway-routed)', platform scope); fusion
+   (the gateway ensemble) now resolves first for any workspace without an explicit assignment.
+   api restarted to bust the binding-resolver cache; health green. Re-enable = flip the flag
+   back + restart api.
 2. **Mobile app: code done + STAGED on Android emulator (Expo Go, prod API), still no APK.**
    West-first sweep on main (03372423) + a startup-crash fix (fedf3381: Hermes has no
    globalThis.crypto — all shared UUID call sites now go through createUuid). Staged and
