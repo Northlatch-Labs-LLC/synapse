@@ -197,6 +197,37 @@ export function LandingHeroHeadline() {
   const [nextIndex, setNextIndex] = useState(headlineSteps.length > 1 ? 1 : 0)
   const [isAnimating, setIsAnimating] = useState(false)
   const { probeRef, widths } = usePositionWidths()
+  const lineRef = useRef<HTMLDivElement | null>(null)
+  const fitRef = useRef<HTMLDivElement | null>(null)
+  const [scale, setScale] = useState(1)
+
+  // Fit-to-width: the char-slot engine needs a single unbroken line (slot
+  // widths are measured per position), so long phrases like "remember like"
+  // SCALE DOWN to the viewport instead of wrapping (which would shatter the
+  // slots) or clipping.
+  useLayoutEffect(() => {
+    const line = lineRef.current
+    const fit = fitRef.current
+    if (!line || !fit) return
+
+    const measure = () => {
+      const available = fit.clientWidth
+      const needed = line.scrollWidth
+      if (available > 0 && needed > available) {
+        setScale(Math.max(0.45, available / needed))
+      } else {
+        setScale(1)
+      }
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(fit)
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      document.fonts.ready.then(measure).catch(() => undefined)
+    }
+    return () => observer.disconnect()
+  }, [widths])
 
   useEffect(() => {
     if (headlineSteps.length < 2 || isAnimating) return
@@ -231,10 +262,20 @@ export function LandingHeroHeadline() {
   )
 
   return (
-    <div className="font-display animate-fade-up relative mt-6 text-[clamp(2rem,7vw,5rem)] leading-[0.96] font-semibold tracking-tight text-slate-950">
+    <div
+      ref={fitRef}
+      className="font-display animate-fade-up relative mt-6 text-[clamp(2rem,7vw,5rem)] leading-[0.96] font-semibold tracking-tight text-slate-950"
+    >
       <ProbeStrip ref={probeRef} />
 
-      <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-1 leading-none sm:gap-x-1.5">
+      <div
+        ref={lineRef}
+        className="inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 leading-none whitespace-nowrap sm:gap-x-1.5"
+        style={{
+          transform: scale < 1 ? `scale(${scale})` : undefined,
+          transformOrigin: "center center",
+        }}
+      >
         <span>Let AI</span>
         <span className="inline-flex items-center text-primary">
           {renderChar(0)}
