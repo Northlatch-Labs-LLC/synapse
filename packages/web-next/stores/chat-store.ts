@@ -108,6 +108,7 @@ export interface ConversationSummary {
   title?: string
   name?: string
   avatarUrl?: string
+  archived?: boolean
   permissions?: {
     canManage?: boolean
     canManageMembers?: boolean

@@ -784,17 +784,22 @@ export async function updateConversationMutableFields(
     conversationId: string
     title?: string | null
     metadata?: Record<string, unknown>
+    archived?: boolean
   }
 ): Promise<boolean> {
   const update: {
     title?: string | null
     metadata?: RawBuilder<JsonValue>
+    archived?: boolean
   } = {}
   if (input.title !== undefined) {
     update.title = input.title?.trim() || null
   }
   if (input.metadata !== undefined) {
     update.metadata = jsonbValue(input.metadata)
+  }
+  if (input.archived !== undefined) {
+    update.archived = input.archived
   }
   if (Object.keys(update).length === 0) {
     return false

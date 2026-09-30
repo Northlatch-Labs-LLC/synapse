@@ -20,6 +20,7 @@ export type PatchChatConversationInput = {
   conversationId: string
   title?: string | null
   metadata?: Record<string, unknown>
+  archived?: boolean
 }
 
 type ListRealtimeRecipients = (
@@ -56,11 +57,15 @@ export async function patchChatConversationUseCase(
   params: PatchChatConversationInput,
   deps: PatchChatConversationDeps
 ): Promise<ChatConversationEnvelopeRecord | undefined> {
-  if (params.title === undefined && params.metadata === undefined) {
+  if (
+    params.title === undefined &&
+    params.metadata === undefined &&
+    params.archived === undefined
+  ) {
     throw createChatError(
       400,
       "invalid_patch",
-      "At least one of title or metadata must be provided"
+      "At least one of title, metadata, or archived must be provided"
     )
   }
 
@@ -76,6 +81,7 @@ export async function patchChatConversationUseCase(
       conversationId: params.conversationId,
       title: params.title,
       metadata: params.metadata,
+      archived: params.archived,
     })
     if (!updated) {
       return
@@ -124,6 +130,7 @@ export async function patchChatConversation(params: {
   conversationId: string
   title?: string | null
   metadata?: Record<string, unknown>
+  archived?: boolean
 }): Promise<ChatConversationEnvelopeRecord | undefined> {
   const identity = await getWorkspaceMemberIdentityOrThrow(
     params.workspaceId,
@@ -136,6 +143,7 @@ export async function patchChatConversation(params: {
       conversationId: params.conversationId,
       title: params.title,
       metadata: params.metadata,
+      archived: params.archived,
     },
     patchChatConversationDeps()
   )

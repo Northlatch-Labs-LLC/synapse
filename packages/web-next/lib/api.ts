@@ -1000,6 +1000,19 @@ class ApiClient {
     })
     return res.data
   }
+  async setConversationArchived(
+    wsId: string,
+    conversationId: string,
+    archived: boolean
+  ): Promise<void> {
+    await this.fetch(
+      `/workspaces/${wsId}/chat/conversations/${conversationId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ archived }),
+      }
+    )
+  }
   async listInvites(wsId: string): Promise<WorkspaceInviteListView> {
     const res = await this.fetch(`/workspaces/${wsId}/invites`)
     return res.data

@@ -10,6 +10,7 @@ import NewConversationDialog from "./new-conversation-dialog"
 import type { ChatComposerSubmitPayload } from "@/components/chat-composer"
 import { MessageSquare } from "lucide-react"
 
+import { api } from "@/lib/api"
 import { createLogger } from "@/lib/client-logger"
 
 const clientLog = createLogger("web.dashboard.chat")
@@ -170,6 +171,15 @@ export default function ChatPage() {
           runtimeMap={runtimeMap}
           onSelect={handleSelectConversation}
           onNewConversation={handleNewConversation}
+          onToggleArchive={(conversationId, archived) => {
+            if (!workspaceId) return
+            void api
+              .setConversationArchived(workspaceId, conversationId, archived)
+              .then(() => loadConversations(workspaceId))
+              .catch((err) =>
+                clientLog.error("Failed to archive conversation:", err)
+              )
+          }}
         />
       </div>
 

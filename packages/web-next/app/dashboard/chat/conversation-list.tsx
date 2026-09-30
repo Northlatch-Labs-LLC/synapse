@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
-import { Plus, Search } from "lucide-react"
+import { Archive, Plus, Search } from "lucide-react"
 import ChatAvatar from "./chat-avatar"
 import TransportKindIcon from "./transport-kind-icon"
 import type {
@@ -37,6 +37,7 @@ interface ConversationListProps {
   runtimeMap: ConversationRuntimeMap
   onSelect: (id: string) => void
   onNewConversation: () => void
+  onToggleArchive?: (id: string, archived: boolean) => void
   className?: string
   title?: string
   loading?: boolean
@@ -81,18 +82,23 @@ export default function ConversationList({
   runtimeMap,
   onSelect,
   onNewConversation,
+  onToggleArchive,
   className,
   title,
   loading = false,
 }: ConversationListProps) {
   const [search, setSearch] = useState("")
+  const [showArchived, setShowArchived] = useState(false)
   const browserLocale = useBrowserLocale()
   const formatRelativeTime = (dateStr: string) =>
     formatChatTimestamp(dateStr, "relative", { locale: browserLocale })
   const headerTitle = title || "Messages"
 
+  const visible = showArchived
+    ? conversations.filter((conversation) => conversation.archived)
+    : conversations.filter((conversation) => !conversation.archived)
   const filtered = search
-    ? conversations.filter((conversation) => {
+    ? visible.filter((conversation) => {
         const s = search.toLowerCase()
         return (
           conversation.title?.toLowerCase().includes(s) ||
@@ -102,7 +108,7 @@ export default function ConversationList({
           conversation.lastMessage?.content.toLowerCase().includes(s)
         )
       })
-    : conversations
+    : visible
 
   return (
     <div
@@ -116,6 +122,20 @@ export default function ConversationList({
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
             {headerTitle}
           </h2>
+          {onToggleArchive ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "size-8 shrink-0 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                showArchived && "bg-accent text-primary"
+              )}
+              onClick={() => setShowArchived((value) => !value)}
+              title={showArchived ? "Back to active chats" : "Show archived"}
+            >
+              <Archive className="size-4" />
+            </Button>
+          ) : null}
           <Button
             variant="ghost"
             size="icon"
@@ -163,60 +183,73 @@ export default function ConversationList({
               conversation.lastMessage?.createdAt || conversation.createdAt
 
             return (
-              <button
-                key={conversation.id}
-                onClick={() => onSelect(conversation.id)}
-                className={`relative w-full px-4 py-3 text-left transition-colors ${
-                  isSelected ? "bg-accent" : "hover:bg-accent/70"
-                } `}
-              >
-                {isSelected ? (
-                  <div className="absolute top-1/2 left-0 h-8 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
-                ) : null}
+              <div key={conversation.id} className="relative">
+                <button
+                  onClick={() => onSelect(conversation.id)}
+                  className={`group relative w-full px-4 py-3 text-left transition-colors ${
+                    isSelected ? "bg-accent" : "hover:bg-accent/70"
+                  } `}
+                >
+                  {isSelected ? (
+                    <div className="absolute top-1/2 left-0 h-8 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
+                  ) : null}
 
-                <div className="flex items-center gap-3">
-                  {/* Avatar */}
-                  <div className="relative shrink-0">
-                    <ChatAvatar
-                      name={name}
-                      avatarUrl={conversation.avatarUrl}
-                      entityType="conversation"
-                      size="lg"
-                    />
-                    <TransportKindIcon
-                      kind={conversation.transportKind}
-                      size={14}
-                      className="absolute -right-1 -bottom-1 size-5 p-0.5"
-                    />
-                    {conversation.unreadCount > 0 ? (
-                      <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                        {conversation.unreadCount > 99
-                          ? "99+"
-                          : conversation.unreadCount}
-                      </span>
-                    ) : null}
-                  </div>
-
-                  {/* Content */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <span
-                        className={`truncate text-sm font-semibold ${
-                          isSelected ? "text-primary" : "text-foreground"
-                        }`}
-                      >
-                        {name}
-                      </span>
-                      <span className="shrink-0 text-xs text-muted-foreground">
-                        {formatRelativeTime(timeStr)}
-                      </span>
+                  <div className="flex items-center gap-3">
+                    {/* Avatar */}
+                    <div className="relative shrink-0">
+                      <ChatAvatar
+                        name={name}
+                        avatarUrl={conversation.avatarUrl}
+                        entityType="conversation"
+                        size="lg"
+                      />
+                      <TransportKindIcon
+                        kind={conversation.transportKind}
+                        size={14}
+                        className="absolute -right-1 -bottom-1 size-5 p-0.5"
+                      />
+                      {conversation.unreadCount > 0 ? (
+                        <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                          {conversation.unreadCount > 99
+                            ? "99+"
+                            : conversation.unreadCount}
+                        </span>
+                      ) : null}
                     </div>
-                    <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                      {runtimePreview || previewTrunc || "No messages yet"}
-                    </p>
+
+                    {/* Content */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`truncate text-sm font-semibold ${
+                            isSelected ? "text-primary" : "text-foreground"
+                          }`}
+                        >
+                          {name}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          {formatRelativeTime(timeStr)}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                        {runtimePreview || previewTrunc || "No messages yet"}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </button>
+                </button>
+                {onToggleArchive ? (
+                  <button
+                    className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md bg-background/80 p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent hover:text-foreground"
+                    title={conversation.archived ? "Unarchive" : "Archive"}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onToggleArchive(conversation.id, !conversation.archived)
+                    }}
+                  >
+                    <Archive className="size-4" />
+                  </button>
+                ) : null}
+              </div>
             )
           })
         )}

@@ -928,10 +928,14 @@ export const ChatConversationPatchInputSchema = z
   .object({
     title: z.string().trim().min(1).max(255).nullable().optional(),
     metadata: chatJsonRecordSchema,
+    archived: z.boolean().optional(),
   })
   .refine(
-    (value) => value.title !== undefined || value.metadata !== undefined,
-    { message: "At least one of title or metadata must be provided" }
+    (value) =>
+      value.title !== undefined ||
+      value.metadata !== undefined ||
+      value.archived !== undefined,
+    { message: "At least one of title, metadata, or archived must be provided" }
   )
 export type ChatConversationPatchInputSchemaType = z.infer<
   typeof ChatConversationPatchInputSchema

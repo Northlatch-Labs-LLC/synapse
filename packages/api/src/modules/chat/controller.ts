@@ -544,6 +544,7 @@ export default async function chatController(app: FastifyInstance) {
           conversationId: params.conversationId,
           title: body.title,
           metadata: body.metadata,
+          archived: body.archived,
         })
         return record ? presentChatConversationEnvelope(record) : undefined
       } catch (error) {
