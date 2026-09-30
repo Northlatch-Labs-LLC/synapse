@@ -6,6 +6,7 @@
 // `@synapse/shared` imports keep working unchanged.
 
 import type { UUID } from "../types/index.js"
+import { createUuid } from "../uuid/index.js"
 import { isTransportKind } from "../constants/enums.js"
 import type {
   CallableToolResult,
@@ -20,10 +21,10 @@ import type {
 } from "../types/index.js"
 
 export function createCanonicalContentBlockId(_prefix = "block"): UUID {
-  // crypto.randomUUID is available in every runtime this ships to. The prefix
-  // arg is retained for call-site readability but no longer affects the id (a
-  // real UUID has no prefix); it previously only fed a Math.random fallback.
-  return globalThis.crypto.randomUUID()
+  // createUuid, not bare crypto.randomUUID: Hermes (Expo Go) has no
+  // globalThis.crypto. The prefix arg is retained for call-site readability
+  // but no longer affects the id (a real UUID has no prefix).
+  return createUuid() as UUID
 }
 
 export function textBlock(text: string, id?: UUID): CanonicalTextBlock {

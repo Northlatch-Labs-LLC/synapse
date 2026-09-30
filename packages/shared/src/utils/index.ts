@@ -16,13 +16,13 @@ import type {
   WorkItemStatus,
 } from "../types/index.js"
 import { WORK_ITEM_TRANSITIONS } from "../work-item/index.js"
+import { createUuid } from "../uuid/index.js"
 
 export function generateId(): string {
-  // crypto.randomUUID is available in every runtime this ships to (Node 18+,
-  // all modern browsers, RN/Hermes with the polyfill). No Math.random
-  // fallback — that produced non-UUID, low-entropy ids and only ever ran in
-  // ancient environments we don't support.
-  return globalThis.crypto.randomUUID()
+  // createUuid, not bare crypto.randomUUID: Hermes (Expo Go) has no
+  // globalThis.crypto at all. On Node/browsers this still resolves to
+  // crypto.randomUUID first — identical behavior to the old bare call.
+  return createUuid()
 }
 
 export function isValidTransition(

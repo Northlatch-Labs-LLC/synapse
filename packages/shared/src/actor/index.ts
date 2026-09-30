@@ -6,6 +6,7 @@
 // `@synapse/shared` imports keep working unchanged.
 
 import type { UUID } from "../types/index.js"
+import { createUuid } from "../uuid/index.js"
 import {
   extractText,
   normalizeCanonicalContentBlocks,
@@ -22,7 +23,9 @@ import type {
 import { ACTOR_DOC_TEMPLATE_MAP } from "./templates.js"
 
 function createActorDocId(): UUID {
-  return globalThis.crypto.randomUUID()
+  // createUuid, not bare crypto.randomUUID: Hermes (Expo Go) has no
+  // globalThis.crypto, and this module loads at startup on mobile.
+  return createUuid() as UUID
 }
 
 export const SECRETARY_DEFAULT_NAME = "Command Secretary"
