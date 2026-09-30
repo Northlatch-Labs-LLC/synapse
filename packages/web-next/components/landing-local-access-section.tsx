@@ -195,7 +195,7 @@ export function LandingLocalAccessSection() {
                     <div className="absolute inset-[10%] rounded-full border border-white/70" />
                     <Image
                       src="/synapse.svg"
-                      alt="Synapse"
+                      alt="Synappse"
                       width={72}
                       height={72}
                       className="relative size-8 sm:size-9"

@@ -2327,7 +2327,8 @@ export default function ImPage() {
               <CardDescription>
                 Enter app credentials directly. Choose whether this transport
                 account is workspace-owned or member-owned. For webhook mode,
-                Synapse generates the callback URL after the account is created.
+                Synappse generates the callback URL after the account is
+                created.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -2511,7 +2512,7 @@ export default function ImPage() {
               </CardTitle>
               <CardDescription>
                 Enter the smart-bot BotID and Secret from the WeCom admin
-                console (API mode &gt; long connection). Synapse opens a
+                console (API mode &gt; long connection). Synappse opens a
                 persistent WebSocket to wss://openws.work.weixin.qq.com — no
                 public callback URL required. v1 supports text and markdown
                 only; image / file / template_card are out of scope.
@@ -2652,9 +2653,9 @@ export default function ImPage() {
                 Connect WeChat via QR
               </CardTitle>
               <CardDescription>
-                Start a QR session, scan with WeChat, and Synapse stores the bot
-                token automatically after confirmation. The connected login can
-                be owned by the workspace or by a specific workspace member.
+                Start a QR session, scan with WeChat, and Synappse stores the
+                bot token automatically after confirmation. The connected login
+                can be owned by the workspace or by a specific workspace member.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -3271,8 +3272,8 @@ export default function ImPage() {
           <CardDescription>
             Connect a Telegram bot via a BotFather token. Long connection
             (getUpdates long-poll) needs no public URL; webhook mode registers a
-            callback with a secret token. Synapse probes the token with getMe on
-            create.
+            callback with a secret token. Synappse probes the token with getMe
+            on create.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -3353,7 +3354,7 @@ export default function ImPage() {
                 placeholder="Required for webhook mode"
               />
               <p className="text-xs text-muted-foreground">
-                Sent as the X-Telegram-Bot-Api-Secret-Token header. Synapse
+                Sent as the X-Telegram-Bot-Api-Secret-Token header. Synappse
                 registers the webhook for you with setWebhook.
               </p>
             </div>
@@ -3660,7 +3661,7 @@ export default function ImPage() {
               <strong>rate-limited, suspended, or permanently banned</strong> at
               any time without warning. Do not use a primary/personal number,
               keep automated send volume low, and engage the operator
-              kill-switch immediately if you suspect a protocol break. Synapse
+              kill-switch immediately if you suspect a protocol break. Synappse
               cannot recover a banned account.
             </p>
           </div>

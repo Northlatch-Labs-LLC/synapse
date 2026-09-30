@@ -58,7 +58,7 @@ export { runBuilder }
 export type { Executor }
 
 const DEFAULT_MARKETPLACE_PUBLISHER_SLUG = "synapse-official"
-const DEFAULT_MARKETPLACE_PUBLISHER_NAME = "Synapse Official"
+const DEFAULT_MARKETPLACE_PUBLISHER_NAME = "Synappse Official"
 
 type QueryRow = pg.QueryResultRow
 type QueryResultLike<T extends QueryRow> = { rows: T[] }

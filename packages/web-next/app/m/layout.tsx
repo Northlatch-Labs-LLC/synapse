@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next"
 export const metadata: Metadata = {
   title: "Turn AI into a Team",
   description:
-    "Synapse mobile · One AI-team runtime for shareable coworkers, memory, authorizations, plugins, local execution, and remote agents.",
+    "Synappse mobile · One AI-team runtime for shareable coworkers, memory, authorizations, plugins, local execution, and remote agents.",
 }
 
 export const viewport: Viewport = {

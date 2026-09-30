@@ -60,7 +60,7 @@ export default function InviteClient({ token }: { token: string }) {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary p-2">
               <Image
                 src="/synapse.svg"
-                alt="Synapse"
+                alt="Synappse"
                 width={32}
                 height={32}
                 className="invert"

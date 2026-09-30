@@ -83,7 +83,7 @@ export function SignupForm() {
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Sign up</CardTitle>
-          <CardDescription>Create a Synapse account</CardDescription>
+          <CardDescription>Create a Synappse account</CardDescription>
         </CardHeader>
         <CardContent>
           <form method="post" onSubmit={onSubmit} noValidate>

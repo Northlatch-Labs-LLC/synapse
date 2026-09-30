@@ -400,7 +400,7 @@ export function AppSidebar({
         id: workspace.id,
         name: workspace.name,
         logo: SynapseLogo,
-        plan: "Synapse Workspace",
+        plan: "Synappse Workspace",
       })),
     [workspaces]
   )

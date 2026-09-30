@@ -121,7 +121,7 @@ export function LoginForm() {
           <CardTitle className="text-xl">Sign in</CardTitle>
           <CardDescription>
             {showingQr
-              ? "Scan the QR code with the Synapse app to sign in"
+              ? "Scan the QR code with the Synappse app to sign in"
               : "Sign in with Feishu, email, or QR code"}
           </CardDescription>
         </CardHeader>

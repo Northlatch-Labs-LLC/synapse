@@ -1989,7 +1989,7 @@ export default function InstallDialog({
                   sources now
                 </label>
                 <p className="text-sm text-muted-foreground">
-                  Synapse will reuse this installation&apos;s token to register
+                  Synappse will reuse this installation&apos;s token to register
                   platform webhooks through the official API. The MCP server
                   remains separate from event ingestion.
                 </p>

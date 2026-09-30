@@ -50,8 +50,8 @@ const metadataBase = resolveMetadataBase()
 export const metadata: Metadata = {
   metadataBase,
   title: {
-    default: "Synapse",
-    template: "%s | Synapse",
+    default: "Synappse",
+    template: "%s | Synappse",
   },
   description:
     "Turn AI into an organization of digital employees with roles, memory, permissions, and collaboration.",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Synapse",
+    title: "Synappse",
     description: "The cloud runtime for your AI digital workforce.",
     images: ["/synapse.png"],
   },

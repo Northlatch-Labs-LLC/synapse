@@ -21,7 +21,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
             className="brightness-0 invert"
           />
         </span>
-        Synapse
+        Synappse
       </Link>
       {children}
     </div>

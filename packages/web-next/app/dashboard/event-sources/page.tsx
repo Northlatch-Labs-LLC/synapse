@@ -1152,7 +1152,7 @@ export default function EventSourcesPage() {
                 </div>
 
                 <div className="rounded-[22px] border border-border/70 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
-                  Synapse will create one durable event source and one official
+                  Synappse will create one durable event source and one official
                   platform webhook per selected definition. Incoming events
                   still use GitHub/GitLab official webhook delivery, not the MCP
                   server.

@@ -23,7 +23,7 @@ import { IS_REPO_LINK_MODE, SYNAPSE_REPO_URL } from "@/lib/repo-link-mode"
 export const metadata: Metadata = {
   title: "Turn AI into a Team",
   description:
-    "Synapse is the AI collaboration runtime for teams — shareable coworkers, memory, authorizations, plugins, local execution, and remote agents, all working together in one hub.",
+    "Synappse is the AI collaboration runtime for teams — shareable coworkers, memory, authorizations, plugins, local execution, and remote agents, all working together in one hub.",
 }
 
 export default function HomePage() {
@@ -38,9 +38,9 @@ export default function HomePage() {
         <header className="fixed inset-x-0 top-4 z-40 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-6 rounded-full border border-white/70 bg-white/58 px-5 py-3 shadow-[0_24px_70px_-44px_rgba(15,23,42,0.55)] backdrop-blur-2xl lg:px-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/synapse.svg" alt="Synapse" width={28} height={28} />
+              <Image src="/synapse.svg" alt="Synappse" width={28} height={28} />
               <div className="font-display text-lg font-semibold tracking-tight text-foreground">
-                Synapse
+                Synappse
               </div>
             </Link>
 
