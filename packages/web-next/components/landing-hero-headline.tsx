@@ -42,7 +42,6 @@ function StaticChar({
       style={{
         height: CHAR_HEIGHT,
         lineHeight: CHAR_HEIGHT,
-        width: widthPx ? `${widthPx}px` : undefined,
       }}
     >
       {char}
@@ -69,7 +68,7 @@ function RollingChar({
       style={{
         height: CHAR_HEIGHT,
         lineHeight: CHAR_HEIGHT,
-        width: widthPx ? `${widthPx}px` : "1em",
+        width: "max-content",
       }}
     >
       <span
