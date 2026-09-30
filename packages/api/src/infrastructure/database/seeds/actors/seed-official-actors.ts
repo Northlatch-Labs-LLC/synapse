@@ -58,7 +58,7 @@ export async function seedOfficialActorCatalog(
     const publisherId = await ensurePublisher(client, {
       slug: SYNAPSE_PUBLISHER_SLUG,
       displayName: "Synappse Official",
-      description: "Official Synapse catalog publisher",
+      description: "Official Synappse catalog publisher",
       ownerUserId: userId,
       isVerified: true,
     })

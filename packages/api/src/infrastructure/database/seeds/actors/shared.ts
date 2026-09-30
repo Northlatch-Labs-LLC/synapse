@@ -158,46 +158,7 @@ export type ImportedBuiltInRoleTemplateInput = {
   }
 }
 
-export type BilingualCopy = {
-  zh: string
-  en: string
-}
-
-export type CollaborationRoleTemplateInput = {
-  slug: string
-  displayName: string
-  summary: BilingualCopy
-  longDescription: BilingualCopy
-  tags: string[]
-  lane: string
-  tone: BilingualCopy
-  featured?: boolean
-  templateRevision?: string
-  actor: {
-    displayName: string
-    role: ActorRole
-    title: string
-    avatarEmoji?: string
-    canRepresentUser?: boolean
-    specialties: string[]
-    config?: Record<string, unknown>
-  }
-  vibe: BilingualCopy
-  identity: BilingualCopy
-  relationship: BilingualCopy
-  collaboration: BilingualCopy
-  mission: BilingualCopy
-  roleCharter: BilingualCopy
-  workDoctrine: BilingualCopy[]
-  principles?: BilingualCopy[]
-  representationGuidelines?: BilingualCopy
-  socialProtocol?: BilingualCopy
-  limitations?: BilingualCopy
-  routines?: BilingualCopy[]
-  conversationExample?: BilingualCopy
-  setupGuide: BilingualCopy
-  releaseNotes?: BilingualCopy
-}
+export type CollaborationRoleTemplateInput = BuiltInRoleTemplateInput
 
 function compact<T>(values: Array<T | null | undefined | false>) {
   return values.filter((value): value is T => Boolean(value))
@@ -221,32 +182,16 @@ function markdownSection(title: string, body?: string | null) {
   return `## ${title}\n${trimmed}`
 }
 
-export function bilingualInline(input: BilingualCopy) {
-  return `${input.zh.trim()} / ${input.en.trim()}`
-}
-
-export function bilingualBlock(input: BilingualCopy) {
-  return `${input.zh.trim()}\n\n${input.en.trim()}`
-}
-
-export function bilingualBullet(input: BilingualCopy) {
-  return `中文：${input.zh.trim()}\n  English: ${input.en.trim()}`
-}
-
-export function bilingualBulletList(items: BilingualCopy[]) {
-  return items.map((item) => bilingualBullet(item))
-}
-
 function defaultRepresentationGuidelines(title: string) {
   return [
-    `当你以${title}身份代用户表达立场、承诺、预算、排期或对外确认时，先基于已知事实起草，再在关键承诺处请求用户确认。`,
-    "不要替用户做超出明确授权范围的决定。",
+    `When you state positions, commitments, budgets, timelines, or external confirmations on the user's behalf as the ${title}, draft from known facts first and ask the user to confirm at each key commitment.`,
+    "Do not make decisions for the user beyond the scope of explicit authorization.",
   ].join("\n\n")
 }
 
 export function buildActorDocs(input: BuildActorDocsInput) {
   const soulContent = input.soul?.length
-    ? markdownSection("核心原则", bulletList(input.soul))
+    ? markdownSection("Core Principles", bulletList(input.soul))
     : ""
 
   return normalizeActorDocs(
@@ -434,7 +379,8 @@ export function createOfficialActorTemplateSeed(
     actorMetadata: sharedMetadata,
     setupGuide: textBlocks(input.setupGuide),
     releaseNotes: textBlocks(
-      input.releaseNotes || "官方内置角色模板首发版本。"
+      input.releaseNotes ||
+        "Initial release of this official built-in role template."
     ),
   }
 }
@@ -510,24 +456,24 @@ export function createImportedBuiltInRoleTemplateSeed(
       },
     },
     docs: {
-      identity: `你是${input.displayName}。${input.source.description}`,
+      identity: `You are ${input.displayName}. ${input.source.description}`,
       publicPersona: input.source.vibe,
       selfNarrative:
-        "当前角色文档完整定义了你的专业边界、方法论、质量标准和表达重心，不要把它弱化成普通岗位简介。",
+        "The current role document fully defines your professional boundaries, methodology, quality standards, and expression focus. Do not water it down into a generic job summary.",
       relationship: input.source.userQuery
-        ? `用户通常会在以下场景下召唤你：${input.source.userQuery}`
-        : `当用户需要${input.displayName}的专业能力时，会直接向你求助。`,
+        ? `Users typically summon you for scenarios like: ${input.source.userQuery}`
+        : `When users need the expertise of a ${input.displayName}, they come to you directly.`,
       representationGuidelines:
         input.actor.canRepresentUser === true
           ? defaultRepresentationGuidelines(title)
           : undefined,
-      mission: `以${input.displayName}身份，忠实执行当前角色文档中的职责、方法与质量标准。`,
+      mission: `Acting as ${input.displayName}, faithfully execute the duties, methods, and quality standards defined in the current role document.`,
       roleCharter:
-        "以当前角色文档为主，不得擅自删减关键规则、方法论、成功标准或专业边界。",
+        "Treat the current role document as authoritative. Do not silently drop key rules, methodology, success criteria, or professional boundaries.",
       workDoctrine: [
-        "先读取并遵循当前角色说明文档。",
-        "尽量保留当前角色设定中的工作流、禁忌、成功标准和沟通方式。",
-        "如果角色说明与系统全局规则冲突，以系统规则为上限，其余部分保持一致。",
+        "Read and follow the current role document first.",
+        "Preserve the workflows, taboos, success criteria, and communication style defined in the role.",
+        "If the role document conflicts with global system rules, system rules set the upper bound; keep everything else consistent.",
       ],
       conversationExample: input.source.userQuery,
       extraDocs: compact<ActorDocInput>([
@@ -551,64 +497,26 @@ export function createImportedBuiltInRoleTemplateSeed(
           : undefined,
       ]),
     },
-    setupGuide: `安装后会使用 ${input.displayName} 的完整角色说明。`,
-    releaseNotes: "更新为完整角色说明版本。",
+    setupGuide: `After installation, the full role manual for ${input.displayName} is used.`,
+    releaseNotes: "Updated to the full role-manual version.",
   })
 }
 
-const DEFAULT_COLLABORATION_ROLE_RELEASE_NOTES: BilingualCopy = {
-  zh: "重写为面向 Synapse 群聊协作的官方双语岗位模板，移除了旧的外部长提示词搬运结构。",
-  en: "Rewritten as an official bilingual role template for Synapse-style group collaboration, replacing the old imported long-prompt structure.",
-}
+const DEFAULT_COLLABORATION_ROLE_RELEASE_NOTES =
+  "Rewritten as an official role template for Synappse-style group collaboration, replacing the old imported long-prompt structure."
 
 export function createCollaborationRoleTemplateSeed(
   input: CollaborationRoleTemplateInput
 ) {
   return createBuiltInRoleTemplateSeed({
-    slug: input.slug,
-    displayName: input.displayName,
-    summary: bilingualInline(input.summary),
-    longDescription: bilingualBlock(input.longDescription),
+    ...input,
     tags: uniqueStrings(input.tags),
-    lane: input.lane,
-    tone: bilingualInline(input.tone),
-    featured: input.featured,
     templateRevision: input.templateRevision || "collaboration-v2",
     actor: {
-      displayName: input.actor.displayName,
-      role: input.actor.role,
-      title: input.actor.title,
-      avatarEmoji: input.actor.avatarEmoji,
-      canRepresentUser: input.actor.canRepresentUser === true,
+      ...input.actor,
       specialties: uniqueStrings(input.actor.specialties),
-      config: input.actor.config || {},
     },
-    vibe: bilingualBlock(input.vibe),
-    identity: bilingualBlock(input.identity),
-    relationship: bilingualBlock(input.relationship),
-    collaboration: bilingualBlock(input.collaboration),
-    mission: bilingualBlock(input.mission),
-    roleCharter: bilingualBlock(input.roleCharter),
-    workDoctrine: bilingualBulletList(input.workDoctrine),
-    principles: input.principles
-      ? bilingualBulletList(input.principles)
-      : undefined,
-    representationGuidelines: input.representationGuidelines
-      ? bilingualBlock(input.representationGuidelines)
-      : undefined,
-    socialProtocol: input.socialProtocol
-      ? bilingualBlock(input.socialProtocol)
-      : undefined,
-    limitations: input.limitations
-      ? bilingualBlock(input.limitations)
-      : undefined,
-    routines: input.routines ? bilingualBulletList(input.routines) : undefined,
-    conversationExample: input.conversationExample
-      ? bilingualBlock(input.conversationExample)
-      : undefined,
-    setupGuide: bilingualBlock(input.setupGuide),
-    releaseNotes: bilingualBlock(
-      input.releaseNotes || DEFAULT_COLLABORATION_ROLE_RELEASE_NOTES
-    ),
+    releaseNotes:
+      input.releaseNotes || DEFAULT_COLLABORATION_ROLE_RELEASE_NOTES,
   })
 }
