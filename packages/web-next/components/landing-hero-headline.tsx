@@ -234,7 +234,7 @@ export function LandingHeroHeadline() {
     <div className="font-display animate-fade-up relative mt-6 text-[clamp(2rem,7vw,5rem)] leading-[0.96] font-semibold tracking-tight text-slate-950">
       <ProbeStrip ref={probeRef} />
 
-      <div className="inline-flex max-w-full flex-nowrap items-center justify-center gap-x-1 leading-none whitespace-nowrap sm:gap-x-1.5">
+      <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-1 leading-none sm:gap-x-1.5">
         <span>Let AI</span>
         <span className="inline-flex items-center text-primary">
           {renderChar(0)}
