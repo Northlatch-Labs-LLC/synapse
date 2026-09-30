@@ -122,9 +122,19 @@ function HeadlineChar({
   )
 }
 
+// Founder spec (2026-09-30): the rotating strip is a FIXED 10-character
+// window — the longest phrase ("think like") is exactly 10 chars, shorter
+// phrases are centered inside the same 10 slots, so the window width never
+// changes and can never truncate.
+const ROTATING_WINDOW_CHARS = 10
+
 function getStepChars(stepIndex: number) {
   const step = headlineSteps[stepIndex]
-  return [step.lead, ...Array.from(step.tail)]
+  const phrase = step.lead
+  const slack = Math.max(0, ROTATING_WINDOW_CHARS - phrase.length)
+  const left = Math.floor(slack / 2)
+  const padded = " ".repeat(left) + phrase + " ".repeat(slack - left)
+  return [padded, ...Array.from(step.tail)]
 }
 
 const positionCharSets: string[][] = (() => {
