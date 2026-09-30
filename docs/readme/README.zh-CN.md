@@ -177,7 +177,7 @@ Synapse 采用以会话为核心的架构，在此基础上将资源运行时、
 克隆仓库并启动本地基础环境：
 
 ```bash
-git clone --recurse-submodules https://github.com/zai-org/Synapse
+git clone --recurse-submodules https://github.com/Northlatch-Labs-LLC/synapse
 cd Synapse
 
 npm ci

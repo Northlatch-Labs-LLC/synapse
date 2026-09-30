@@ -10,6 +10,11 @@
 </p>
 
 <p align="center">
+  Maintained by <strong>Northlatch Labs LLC</strong> ·
+  Live instance: <a href="https://synapse.xlaunch.work">https://synapse.xlaunch.work</a>
+</p>
+
+<p align="center">
   A self-hosted AI workspace for shareable teammates, shared conversations, memory,
   governed access to plugins and MCP tools, local execution, and event-driven automation.
 </p>
@@ -177,7 +182,7 @@ Prerequisites:
 Clone the repo and start the core local stack:
 
 ```bash
-git clone --recurse-submodules https://github.com/zai-org/Synapse
+git clone --recurse-submodules https://github.com/Northlatch-Labs-LLC/synapse
 cd Synapse
 
 npm ci
@@ -199,9 +204,16 @@ Open:
 - Desktop web: `http://localhost:3000`
 - API health: `http://localhost:3001/api/v1/health`
 
+Sign-in is western-first: WhatsApp OTP by default (requires
+`WHATSAPP_CLOUD_TOKEN` / `WHATSAPP_CLOUD_PHONE_NUMBER_ID` in `.env`), with
+email + password always available.
+
 If your local Docker setup requires elevated privileges, run the `docker compose` command with `sudo`.
 
-Before using actor or chat flows with real models, configure at least one platform model group: copy `packages/api/config/model-groups.yaml.example` to `packages/api/config/model-groups.yaml`, fill in the referenced `${ENV}` variables (e.g. `ANTHROPIC_API_KEY`) in `.env`, then apply it with `npm run db:rebuild` (which imports it automatically) or `npm run db:seed:model-groups`.
+Before using actor or chat flows with real models, configure at least one platform model group: copy `packages/api/config/model-groups.yaml.example` to `packages/api/config/model-groups.yaml`, fill in the referenced `${ENV}` variables in `.env`. On the Northlatch managed
+instance this is preconfigured against the Northlatch Gateway
+(`https://gateway.xlaunch.work/v1`, model `auto` — the gateway routes each
+request to an available inference model on its own), then apply it with `npm run db:rebuild` (which imports it automatically) or `npm run db:seed:model-groups`.
 
 ### Optional: reset and seed a demo environment
 

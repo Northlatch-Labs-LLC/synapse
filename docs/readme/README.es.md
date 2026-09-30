@@ -177,7 +177,7 @@ Requisitos previos:
 Clona el repositorio y levanta el entorno local básico:
 
 ```bash
-git clone --recurse-submodules https://github.com/zai-org/Synapse
+git clone --recurse-submodules https://github.com/Northlatch-Labs-LLC/synapse
 cd Synapse
 
 npm ci
