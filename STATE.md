@@ -6,7 +6,7 @@ work or claims credit for gaps that are known and open.
 
 - **Live:** https://synappse.work (production, apex). Old `synapse.xlaunch.work` 301s page
   routes to the apex; `/api/v1` and `/ws` are exempt (the Stripe webhook still delivers there by design).
-- **Trunk:** `main` only, all branches deleted by founder. Code HEAD: `df939efa` (2026-09-30); this doc updated same day (ops round: spin capture, prune rule, blips).
+- **Trunk:** `main` only, all branches deleted by founder. Code HEAD: `e8b9f8b4` (2026-09-30 — mobile APK v1.0.0 RECALLED: delivered without boot verification, crashes on device). This line was stale at `df939efa` (12 commits behind) until corrected 2026-09-30 by operator directive; doc's ops-round notes below still describe that earlier round.
 - **Brand:** user-facing mark is **Synappse** (double-p). Internal identifiers stay `synapse`
   (`@synapse/*` packages, `SYNAPSE_*` env, `synapse://` scheme, repo name) — do not "fix" them.
 - **Adjacent programs (separate state, separate repos):** Latch (desktop/CLI/mobile harness,
