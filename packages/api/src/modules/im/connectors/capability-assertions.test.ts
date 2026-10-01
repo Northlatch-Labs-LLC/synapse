@@ -29,7 +29,10 @@
 
 import test from "node:test"
 import assert from "node:assert/strict"
-import { TRANSPORT_KINDS } from "@synapse/shared/constants"
+import {
+  TRANSPORT_KINDS,
+  WESTERN_TRANSPORT_KINDS,
+} from "@synapse/shared/constants"
 import type { TransportKind } from "@synapse/shared/types"
 
 // Single registration entrypoint — same import production goes through.
@@ -84,7 +87,13 @@ test("assertSupportedEndpointType: rejected pair → 400 + stable code", () => {
 })
 
 test("registry covers every TRANSPORT_KINDS entry", () => {
-  const registered = listTransportConnectorCapabilities()
+  // Coverage is a REGISTRY question ("did register-all.ts import every
+  // connector?"), so assert against listConnectors() — the raw registry.
+  // listTransportConnectorCapabilities() applies the west-first product
+  // gate (config.im.westernOnly), which intentionally hides non-western
+  // kinds; asserting against the gated view made this test fail since the
+  // gate shipped, even though registration itself was correct.
+  const registered = listConnectors()
     .map((c) => c.transportKind)
     .slice()
     .sort()
@@ -95,7 +104,27 @@ test("registry covers every TRANSPORT_KINDS entry", () => {
     `expected register-all.ts to cover exactly ${JSON.stringify(
       expected
     )}, got ${JSON.stringify(registered)}. ` +
-      `If you added a kind to TRANSPORT_KINDS, also add its side-effect import to register-all.ts.`
+      `If you added a kind to TRANSPORT_KINDS, add its side-effect import to register-all.ts.`
+  )
+})
+
+test("gated capability view exposes exactly the west-first product set", () => {
+  // The product-facing metadata list is intentionally filtered by
+  // config.im.westernOnly (west-first launch): only WESTERN_TRANSPORT_KINDS
+  // may appear. Locks the gate so a future refactor can't silently widen
+  // the product surface without a deliberate change here.
+  const exposed = listTransportConnectorCapabilities()
+    .map((c) => c.transportKind)
+    .slice()
+    .sort()
+  const expected = [...WESTERN_TRANSPORT_KINDS].slice().sort()
+  assert.deepEqual(
+    exposed,
+    expected,
+    `gated view should expose exactly ${JSON.stringify(
+      expected
+    )}, got ${JSON.stringify(exposed)}. ` +
+      `If you intend to widen the product set, update WESTERN_TRANSPORT_KINDS in @synapse/shared and this contract together.`
   )
 })
 
