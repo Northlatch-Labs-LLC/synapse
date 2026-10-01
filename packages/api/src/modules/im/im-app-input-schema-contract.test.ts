@@ -1,3 +1,5 @@
+// West-first gate (founder order 2026-09-29): input schemas accept PRODUCT_TRANSPORT_KINDS only.
+
 import assert from "node:assert/strict"
 import test from "node:test"
 import {
@@ -14,20 +16,31 @@ const transportAccountId = "00000000-0000-4000-8000-000000000003"
 
 test("TransportAccountCreateInputSchema preserves generic account defaults", () => {
   const parsed = TransportAccountCreateInputSchema.safeParse({
-    transportKind: "feishu",
+    transportKind: "telegram",
     accountKey: "main",
-    displayName: "Main Feishu",
+    displayName: "Main Account",
     connectionMode: "webhook",
   })
 
   assert.ok(parsed.success, JSON.stringify(parsed.error?.issues))
   assert.equal(parsed.data.ownerScope, "workspace")
+
+  // West-first gate: Chinese-market kinds must be rejected on create.
+  assert.equal(
+    TransportAccountCreateInputSchema.safeParse({
+      transportKind: "feishu",
+      accountKey: "main",
+      displayName: "Main Account",
+      connectionMode: "webhook",
+    }).success,
+    false
+  )
 })
 
 test("TransportAccountCreateInputSchema validates owner and inbound actor invariants", () => {
   assert.equal(
     TransportAccountCreateInputSchema.safeParse({
-      transportKind: "feishu",
+      transportKind: "telegram",
       accountKey: "member",
       displayName: "Member Account",
       connectionMode: "webhook",
@@ -39,7 +52,7 @@ test("TransportAccountCreateInputSchema validates owner and inbound actor invari
 
   assert.ok(
     TransportAccountCreateInputSchema.safeParse({
-      transportKind: "feishu",
+      transportKind: "telegram",
       accountKey: "member",
       displayName: "Member Account",
       connectionMode: "webhook",
