@@ -259,6 +259,13 @@ test(
       const u = await insertUser(db)
       const ws = await insertWorkspace(db, u)
       await insertMember(db, ws, u, "admin")
+      // GDPR S1: seed BOTH phone spellings (users has phone_number and
+      // "phoneNumber", schema.sql:267-270) so closure can prove it erases them.
+      await sql`
+        UPDATE users
+        SET phone_number = '+15550001', "phoneNumber" = '+15550002'
+        WHERE id = ${u}
+      `.execute(db)
       await db
         .insertInto("account")
         .values({
@@ -290,6 +297,18 @@ test(
         /@deleted\.invalid$/,
         "email anonymized"
       )
+      // GDPR S1: both phone spellings erased. Selected via raw SQL with
+      // distinct aliases — the camelCase result plugin would fold phone_number
+      // and "phoneNumber" into the same key.
+      const phones = await sql<{
+        snakePhone: string | null
+        camelPhone: string | null
+      }>`
+        SELECT phone_number AS snake_phone, "phoneNumber" AS camel_phone
+        FROM users WHERE id = ${u}
+      `.execute(db)
+      assert.equal(phones.rows[0].snakePhone, null, "phone_number erased")
+      assert.equal(phones.rows[0].camelPhone, null, '"phoneNumber" erased')
       const acct = await db
         .selectFrom("account")
         .selectAll()

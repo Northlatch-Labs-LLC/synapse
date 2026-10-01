@@ -295,11 +295,18 @@ export async function markUserDeleted(
   `.execute(db)
 
   // 6. PII anonymization on the (already tombstoned) user row.
+  //    Both phone spellings (schema.sql:267-270: the BA phoneNumber plugin
+  //    reads camelCase names, the snake_case pair is the house set) are
+  //    nullable UNIQUE, so NULL is the tombstone — no deleted: placeholder
+  //    needed. Verified flags are NOT NULL DEFAULT FALSE, so FALSE is their
+  //    erased state.
   await sql`
     UPDATE users
     SET email = 'deleted+' || id::text || '@deleted.invalid',
         name = 'Deleted User',
         image = NULL,
+        phone_number = NULL, phone_number_verified = FALSE,
+        "phoneNumber" = NULL, "phoneNumberVerified" = FALSE,
         feishu_open_id = NULL, feishu_union_id = NULL, feishu_tenant_key = NULL
     WHERE id = ${userId}
   `.execute(db)

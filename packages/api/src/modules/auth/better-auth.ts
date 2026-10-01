@@ -97,6 +97,14 @@ async function readFeishuProviderJsonObjectResponse(
 }
 
 /**
+ * Mask a phone number for logs: fixed bullet run + last two digits only.
+ * The fixed width keeps the number's length out of the log stream.
+ */
+function maskPhoneForLog(dest: string): string {
+  return `+•••••••${dest.slice(-2)}`
+}
+
+/**
  * Resolve the email to hand Better Auth for a Feishu profile.
  *
  * Feishu commonly returns email as an EMPTY STRING (not null/absent) when the
@@ -609,7 +617,7 @@ export const auth = betterAuth({
           log.error({ status: res.status }, "whatsapp otp delivery failed")
           throw new Error("WhatsApp OTP delivery failed")
         }
-        log.info({ to: dest }, "whatsapp otp sent")
+        log.info({ to: maskPhoneForLog(dest) }, "whatsapp otp sent")
       },
       signUpOnVerification: {
         getTempEmail: (dest: string) =>
