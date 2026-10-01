@@ -124,13 +124,16 @@ verify PUBLIC (curl health + playwright screenshot of the real page)
    (the gateway ensemble) now resolves first for any workspace without an explicit assignment.
    api restarted to bust the binding-resolver cache; health green. Re-enable = flip the flag
    back + restart api.
-2. **Mobile app: code done + STAGED on Android emulator (Expo Go, prod API), still no APK.**
-   West-first sweep on main (03372423) + a startup-crash fix (fedf3381: Hermes has no
-   globalThis.crypto — all shared UUID call sites now go through createUuid). Staged and
-   screenshot-verified 2026-09-30: emulator Pixel_9_API_36 + Expo Go 54.0.8 + Metro
-   (`packages/mobile-app`, `.env` EXPO_PUBLIC_API_URL=https://synappse.work/api/v1, git-
-   ignored) — login screen renders English-only, no Feishu button. Still NOT a signed build:
-   no APK/IPA exists, never present as shipped. (This Mac has no JDK: no native debug build.)
+2. **Mobile app: UNSHIPPED — APK v1.0.0 was delivered 2026-09-30 and RECALLED same day
+   (crashes on device, founder report).** The delivery was made on artifact verification
+   only (badging/signature/bundle greps) — the app was never booted before handover, and
+   the build had crash reporting stubbed out (Sentry no-op) to pass. LESSON ON RECORD:
+   no mobile/web release is "delivered" until it is INSTALLED AND BOOTED through the
+   founder's exact path — login screen renders, one real login, on a device — with crash
+   reporting actually enabled. Remaining true state: west-first sweep + Hermes UUID fix on
+   main (03372423, fedf3381), login screen renders under Expo Go on emulator. Before any
+   next APK: root-cause this crash, boot-verify on emulator AND a real device, restore
+   real crash reporting, then release.
 3. ~~Actor seed catalog bilingual~~ — DONE on main (0625b6a6): `BilingualCopy` removed at the
    type level, 21 seed files English-only. Inert on prod (db:seed never runs there); repo now
    clean of CJK in the seed catalog.
