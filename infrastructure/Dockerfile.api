@@ -135,6 +135,23 @@ RUN apt-get update \
   # sigstore, minimatch) carry known CRITICAL/HIGH CVEs that Trivy flags on
   # the final image. npm 11 vendors the fixed lines.
   && npm install -g npm@11 \
+  # npm@11 (through 12.2.0) itself vendors undici@6.28.0 (CVE-2026-19534)
+  # and brace-expansion@5.0.9 (CVE-2026-102276/102278) — no npm release
+  # carries the fixed lines yet. npm CANNOT be deleted here (the web image
+  # does `rm -rf` its npm tree): this container's local-bare-plane
+  # device-runtime child installs CLI harnesses at runtime by spawning
+  # `npm install -g` off PATH (device-runtime cli-catalog/install.ts).
+  # So patch the two vendored copies in place. Semver-safe: 6.28.1 satisfies
+  # node-gyp's ^6.25.0, 5.0.11 satisfies minimatch's ^5.0.5.
+  && npm pack undici@6.28.1 brace-expansion@5.0.11 --silent --pack-destination /tmp \
+  && rm -rf /usr/local/lib/node_modules/npm/node_modules/undici \
+            /usr/local/lib/node_modules/npm/node_modules/brace-expansion \
+  && mkdir -p /usr/local/lib/node_modules/npm/node_modules/undici \
+             /usr/local/lib/node_modules/npm/node_modules/brace-expansion \
+  && tar -xzf /tmp/undici-6.28.1.tgz -C /usr/local/lib/node_modules/npm/node_modules/undici --strip-components=1 \
+  && tar -xzf /tmp/brace-expansion-5.0.11.tgz -C /usr/local/lib/node_modules/npm/node_modules/brace-expansion --strip-components=1 \
+  && rm -f /tmp/undici-6.28.1.tgz /tmp/brace-expansion-5.0.11.tgz \
+  && node -e "console.log('npm vendored undici', require('/usr/local/lib/node_modules/npm/node_modules/undici/package.json').version, '| brace-expansion', require('/usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json').version)" \
   && curl -fsSL "https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_CLI_VERSION}.tgz" \
        -o /tmp/docker.tgz \
   && tar -xzf /tmp/docker.tgz -C /tmp \
