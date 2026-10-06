@@ -1,0 +1,6 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Synappse daily health report (plain-English email digest to the founder).
+# The script silently exits when RESEND_API_KEY is not yet configured.
+0 15 * * * root /data/synapse/scripts/daily-health-report.sh >> /var/log/synapse-health-report.log 2>&1

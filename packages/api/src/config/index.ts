@@ -265,6 +265,13 @@ const envObjectSchema = z.object({
 
   PLATFORM_ADMIN_EMAILS: withDefault(z.string(), ""),
 
+  // ===== Outbound email (Resend) =====
+  // Optional: an absent key disables all email sends (logged no-ops), matching
+  // the env-selected provider pattern used by embedding/OCR/transcription.
+  RESEND_API_KEY: withDefault(z.string(), ""),
+  EMAIL_FROM: withDefault(z.string(), "Synappse <no-reply@synappse.work>"),
+  EMAIL_ALERT_TO: withDefault(z.string(), ""),
+
   // ===== Better Auth =====
   // Session signing secret. Falls back through AUTH_SECRET / APP_SECRET so a
   // single deployment secret can cover both BA and the legacy crypto layer.
@@ -1015,6 +1022,11 @@ export const config = {
     adminEmails: env.PLATFORM_ADMIN_EMAILS.split(",")
       .map((email) => email.trim().toLowerCase())
       .filter(Boolean),
+  },
+  email: {
+    apiKey: env.RESEND_API_KEY || undefined,
+    from: env.EMAIL_FROM,
+    alertTo: env.EMAIL_ALERT_TO || undefined,
   },
   auth: {
     // Session signing secret: first non-empty of the three candidates. In
