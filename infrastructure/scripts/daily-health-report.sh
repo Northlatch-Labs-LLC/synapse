@@ -24,7 +24,7 @@ set -a
 set +a
 [ -n "${RESEND_API_KEY:-}" ] || { log "RESEND_API_KEY not set, exiting"; exit 0; }
 
-TO="${EMAIL_ALERT_TO:-ops@northlatch.dev}"
+TO="${EMAIL_ALERT_TO:-hello@projectxprotocol.dev}"
 FROM="${EMAIL_FROM:-Synappse <no-reply@synappse.work>}"
 
 db() {
