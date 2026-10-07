@@ -22,6 +22,7 @@
     "guard:schemas": "tsx scripts/gen-config-schemas.mts --check",
     "pretest": "bash ../../scripts/pretest-fs-helper.sh release && npm run guard:db && npm run guard:fk-policy && npm run guard:soft-delete && npm run guard:layering && npm run guard:content-store && node ../../scripts/guard-datetime-boundaries.mjs --self-test && node ../../scripts/guard-datetime-boundaries.mjs && node ../../scripts/guard-logging.mjs && npm run typecheck && npm run guard:schemas",
     "test": "tsx --test --experimental-test-module-mocks --test-concurrency=4 \"src/**/*.test.ts\"",
+    "test:scoped": "tsx --test --experimental-test-module-mocks --test-concurrency=4",
     "test:integration": "bash tests/integration/scripts/run-integration.sh",
     "test:integration:keep-stack": "KEEP_CONTAINERS=1 bash tests/integration/scripts/run-integration.sh",
     "test:integration:llm-smoke": "tsx --test tests/integration/manual/llm-smoke.test.ts",

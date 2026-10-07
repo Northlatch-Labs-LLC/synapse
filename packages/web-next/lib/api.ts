@@ -160,6 +160,8 @@ import type {
   PlatformAccessBindingView,
   PlatformAccessGrantInput,
   PlatformNavigationView,
+  PlatformUserListView,
+  PlatformUserListQuery,
   PluginCategoryListView,
   PluginInstallationDetailView,
   PluginInstallationListView,
@@ -492,6 +494,24 @@ class ApiClient {
   logout() {
     return this.fetch("/auth/sign-out", { method: "POST" })
   }
+  // Password reset (Better Auth emailAndPassword). requestPasswordReset makes
+  // the API send the reset email (the address is echoed in a neutral success
+  // response either way, so this cannot be used to enumerate accounts);
+  // resetPassword consumes the token the email links to (/auth/reset-password).
+  // NOTE: better-auth 1.7.6's endpoint is /request-password-reset (the older
+  // /forget-password name does not exist in this version).
+  requestPasswordReset(email: string) {
+    return this.fetch("/auth/request-password-reset", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    })
+  }
+  resetPassword(token: string, newPassword: string) {
+    return this.fetch("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword }),
+    })
+  }
   logoutAll() {
     return this.fetch("/auth/revoke-sessions", { method: "POST" })
   }
@@ -716,6 +736,36 @@ class ApiClient {
     accessKey: PlatformAccessGrantInput["accessKey"]
   ) {
     return this.fetch(`/platform/access/${accessKey}/users/${userId}/revoke`, {
+      method: "POST",
+      body: "{}",
+    })
+  }
+
+  // Platform Users (registered-users admin layer)
+  async getPlatformUsers(
+    query?: PlatformUserListQuery
+  ): Promise<PlatformUserListView> {
+    const path = withQuery(
+      "/platform/users",
+      query as Record<string, QueryValue>
+    )
+    const res = await this.fetch(path)
+    return res.data
+  }
+  suspendPlatformUser(userId: string) {
+    return this.fetch(`/platform/users/${userId}/suspend`, {
+      method: "POST",
+      body: "{}",
+    })
+  }
+  unsuspendPlatformUser(userId: string) {
+    return this.fetch(`/platform/users/${userId}/unsuspend`, {
+      method: "POST",
+      body: "{}",
+    })
+  }
+  signOutPlatformUserEverywhere(userId: string) {
+    return this.fetch(`/platform/users/${userId}/sign-out-everywhere`, {
       method: "POST",
       body: "{}",
     })

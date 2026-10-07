@@ -25,6 +25,7 @@ export function presentPlatformNavigation(input: {
     canAccessPlatformModels: input.canManagePlatform,
     canAccessPlatformAccess: input.canManagePlatform,
     canAccessPlatformSkills: input.canManagePlatform,
+    canAccessPlatformUsers: input.canManagePlatform,
   }
 }
 

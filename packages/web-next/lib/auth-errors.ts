@@ -1,6 +1,6 @@
 import { ApiError } from "@/lib/api"
 
-type AuthActionLabel = "Sign in" | "Sign up" | "Authorize"
+type AuthActionLabel = "Sign in" | "Sign up" | "Authorize" | "Reset"
 
 /**
  * Map an auth failure to one of three user-facing messages. We deliberately do
@@ -20,6 +20,12 @@ export function getAuthErrorMessage(
 
   if (status === 429) {
     return "Too many attempts. Please try again later."
+  }
+  // Suspension is a verdict, not a credential failure: the sign-in hooks
+  // (better-auth session.create.before) answer 403 account_suspended with the
+  // same message the session middleware uses for already-sessioned requests.
+  if (code === "account_suspended") {
+    return "This account has been suspended by a platform administrator. Contact support if you believe this is a mistake."
   }
   if (status === 401 || code === "INVALID_EMAIL_OR_PASSWORD") {
     return "Incorrect email or password."

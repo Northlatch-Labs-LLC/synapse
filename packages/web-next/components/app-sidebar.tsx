@@ -26,6 +26,7 @@ import {
   SquareTerminal,
   ShieldCheck,
   Sun,
+  Users,
 } from "lucide-react"
 
 import { useWorkspace } from "@/app/dashboard/workspace-provider"
@@ -100,6 +101,12 @@ const accessItems = [
   },
 ]
 
+// Platform-admin section: only rendered when the platform navigation grants
+// the user access (canAccessPlatformUsers = platform.manage).
+const platformItems = [
+  { href: "/dashboard/users", label: "Users", icon: Users },
+]
+
 const emptyWorkspaceNavigation = {
   canViewWorkspace: false,
   canAccessWorkspaceModels: false,
@@ -111,6 +118,7 @@ const emptyPlatformNavigation = {
   canAccessPlatformModels: false,
   canAccessPlatformAccess: false,
   canAccessPlatformSkills: false,
+  canAccessPlatformUsers: false,
 }
 
 function SynapseLogo({ className }: { className?: string }) {
@@ -479,6 +487,14 @@ export function AppSidebar({
     return automationItems
   }, [workspaceNavigation.canViewWorkspace])
 
+  const visiblePlatformItems = React.useMemo(() => {
+    if (!platformNavigation.canAccessPlatformUsers) {
+      return []
+    }
+
+    return platformItems
+  }, [platformNavigation.canAccessPlatformUsers])
+
   return (
     <Sidebar collapsible="offcanvas" variant="inset" {...props}>
       <SidebarHeader>
@@ -515,6 +531,11 @@ export function AppSidebar({
         <NavSection
           label="Access"
           items={visibleAccessItems}
+          pathname={pathname}
+        />
+        <NavSection
+          label="Platform"
+          items={visiblePlatformItems}
           pathname={pathname}
         />
       </SidebarContent>

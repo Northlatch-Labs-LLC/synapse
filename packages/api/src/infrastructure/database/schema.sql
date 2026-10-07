@@ -283,6 +283,40 @@ CREATE TABLE users (
 
 CREATE INDEX idx_users_email ON users(email);
 
+-- ============ Platform user-management: account suspension (2026-10-06) ============
+-- Platform admins can suspend an account (packages/api/src/modules/platform-users).
+-- NULL = not suspended; a timestamp marks WHEN the suspension was applied.
+-- Suspension is NOT a soft delete: the row stays fully live (it still appears in
+-- users_live), access is denied at the auth middleware (403 account_suspended)
+-- and the user's active sessions are revoked at suspend time.
+--
+-- DEPLOY NOTE FOR EXISTING DATABASES (prod included — db:bootstrap fail-louds on
+-- any schema.sql change via EFFECTIVE_SCHEMA_VERSION, see bootstrap.ts): the
+-- deploy stage must apply the additive DDL below MANUALLY, then record the new
+-- EFFECTIVE_SCHEMA_VERSION row in schema_migrations (fresh databases get all of
+-- this from this file directly). Exact statements:
+--
+--   ALTER TABLE users ADD COLUMN suspended_at TIMESTAMPTZ;
+--   CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_created_at ON users (created_at DESC);
+--   CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_email_trgm ON users USING GIN (email gin_trgm_ops);
+--   CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_name_trgm ON users USING GIN (name gin_trgm_ops);
+--
+-- (CONCURRENTLY for live tables on prod; plain CREATE INDEX — as in the fresh
+-- bootstrap below — is fine on empty databases. The created_at index keeps the
+-- platform users list from sorting a million-row table per page; the trgm GIN
+-- indexes back the case-insensitive ILIKE search. After applying the DDL, boot
+-- will still fail-loud until the new schema version is recorded. The expected
+-- EFFECTIVE_SCHEMA_VERSION literal is printed by that boot failure (do NOT paste
+-- it here: this comment is part of the hashed file, so a pasted literal would
+-- change the hash it names). Record it with:
+--   INSERT INTO schema_migrations (version, description)
+--   VALUES ('<EFFECTIVE_SCHEMA_VERSION from the boot failure log>', 'users.suspended_at platform user-management layer');
+-- )
+
+CREATE INDEX idx_users_created_at ON users (created_at DESC);
+CREATE INDEX idx_users_email_trgm ON users USING GIN (email gin_trgm_ops);
+CREATE INDEX idx_users_name_trgm ON users USING GIN (name gin_trgm_ops);
+
 -- ============ Better Auth: account (sign-in methods + provider tokens) ============
 -- One row per (provider_id, account_id). For the credential provider,
 -- account_id = users.id and `password` holds the BA scrypt hash. For OAuth
@@ -6038,6 +6072,10 @@ ALTER TABLE publishers                       ADD COLUMN deleted_at TIMESTAMPTZ;
 ALTER TABLE remote_agent_machines            ADD COLUMN deleted_at TIMESTAMPTZ;
 ALTER TABLE transport_accounts               ADD COLUMN deleted_at TIMESTAMPTZ;
 ALTER TABLE users                            ADD COLUMN deleted_at TIMESTAMPTZ;
+-- Platform user-management (2026-10-06): account suspension marker — NULL =
+-- not suspended. See the full DEPLOY NOTE at the users table block above for
+-- the exact additive statements existing databases must apply manually.
+ALTER TABLE users                            ADD COLUMN suspended_at TIMESTAMPTZ;
 ALTER TABLE workspaces                       ADD COLUMN deleted_at TIMESTAMPTZ;
 
 -- 2) workspace_members: single durable identity row (design §6). status flips on

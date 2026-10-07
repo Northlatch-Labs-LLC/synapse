@@ -8,7 +8,11 @@ import {
 } from "../files/service.js"
 import { auth } from "./better-auth.js"
 import { presentUser } from "./presenter.js"
-import { selectUserById, updateUserProfileRow, isUserLive } from "./repo.js"
+import {
+  selectUserById,
+  updateUserProfileRow,
+  selectUserSessionGuardState,
+} from "./repo.js"
 
 /**
  * Auth service — Better Auth edition.
@@ -119,39 +123,77 @@ function toAuthenticated(
 }
 
 /**
- * Soft-delete guard (design §8.4): Better Auth's getSession/findUserById do NOT
- * filter users.deleted_at, so a session minted before account closure (or via a
- * residual device_code) could still resolve. Reject any session whose user is
- * soft-deleted, treating it as unauthenticated.
+ * Resolution outcome of the session guard, consumed by the Fastify auth
+ * middleware so a SUSPENDED user can be told apart from an unauthenticated
+ * request (403 account_suspended vs 401 UNAUTHENTICATED). Non-middleware
+ * consumers (WebSocket layers, log ingest) use the boolean-style helpers below,
+ * which collapse suspension to "not authenticated" — the safest behavior for
+ * channels with no error-reply path.
  */
-async function rejectIfUserDeleted(
+export type AuthenticatedSessionResolution =
+  | { kind: "authenticated"; session: AuthenticatedRequestSession }
+  | { kind: "unauthenticated" }
+  | { kind: "suspended" }
+
+/**
+ * Soft-delete + suspension guard. Better Auth's getSession/findUserById do NOT
+ * filter users.deleted_at (and know nothing of users.suspended_at), so a session
+ * minted before account closure (or via a residual device_code) — or an account
+ * suspended by a platform admin (modules/platform-users) — could still resolve.
+ * One extra indexed (primary-key) users lookup decides both, treating closed
+ * users as unauthenticated and suspended users as a distinct outcome.
+ */
+async function guardResolvedSession(
   authed: AuthenticatedRequestSession | null
-): Promise<AuthenticatedRequestSession | null> {
-  if (!authed) return null
-  const live = await isUserLive(authed.user.id)
-  return live ? authed : null
+): Promise<AuthenticatedSessionResolution> {
+  if (!authed) return { kind: "unauthenticated" }
+  const guard = await selectUserSessionGuardState(authed.user.id)
+  if (!guard || guard.deletedAt !== null) {
+    return { kind: "unauthenticated" }
+  }
+  if (guard.suspendedAt !== null) {
+    return { kind: "suspended" }
+  }
+  return { kind: "authenticated", session: authed }
+}
+
+function toAuthenticatedOrNull(
+  resolution: AuthenticatedSessionResolution
+): AuthenticatedRequestSession | null {
+  return resolution.kind === "authenticated" ? resolution.session : null
 }
 
 /**
  * Resolve a session from a set of (Node) request headers — the cookie-only
- * path. Used by the Fastify middleware (HTTP) and by the WebSocket/ASR layers
- * when the client relies on the signed session cookie carried on the upgrade
- * request (web / Expo web).
+ * path, with the full suspended/unauthenticated discrimination. Used by the
+ * Fastify auth middleware, which owns the wire-level error replies.
+ */
+export async function resolveSessionFromHeaders(
+  headers: NodeJS.Dict<string | string[]>
+): Promise<AuthenticatedSessionResolution> {
+  const result = await auth.api.getSession({
+    headers: fromNodeHeaders(headers),
+  })
+  return guardResolvedSession(toAuthenticated(result))
+}
+
+/**
+ * Cookie-path helper that collapses suspension to "not authenticated" (null).
+ * Used by the WebSocket/ASR layers when the client relies on the signed session
+ * cookie carried on the upgrade request (web / Expo web).
  */
 export async function authenticateSessionFromHeaders(
   headers: NodeJS.Dict<string | string[]>
 ): Promise<AuthenticatedRequestSession | null> {
-  const result = await auth.api.getSession({
-    headers: fromNodeHeaders(headers),
-  })
-  return rejectIfUserDeleted(toAuthenticated(result))
+  return toAuthenticatedOrNull(await resolveSessionFromHeaders(headers))
 }
 
 /**
  * Resolve a session from a raw bearer token — the token path. Used by native
  * mobile clients that carry the Better Auth session token in an app-level WS
  * auth frame (no cookie). Requires the `bearer()` plugin, which turns
- * `Authorization: Bearer <token>` into a session lookup.
+ * `Authorization: Bearer <token>` into a session lookup. Suspension collapses
+ * to null here as well (the WS layers have no structured error reply).
  */
 export async function authenticateSessionToken(
   token: string
@@ -160,14 +202,18 @@ export async function authenticateSessionToken(
   const result = await auth.api.getSession({
     headers: headers as unknown as Headers,
   })
-  return rejectIfUserDeleted(toAuthenticated(result))
+  return toAuthenticatedOrNull(
+    await guardResolvedSession(toAuthenticated(result))
+  )
 }
 
 /**
- * Resolve the session for an incoming Fastify request from its headers.
+ * Resolve the session for an incoming Fastify request from its headers,
+ * collapsing suspension to "not authenticated" (null). Non-middleware callers
+ * (log ingest fallback) keep the old shape.
  */
 export async function authenticateRequestSession(
   request: FastifyRequest
 ): Promise<AuthenticatedRequestSession | null> {
-  return authenticateSessionFromHeaders(request.headers)
+  return toAuthenticatedOrNull(await resolveSessionFromHeaders(request.headers))
 }

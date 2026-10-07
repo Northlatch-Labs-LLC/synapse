@@ -123,6 +123,9 @@ const SCOPE_TO_DOMAIN: Readonly<Record<string, DomainScope>> = {
     domain: "embedding",
     component: "openai-compatible",
   },
+  // Outbound platform email (Resend); was falling back to this exact pair via
+  // resolveScope() before being mapped explicitly.
+  email: { domain: "infra", component: "email" },
   events: { domain: "infra", component: "events" },
   execution: { domain: "execution" },
   "file-io": { domain: "files", component: "io" },

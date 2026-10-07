@@ -6,7 +6,7 @@
     "conversations": 1
   },
   "modules/auth/repo.ts": {
-    "users": 4
+    "users": 3
   },
   "modules/automation/repo.ts": {
     "automation_rules": 1,
@@ -44,6 +44,10 @@
   "modules/organization/repo.ts": {
     "catalog_items": 2,
     "publishers": 2
+  },
+  "modules/platform-users/repo.ts": {
+    "conversations": 1,
+    "users": 3
   },
   "modules/relationship/repo.ts": {
     "workspaces": 3

@@ -10,6 +10,7 @@ import { z } from "zod"
 import { auth } from "./better-auth.js"
 import { resolveOAuthErrorRedirect } from "./oauth-error-routing.js"
 import { getProfile, updateProfile, AuthError } from "./service.js"
+import { emailEnvFrom, isEmailConfigured } from "../email/index.js"
 import {
   AuthMeViewSchema,
   UpdateMeInputSchema,
@@ -78,6 +79,28 @@ export function isOAuthCallbackEarlyError(
 }
 
 /**
+ * Whether this request is the Better Auth password-reset-email request
+ * (POST /api/v1/auth/request-password-reset) on a deployment with NO outbound
+ * email configured (no RESEND_API_KEY).
+ *
+ * Intercepted BEFORE Better Auth (like the OAuth early-error path above)
+ * because the emailAndPassword.sendResetPassword hook deliberately never
+ * throws: on a not-configured send it can only log, after which Better Auth
+ * still answers the neutral anti-enumeration success and the user is stranded.
+ * Answering here — before the user lookup — keeps the response identical for
+ * existing AND unknown addresses, so the misconfiguration cannot become an
+ * account-enumeration oracle. Exported for wiring tests.
+ */
+export function isPasswordResetEmailUnavailable(
+  method: string,
+  pathname: string
+): boolean {
+  if (method.toUpperCase() !== "POST") return false
+  if (pathname !== "/api/v1/auth/request-password-reset") return false
+  return !isEmailConfigured(emailEnvFrom(process.env))
+}
+
+/**
  * Intercept OAuth callback EARLY errors (provider cancelled / no code) before
  * delegating to Better Auth, and route them to the right platform target (see
  * resolveOAuthErrorRedirect). Returns true if it handled the request.
@@ -134,6 +157,20 @@ async function handleWithBetterAuth(
   // Cross-platform OAuth early-error routing must run before Better Auth, which
   // would otherwise send every early error to the single global errorURL.
   if (await tryHandleOAuthCallbackError(request, reply, url)) return
+
+  // Password-reset early guard (see isPasswordResetEmailUnavailable): without
+  // outbound email the send hook could only log, Better Auth would still answer
+  // the neutral success, and the user would stare at a dead-end "check your
+  // inbox" screen. 503 with a distinct code the web reset page maps to an
+  // actionable message.
+  if (isPasswordResetEmailUnavailable(request.method, url.pathname)) {
+    reply.status(503).send({
+      error:
+        "Email delivery is not configured on this server, so a password reset link cannot be sent. Contact support if you need help signing in.",
+      code: "EMAIL_NOT_CONFIGURED",
+    })
+    return
+  }
 
   const method = request.method.toUpperCase()
   const hasBody = method !== "GET" && method !== "HEAD"

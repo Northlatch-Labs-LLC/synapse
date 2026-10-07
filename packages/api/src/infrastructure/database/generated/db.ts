@@ -2858,6 +2858,7 @@ export interface Users {
   id: Generated<string>;
   image: string | null;
   name: string;
+  suspendedAt: Date | null;
   updatedAt: Generated<Date>;
 }
 
@@ -2873,6 +2874,7 @@ export interface UsersLive {
   id: string | null;
   image: string | null;
   name: string | null;
+  suspendedAt: Date | null;
   updatedAt: Date | null;
 }
 

@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth"
+import { APIError } from "better-call"
 import { bearer, genericOAuth, phoneNumber } from "better-auth/plugins"
 import { deviceAuthorization } from "better-auth/plugins"
 import { randomBytes } from "node:crypto"
@@ -7,7 +8,18 @@ import { expo } from "@better-auth/expo"
 import { config } from "../../config/index.js"
 import { createBetterAuthDialect } from "../../infrastructure/database/kysely.js"
 import { createLogger } from "../../infrastructure/logger/index.js"
-import { backfillGeneratedUserAvatar, selectUserDeletedState } from "./repo.js"
+import {
+  backfillGeneratedUserAvatar,
+  selectUserSessionGuardState,
+} from "./repo.js"
+import {
+  buildPasswordResetEmail,
+  buildPasswordResetUrl,
+  buildWelcomeEmail,
+  emailEnvFrom,
+  PASSWORD_RESET_TOKEN_TTL_MINUTES,
+  sendPlatformEmail,
+} from "../email/index.js"
 import { AUTH_SESSION_MAX_AGE_SECONDS } from "@synapse/shared"
 import { disconnectSocketsForSession } from "../../infrastructure/websocket/auth-session-registry.js"
 import { deviceSessionCookie } from "./device-session-cookie.js"
@@ -361,6 +373,45 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
+    // Password reset via email. NOTE: requireEmailVerification stays OFF —
+    // enabling it would lock every existing unverified user out of their
+    // account (WhatsApp-OTP and Feishu users never verify an email at all).
+    // Keep the token TTL in sync with the expiry copy in the reset email
+    // (PASSWORD_RESET_TOKEN_TTL_MINUTES is Better Auth's 3600s default).
+    resetPasswordTokenExpiresIn: PASSWORD_RESET_TOKEN_TTL_MINUTES * 60,
+    // Delivers the reset email through the platform email module (Resend).
+    // The contract hands us a ready-made `url` (destructured out on purpose:
+    // it points at ${baseURL}/reset-password/<token>, an API route no web page
+    // serves) plus the raw token, which explicitly exists so the sender can
+    // build a URL for a custom route — here the web reset-password page.
+    // Email must NEVER break the auth flow: sendPlatformEmail already maps
+    // provider failures to results, and anything else is caught and logged.
+    sendResetPassword: async ({ user, token }) => {
+      try {
+        const url = buildPasswordResetUrl(config.auth.baseUrl, token)
+        const result = await sendPlatformEmail(emailEnvFrom(process.env), {
+          to: user.email,
+          ...buildPasswordResetEmail({
+            url,
+            name: user.name,
+            expiresInMinutes: PASSWORD_RESET_TOKEN_TTL_MINUTES,
+          }),
+        })
+        if (result.sent) {
+          log.info({ userId: user.id }, "Password reset email sent")
+        } else {
+          log.warn(
+            { userId: user.id, reason: result.reason },
+            "Password reset email not sent (non-fatal)"
+          )
+        }
+      } catch (error) {
+        log.error(
+          { err: error, userId: user.id },
+          "Failed to send password reset email (non-fatal)"
+        )
+      }
+    },
   },
 
   account: {
@@ -460,6 +511,50 @@ export const auth = betterAuth({
               "Failed to generate user avatar on create (non-fatal)"
             )
           }
+          // Welcome email. Same best-effort contract, and strictly weaker:
+          // signup must NEVER fail because of email. Skipped for the synthetic
+          // addresses some creation paths mint (@whatsapp.local from phone-OTP
+          // sign-up, @feishu.local from the Feishu email fallback) — those have
+          // no inbox and would only bounce.
+          //
+          // Deliberately NOT awaited: Better Auth 1.7.6 awaits after-commit
+          // hooks before responding, so an inline send would put Resend's
+          // latency (capped at RESEND_SEND_TIMEOUT_MS by the client, but still
+          // up to that) directly on every new sign-up. Detached fire-and-forget
+          // with the same internal catch keeps the non-fatal contract while the
+          // request returns immediately; the process is a long-running
+          // container, so a detached send still completes.
+          const welcomeEmail = String(user.email ?? "")
+          if (
+            !welcomeEmail.endsWith("@whatsapp.local") &&
+            !welcomeEmail.endsWith("@feishu.local")
+          ) {
+            void (async () => {
+              try {
+                const result = await sendPlatformEmail(
+                  emailEnvFrom(process.env),
+                  {
+                    to: welcomeEmail,
+                    ...buildWelcomeEmail({
+                      email: welcomeEmail,
+                      name: user.name,
+                    }),
+                  }
+                )
+                if (!result.sent) {
+                  log.warn(
+                    { userId: user.id, reason: result.reason },
+                    "Welcome email not sent (non-fatal)"
+                  )
+                }
+              } catch (error) {
+                log.error(
+                  { err: error, userId: user.id },
+                  "Failed to send welcome email (non-fatal)"
+                )
+              }
+            })()
+          }
         },
       },
     },
@@ -478,9 +573,26 @@ export const auth = betterAuth({
           // exist, the downstream FK / adapter write will fail anyway.
           const userId = session.userId as string | undefined
           if (!userId) return undefined
-          const userRow = await selectUserDeletedState(userId)
-          if (userRow && userRow.deletedAt !== null) {
-            throw new Error("Cannot create a session for a deleted user")
+          const userRow = await selectUserSessionGuardState(userId)
+          if (userRow) {
+            if (userRow.deletedAt !== null) {
+              throw new Error("Cannot create a session for a deleted user")
+            }
+            // Platform-admin suspension (modules/platform-users): block minting
+            // NEW sessions on any sign-in path, so a suspended account cannot
+            // re-enter between the session revocation and the next request.
+            // Thrown as a better-call APIError (the device-session-cookie hook
+            // precedent) so the sign-in response is 403 with the SAME code the
+            // session middleware uses for already-sessioned requests
+            // (infrastructure/middleware/auth.ts) — a plain Error here maps to
+            // a 500, which the login forms would show as a generic retry.
+            if (userRow.suspendedAt !== null) {
+              throw new APIError("FORBIDDEN", {
+                message:
+                  "This account has been suspended by a platform administrator. Contact support if you believe this is a mistake.",
+                code: "account_suspended",
+              })
+            }
           }
           return undefined
         },

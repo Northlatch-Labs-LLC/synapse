@@ -167,7 +167,15 @@ export function LoginForm() {
                   />
                 </Field>
                 <Field data-invalid={Boolean(errors.password) || undefined}>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <div className="flex items-center justify-between">
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <Link
+                      href="/auth/reset-password"
+                      className="text-sm underline-offset-2 hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <Controller
                     control={control}
                     name="password"

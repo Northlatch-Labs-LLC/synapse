@@ -1,24 +1,41 @@
 import type { FastifyReply, FastifyRequest } from "fastify"
-import { authenticateRequestSession } from "../../modules/auth/service.js"
+import { resolveSessionFromHeaders } from "../../modules/auth/service.js"
+import type { AuthenticatedRequestSession } from "../../modules/auth/service.js"
 
-async function attachAuthenticatedRequest(request: FastifyRequest) {
-  const authenticated = await authenticateRequestSession(request)
-  if (!authenticated) return null
+async function attachAuthenticatedRequest(
+  request: FastifyRequest,
+  authenticated: AuthenticatedRequestSession
+) {
   ;(request as any).user = {
     userId: authenticated.user.id,
     email: authenticated.user.email,
   }
   ;(request as any).authSession = authenticated.session
-
-  return authenticated
 }
 
 export async function authMiddleware(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  const authenticated = await attachAuthenticatedRequest(request)
-  if (authenticated) return
+  // Full three-way resolution: authenticated / unauthenticated / suspended.
+  // The suspension verdict costs one extra indexed (primary-key) users lookup,
+  // shared with the long-standing soft-delete session guard.
+  const resolution = await resolveSessionFromHeaders(request.headers)
+  if (resolution.kind === "authenticated") {
+    await attachAuthenticatedRequest(request, resolution.session)
+    return
+  }
+
+  // Platform-admin account suspension (modules/platform-users): the session
+  // itself is valid, but the account is barred. A distinct 403 + code so
+  // clients can show the right message instead of a re-login loop.
+  if (resolution.kind === "suspended") {
+    return reply.status(403).send({
+      error:
+        "This account has been suspended by a platform administrator. Contact support if you believe this is a mistake.",
+      code: "account_suspended",
+    })
+  }
 
   // Note: we no longer clear a cookie by name here. Better Auth's session
   // cookie carries an environment-dependent `__Secure-` prefix in production,
@@ -31,7 +48,13 @@ export async function authMiddleware(
 }
 
 export async function optionalAuth(request: FastifyRequest) {
-  await attachAuthenticatedRequest(request)
+  // Optional gate: an unauthenticated OR suspended caller simply stays
+  // anonymous (suspension collapses to "not authenticated" here — the routes
+  // behind this hook are public previews, not member surfaces).
+  const resolution = await resolveSessionFromHeaders(request.headers)
+  if (resolution.kind === "authenticated") {
+    await attachAuthenticatedRequest(request, resolution.session)
+  }
 }
 
 export function getUserId(request: FastifyRequest): string {

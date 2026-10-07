@@ -20,6 +20,20 @@ export const PLATFORM_ACCESS_SOURCES = [
   PLATFORM_ACCESS_SOURCE.CONFIG,
   PLATFORM_ACCESS_SOURCE.MANUAL,
 ] as const
+// Platform user-management list filter: "active" = live account (not
+// soft-deleted), "closed" = soft-deleted account, "all" = both.
+export const PLATFORM_USER_STATUS_FILTER = {
+  ACTIVE: "active",
+  CLOSED: "closed",
+  ALL: "all",
+} as const
+export const PLATFORM_USER_STATUS_FILTERS = [
+  PLATFORM_USER_STATUS_FILTER.ACTIVE,
+  PLATFORM_USER_STATUS_FILTER.CLOSED,
+  PLATFORM_USER_STATUS_FILTER.ALL,
+] as const
+export type PlatformUserStatusFilter =
+  (typeof PLATFORM_USER_STATUS_FILTERS)[number]
 
 export const WORKSPACE_ACCESS_KEYS = [
   "model_admin",

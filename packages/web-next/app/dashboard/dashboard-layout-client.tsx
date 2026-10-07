@@ -22,6 +22,7 @@ import {
   Cpu,
   ScrollText,
   SquareTerminal,
+  Users,
 } from "lucide-react"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/settings/models", label: "Model Groups", icon: Cpu },
   { href: "/settings/models/actors", label: "Actor Assignment", icon: Bot },
   { href: "/dashboard/access", label: "Access", icon: ShieldCheck },
+  { href: "/dashboard/users", label: "Users", icon: Users },
   { href: "/dashboard/settings/billing", label: "Billing", icon: CreditCard },
 ]
 

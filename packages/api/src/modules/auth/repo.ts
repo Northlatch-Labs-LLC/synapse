@@ -62,15 +62,26 @@ export async function updateUserProfileRow(
   return (row as UserRow | undefined) ?? null
 }
 
-/** True iff the user exists and is not soft-deleted (design §8.4 session guard). */
-export async function isUserLive(userId: string): Promise<boolean> {
-  const live = await db
+/**
+ * Session-guard state for one user, in a SINGLE indexed (primary-key) lookup:
+ * the soft-delete tombstone AND the platform-admin suspension marker
+ * (users.suspended_at, packages/api/src/modules/platform-users). NULL deletedAt
+ * + NULL suspendedAt = fully live. A missing row returns undefined ("no such
+ * user") and is NOT the same as "exists but closed".
+ */
+export type UserSessionGuardState = {
+  deletedAt: Date | null
+  suspendedAt: Date | null
+}
+
+export async function selectUserSessionGuardState(
+  userId: string
+): Promise<UserSessionGuardState | undefined> {
+  return db
     .selectFrom("users")
-    .select("id")
+    .select(["deletedAt", "suspendedAt"])
     .where("id", "=", userId)
-    .where("deletedAt", "is", null)
     .executeTakeFirst()
-  return Boolean(live)
 }
 
 /** Delete the OAuth `verification` row for a state (early-error cleanup). */
@@ -162,15 +173,4 @@ export async function backfillGeneratedUserAvatar(user: {
     .set({ avatarFileId: avatar.fileId })
     .where("id", "=", user.id)
     .execute()
-}
-
-/** Whether a user is soft-deleted (for the BA session.create.before guard). */
-export async function selectUserDeletedState(
-  userId: string
-): Promise<{ id: string; deletedAt: Date | null } | undefined> {
-  return db
-    .selectFrom("users")
-    .select(["id", "deletedAt"])
-    .where("id", "=", userId)
-    .executeTakeFirst()
 }

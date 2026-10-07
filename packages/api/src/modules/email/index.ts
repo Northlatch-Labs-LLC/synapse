@@ -12,3 +12,12 @@ export {
   type PlatformEmailInput,
   type SendEmailResult,
 } from "./service.js"
+export {
+  buildPasswordResetEmail,
+  buildPasswordResetUrl,
+  buildWelcomeEmail,
+  PASSWORD_RESET_PATH,
+  PASSWORD_RESET_TOKEN_TTL_MINUTES,
+  type PasswordResetEmailInput,
+  type WelcomeEmailInput,
+} from "./content.js"

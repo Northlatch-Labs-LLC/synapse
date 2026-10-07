@@ -139,3 +139,39 @@ test("sendPlatformEmail falls back to the default from-address", async () => {
     restore()
   }
 })
+
+test("sendPlatformEmail bounds the Resend call with an abort signal", async () => {
+  // Better Auth awaits the email hooks inline in sign-up / password-reset, so
+  // the outbound call must carry a timeout signal instead of relying on
+  // undici's ~5-minute default headers timeout.
+  const { calls, restore } = stubFetch(200, '{"id":"x"}')
+  try {
+    await sendPlatformEmail(
+      { resendApiKey: "re_test_key" },
+      { to: "ops@northlatch.dev", subject: "Test", html: "<p></p>" }
+    )
+    assert.ok(calls.length === 1)
+    assert.ok(calls[0].init.signal instanceof AbortSignal)
+  } finally {
+    restore()
+  }
+})
+
+test("resendSendEmail honours a custom timeout override", async () => {
+  const { calls, restore } = stubFetch(200, '{"id":"x"}')
+  try {
+    await resendSendEmail(
+      "re_test_key",
+      {
+        from: DEFAULT_FROM_ADDRESS,
+        to: "ops@northlatch.dev",
+        subject: "T",
+        html: "<p></p>",
+      },
+      { timeoutMs: 1234 }
+    )
+    assert.ok(calls[0].init.signal instanceof AbortSignal)
+  } finally {
+    restore()
+  }
+})

@@ -25,9 +25,23 @@ export interface ResendEmailPayload {
   replyTo?: string | string[]
 }
 
+/**
+ * Cap on a single Resend HTTP send. Better Auth awaits the email hooks inline
+ * in the request path (sign-up welcome, password reset), so a hung connection
+ * would otherwise stall those requests for up to undici's ~5-minute default
+ * headers timeout. On expiry the fetch rejects and sendPlatformEmail maps it
+ * to `{ sent: false, reason: "send_failed" }`.
+ */
+export const RESEND_SEND_TIMEOUT_MS = 10_000
+
+export interface ResendSendOptions {
+  timeoutMs?: number
+}
+
 export async function resendSendEmail(
   apiKey: string,
-  payload: ResendEmailPayload
+  payload: ResendEmailPayload,
+  options: ResendSendOptions = {}
 ): Promise<{ id: string }> {
   const response = await fetch(`${RESEND_API_BASE}/emails`, {
     method: "POST",
@@ -36,6 +50,8 @@ export async function resendSendEmail(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
+    // Dependency-free (AbortSignal.timeout is Node >= 17.3 builtin).
+    signal: AbortSignal.timeout(options.timeoutMs ?? RESEND_SEND_TIMEOUT_MS),
   })
   const text = await response.text()
   // External provider boundary: the body should be a Resend REST API

@@ -67,6 +67,7 @@ import runtimeAuthorizationsModule from "./modules/runtime-authorizations/index.
 import auditExportModule from "./modules/audit-export/index.js"
 import modelGroupsModule from "./modules/model-groups/index.js"
 import platformModule from "./modules/platform/index.js"
+import platformUsersModule from "./modules/platform-users/index.js"
 import imModule from "./modules/im/index.js"
 import installerModule from "./modules/installer/index.js"
 import logsModule from "./modules/logs/index.js"
@@ -325,6 +326,7 @@ async function main() {
   await app.register(logsModule)
   await app.register(reportsModule)
   await app.register(platformModule)
+  await app.register(platformUsersModule)
   await app.register(imModule)
   await app.register(installerModule)
 
