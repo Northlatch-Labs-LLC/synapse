@@ -69,6 +69,9 @@ openai_compatible`, base `https://api.z.ai/api/coding/paas/v4` (coding-plan key 
     monitoring + forensics (§1), nightly backups + drill, readmes de-upstreamed (Northlatch
     banner, live link, 0 zai-org refs), GitHub description/homepage updated, main-only trunk,
     zero open PRs.
+12. **In-app email + Registered Users layer.** In-app email (password reset + welcome) and the
+    Registered Users layer (directory, suspend, sign-out-everywhere) — built, reviewed, and
+    deployed live 2026-10-06 (commit 7ec0fc0).
 
 ## 3. How to deploy (the rule — deviations have caused every "it's not there" incident)
 
