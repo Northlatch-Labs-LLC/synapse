@@ -105,6 +105,8 @@ const classifiedJsonParseFiles = {
       "Weixin outbound HTTP responses are provider payloads.",
     "packages/api/src/modules/billing/stripe-client.ts":
       "Stripe REST API responses are third-party provider payloads.",
+    "packages/api/src/modules/email/resend-client.ts":
+      "Resend REST API responses are third-party provider payloads.",
     "packages/api/src/modules/im/connectors/weixin/qr-login-codec.ts":
       "Weixin QR login HTTP responses are provider payloads.",
     "packages/api/src/modules/im/connectors/weixin/client.ts":
