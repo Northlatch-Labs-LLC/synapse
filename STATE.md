@@ -145,8 +145,11 @@ verify PUBLIC (curl health + playwright screenshot of the real page)
    add) lock the workspace row FOR UPDATE and enforce the plan cap in-transaction (free=3,
    pro=10, team=purchased seat_quantity → 402 `plan_limit_reached`); 14 unit tests pass;
    deploy followed the full rule (artifact grep, push, VM pull+up+prune, public health green).
-   Pre-existing suite note: 8 api tests fail on the pristine tree too (5 need outbound
-   network, 3 IM transport-schema tests date from the west-first enum narrowing) — not ours.
+   Pre-existing suite note CORRECTED 2026-10-06: the api suite is GREEN (3169/3169) in its
+   correct environment — Node 22 (Node 26 breaks 5 storage/undici mock tests), built workspace
+   dist (`npm run build -w packages/device-protocol -w packages/shared -w packages/device-runtime`),
+   and a local redis (`docker compose up -d redis`; tests take REDIS_URL from .env). The earlier
+   "8 fail" diagnosis was stale dist + missing local infra, not test rot.
 5. **`main` has no branch protection.** Main-only trunk by founder choice; flagged, unprotected.
 6. **Frontend spec phases 2–3 not approved/started:** type-scale tokens, login state-matrix
    polish, pricing FAQ/table, `?next=` on signup. Phase 0 (shipped, see §2.8) was approved by
