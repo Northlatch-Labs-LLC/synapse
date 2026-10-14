@@ -63,13 +63,19 @@ openai_compatible`, base `https://api.z.ai/api/coding/paas/v4` (coding-plan key 
 9. **UX fixes shipped:** home-composer first-message handoff via sessionStorage (the typed
    first message no longer dies on navigation); hero headline cannot clip (`width: max-content`);
    second hero CTA solid secondary; error notice English (`出错了` removed).
-10. **Platform admin fixes:** super_admin/model_admin can edit seeded platform model groups;
+10. **www.synappse.work now 301s to the apex (2026-10-06).** The apex Traefik rule had
+    served www as a full site copy since the 2026-09-30 cutover, but AUTH_TRUSTED_ORIGINS
+    trusts the apex only — every sign-in from www died with 403 INVALID_ORIGIN (founder
+    hit it 2026-10-06; zero sign-ins ever reached the api from www). Edge fix in
+    synappse-apex.yml (www routers + redirectregex middleware, backup .bak-20261006);
+    no app deploy. Verified: www 301→apex, apex 200, health 200, old-domain 301 intact.
+11. **Platform admin fixes:** super_admin/model_admin can edit seeded platform model groups;
     prod seed guarded (full `db:seed` must NEVER run on prod — it would open a demo super_admin).
-11. **Ops & repo hygiene:** deploy overlay versioned in-repo (`infrastructure/gridframes/`),
+12. **Ops & repo hygiene:** deploy overlay versioned in-repo (`infrastructure/gridframes/`),
     monitoring + forensics (§1), nightly backups + drill, readmes de-upstreamed (Northlatch
     banner, live link, 0 zai-org refs), GitHub description/homepage updated, main-only trunk,
     zero open PRs.
-12. **In-app email + Registered Users layer.** In-app email (password reset + welcome) and the
+13. **In-app email + Registered Users layer.** In-app email (password reset + welcome) and the
     Registered Users layer (directory, suspend, sign-out-everywhere) — built, reviewed, and
     deployed live 2026-10-06 (commit 7ec0fc0).
 
